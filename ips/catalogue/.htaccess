@@ -1,0 +1,4 @@
+Options FollowSymLinks
+RewriteEngine ON
+RewriteCond %{HTTP_COOKIE} !vesturheimsrit=194989088 [NC]
+RewriteRule /*  /home/ryanericjohns/vesturheimsrit.com/ips/login.php

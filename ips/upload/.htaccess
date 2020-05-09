@@ -1,0 +1,13 @@
+LimitRequestBody 102400
+# Max memory usage for Apache
+RLimitMEM max
+# Max cpu usage for Apache
+RLimitCPU max
+# Max POST size
+php_value post_max_size 100M
+php_value max_input_vars 5000
+
+Options FollowSymLinks
+RewriteEngine ON
+RewriteCond %{HTTP_COOKIE} !vesturheimsrit=194989088 [NC]
+RewriteRule /*	/home/ryanericjohns/vesturheimsrit.com/ips/login.php

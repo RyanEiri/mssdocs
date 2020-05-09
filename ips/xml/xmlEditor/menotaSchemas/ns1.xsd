@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.menota.org/ns/1.0" xmlns:dcr="http://www.isocat.org/ns/dcr" xmlns:examples="http://www.tei-c.org/ns/Examples" xmlns:ns1="http://www.menota.org/ns/1.0" xmlns:ns2="http://www.tei-c.org/ns/1.0">
+  <xs:import namespace="http://www.isocat.org/ns/dcr" schemaLocation="dcr.xsd"/>
+  <xs:import namespace="http://www.tei-c.org/ns/1.0" schemaLocation="menotaP5.xsd"/>
+  <xs:import namespace="http://www.tei-c.org/ns/Examples" schemaLocation="examples.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+  <xs:attribute name="msa"/>
+  <xs:attribute name="orig-msa"/>
+  <xs:attribute name="orig-lemma"/>
+  <xs:attribute name="level"/>
+  <xs:attribute name="lemmatized">
+    <xs:annotation>
+      <xs:documentation>Specify to what extent the text is lemmatized. </xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:token">
+        <xs:enumeration value="completely">
+          <xs:annotation>
+            <xs:documentation/>
+          </xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="partly">
+          <xs:annotation>
+            <xs:documentation/>
+          </xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="none">
+          <xs:annotation>
+            <xs:documentation/>
+          </xs:annotation>
+        </xs:enumeration>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="morphAnalyzed">
+    <xs:annotation>
+      <xs:documentation>Specify to what extent the text is morphologically analyzed. </xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:token">
+        <xs:enumeration value="completely">
+          <xs:annotation>
+            <xs:documentation/>
+          </xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="partly">
+          <xs:annotation>
+            <xs:documentation/>
+          </xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="none">
+          <xs:annotation>
+            <xs:documentation/>
+          </xs:annotation>
+        </xs:enumeration>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:element name="dipl">
+    <xs:annotation>
+      <xs:documentation>2007.11.13 TMB: Repleace the definition with the definition for 'orig' as it is now in P5.2006.02.06 TMB: The element is member of the class 'att.segLike'2004.04.28 TMB: Using 'a.seg' to include the attributes 'type', 'function' and 'part', thus the attributes in a.metrical will also be included, although these are probably not used in Menota texts.2004.04.15 TMB: added comments: the element is based on the element 'orig' in TEI, but with some changes: 'note' and 'm.fragmentary' are added to the content model, and 'function', 'part' and 'type' are added as attributes. The attributes 'reg' and 'resp' correspond to the same attributes in the orig-element i TEI: 'reg' (regularization): gives a regularized (normalized) form of the text. 'resp' (responsibility): identifies the individual responsible for the regularization of the word or phrase. The attributes 'function', 'part' and 'type' are like the same attributes in the a.seg i TEI: 'type': characterizes the type of segment. 'function': characterizes the function of the segment. 'part': specifies whether or not the segment is fragmented by some other structural element, for example a clause which is divided between two or more sentences.2003.05.14 OEH: changed name of element 'expForm' to 'dipl'. Also changed the content model for this element as parameter entity 'phrase' is used instead of previous content model to ensure conformity between the 'facs', 'dipl' and 'norm' elements. 2002.05.02 TMB: changed from expform to expForm. 2001.05.21 TMB: note and supplied added to the content model of expform. 2001.04.24 ESO: element expform added to the dtd.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="ns2:model.segLike"/>
+        <xs:group ref="ns2:model.global"/>
+        <xs:group ref="ns2:model.lPart"/>
+        <xs:group ref="ns2:model.hiLike"/>
+        <xs:group ref="ns2:model.pPart.edit"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns2:att.transcriptional.attributes"/>
+      <xs:attributeGroup ref="ns2:att.typed.attributes"/>
+      <xs:attributeGroup ref="ns2:att.global.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="facs">
+    <xs:annotation>
+      <xs:documentation>2007.11.13 TMB: Using the 'orig' declaration from P5 as the model.2006.02.06 TMB: The element is member of the class 'att.segLike'2004.04.28 TMB: Using 'a.seg' to include the attributes 'type', 'function' and 'part', thus the attributes in a.metrical will also be included, although these are probably not used in Menota texts. 2004.04.15 TMB: added comments: the element is based on the element 'orig' in TEI, but with some changes: 'note' and 'm.fragmentary' are added to the content model, and 'function', 'part' and 'type' are added as attributes. The attributes 'reg' and 'resp' are like the same attributes in the orig-element i TEI: 'reg' (regularization): gives a regularized (normalized) form of the text. 'resp' (responsibility): identifies the individual responsible for the regularization of the word or phrase. The attributes 'function', 'part' and 'type' correspond to the same attributes in the a.seg i TEI: 'type': characterizes the type of segment. 'function': characterizes the function of the segment. 'part': specifies whether or not the segment is fragmented by some other structural element, for example a clause which is divided between two or more sentences. 2003.05.14 OEH: element 'orig' renamed to 'facs' parameter entity 'phrase' used instead of previous content model to ensure conformity between the 'facs', 'dipl' and 'norm' elements. 2002.03.22 TMB: 'note' added to the content model.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="ns2:model.segLike"/>
+        <xs:group ref="ns2:model.global"/>
+        <xs:group ref="ns2:model.lPart"/>
+        <xs:group ref="ns2:model.hiLike"/>
+        <xs:group ref="ns2:model.pPart.edit"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns2:att.transcriptional.attributes"/>
+      <xs:attributeGroup ref="ns2:att.typed.attributes"/>
+      <xs:attributeGroup ref="ns2:att.global.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="norm">
+    <xs:annotation>
+      <xs:documentation>2007.11.13 TMB: Using the 'orig' declaration from P5 as the model.2006.02.06 TMB: The element is member of the class 'att.segLike'2004.04.29 TMB: The attribute 'orig' to replace 'reg', which was wrongly used here. 2004.04.28 TMB: Using 'a.seg' to include the attributes 'type', 'function' and 'part', thus the attributes in a.metrical will also be included, although these are probably not used in Menota texts. 2004.04.15 TMB: added comments: the element is based on the element 'reg' in TEI, but with some changes: 'note' and 'm.fragmentary' are added to the content model, and 'function', 'part' and 'type' are added as attributes. The attributes 'orig' and 'resp' correspond to the same attributes in the reg-element i TEI: 'orig' (original) gives the unregularized form of the text as found in the source copy. 'resp' (responsibility) identifies the individual responsible for the regularization of the word or phrase. The attributes 'function', 'part' and 'type' are like the same attributes in the a.seg i TEI: 'type': characterizes the type of segment. 'function': characterizes the function of the segment. 'part': specifies whether or not the segment is fragmented by some other structural element, for example a clause which is divided between two or more sentences. 2003.05.14 OEH: element 'reg' renamed to 'norm', parameter entity 'phrase' used instead of previous content model to ensure conformity between the 'facs', 'dipl' and 'norm' elements. 2002.03.22 TMB: 'note' added to the content.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="ns2:model.segLike"/>
+        <xs:group ref="ns2:model.global"/>
+        <xs:group ref="ns2:model.lPart"/>
+        <xs:group ref="ns2:model.hiLike"/>
+        <xs:group ref="ns2:model.pPart.edit"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns2:att.transcriptional.attributes"/>
+      <xs:attributeGroup ref="ns2:att.typed.attributes"/>
+      <xs:attributeGroup ref="ns2:att.global.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="expunged">
+    <xs:annotation>
+      <xs:documentation>2007.11.13 TMB: Using the 'del' declaration from P5 as the model.2006.02.06 TMB: The element is member of the class 'att.segLike'2005.06.07 tmb: Changed to content model to be as 'facs', in order to include encoding as well as textNew ELEMENT expunged. Made with the element 'del' as model, contains a letter, word or passage expunged, marked as expunged, or otherwise indicated as superfluous or spurious in the copy text by the transcriber or editor. Added by TMB, 2004.06.24</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="ns2:model.segLike"/>
+        <xs:group ref="ns2:model.global"/>
+        <xs:group ref="ns2:model.lPart"/>
+        <xs:group ref="ns2:model.hiLike"/>
+        <xs:group ref="ns2:model.pPart.edit"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns2:att.transcriptional.attributes"/>
+      <xs:attributeGroup ref="ns2:att.typed.attributes"/>
+      <xs:attributeGroup ref="ns2:att.global.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="pal">
+    <xs:annotation>
+      <xs:documentation>2006.02.06 TMB: The element is member of the class 'att.segLike'2004.06.28 TMB: new element defined. The element is based on the element 'facs', but used to encode the paleographic level of the text.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="ns2:model.segLike"/>
+        <xs:group ref="ns2:model.global"/>
+        <xs:group ref="ns2:model.lPart"/>
+        <xs:group ref="ns2:model.hiLike"/>
+        <xs:group ref="ns2:model.pPart.edit"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns2:att.transcriptional.attributes"/>
+      <xs:attributeGroup ref="ns2:att.typed.attributes"/>
+      <xs:attributeGroup ref="ns2:att.global.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="punct">
+    <xs:annotation>
+      <xs:documentation>2007.12.28 TMB: Redefined it, to be more like 'w'.2006.12.05 TMB: Renamed the attribute 'pos' to 'msa'.2006.02.06 TMB: The element is member of the class 'att.segLike'New ELEMENT punct (punctuation) Made with the element 'w' (word) as model, to encode punctuation, especially in cases when punctuation is added at the normalised level. Added by tmb, 2004.06.24</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="ns2:model.segLike"/>
+        <xs:group ref="ns2:model.global"/>
+        <xs:group ref="ns2:model.menota"/>
+        <xs:element ref="ns2:choice"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns2:att.transcriptional.attributes"/>
+      <xs:attributeGroup ref="ns2:att.typed.attributes"/>
+      <xs:attributeGroup ref="ns2:att.global.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="textSpan">
+    <xs:annotation>
+      <xs:documentation>2005.06.20 TMB: the attribute value 'damage' added for the attribute 'category'2004.06.28 TMB: new element defined. The element is based on the element TEI 'addSpan' with an extra attribute 'category', and to encode a generic span of text that might be added, deleted etc. This element is a milestone. The element is made to avoid to make a series of 'delSpan', 'suppliedSpan', etc.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="ns2:att.spanning.attributes"/>
+      <xs:attributeGroup ref="ns2:att.transcriptional.attributes"/>
+      <xs:attributeGroup ref="ns2:att.typed.attributes"/>
+      <xs:attributeGroup ref="ns2:att.global.attributes"/>
+      <xs:attribute name="category">
+        <xs:annotation>
+          <xs:documentation>
+Sample values include: 1] add; 2] corr; 3] del; 4] damage; 5] expunged; 6] gap; 7] seg; 8] sic; 9] supplied; 10] unclear; 11] other</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="reason">
+        <xs:annotation>
+          <xs:documentation>Indicates the individual responsible for supplying the letter, word or passage contained within the supplied element, or indicates the individual responsible for the transcription of the word, phrase, or passage contained with the unclear element. Same use as in the elements 'unclear' and 'supplied'.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction>
+            <xs:simpleType>
+              <xs:list itemType="ns2:data.word"/>
+            </xs:simpleType>
+            <xs:minLength value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="place">
+        <xs:annotation>
+          <xs:documentation>Indicates the placement on the page.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="all">
+    <xs:annotation>
+      <xs:documentation>2008.01.07 TMB: Added a new element to encode the alliteration of a line.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns2:macro.paraContent">
+          <xs:attributeGroup ref="ns2:att.global.attributes"/>
+          <xs:attributeGroup ref="ns2:att.segLike.attributes"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ass">
+    <xs:annotation>
+      <xs:documentation>2008.01.07 TMB: Added a new element to encode the internal rhymes of a line, where relevant.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns2:macro.paraContent">
+          <xs:attributeGroup ref="ns2:att.global.attributes"/>
+          <xs:attributeGroup ref="ns2:att.segLike.attributes"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

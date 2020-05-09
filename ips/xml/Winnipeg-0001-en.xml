@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+    <teiHeader type="text">
+        <fileDesc>
+            <titleStmt>
+                <title>Winnipeg 1</title>
+            </titleStmt>
+            <publicationStmt>
+                <p>Draft version.</p>
+                <!-- To do: add Víglundur Andrésson (dagsetningar vitlausar í Íslendingabók)
+                
+                <person sex="1" xml:id="VigAnd001">
+                <persName>
+                <forename sort="1">Víglundur</forename>
+                <surname sort="2">Andrésson</surname>
+                <surname sort="3">Davíðsson</surname>
+                </persName>
+                <birth when="1884-11-10" xml:lang="en">10 November 1884</birth>
+                <death when="1938-10-21" xml:lang="en">21 October 1938</death>
+                <residence>
+                <placeName>
+                <settlement type="city">Reykjavík</settlement>
+                <region type="compass">Southern</region>
+                <country key="IS" xml:lang="en">Iceland</country>
+                </placeName>
+                <placeName>
+                <settlement type="farm">Gunnólfsstaðir</settlement>
+                <region type="county">Norður-Múlasýsla</region>
+                <region type="compass">Eastern</region>
+                <country key="IS" xml:lang="en">Iceland</country>
+                </placeName>
+                <placeName>
+                <settlement type="city">Winnipeg</settlement>
+                <region type="province">Manitoba</region>
+                <country key="CA" xml:lang="en">Canada</country>
+                </placeName>
+                </residence>
+                <occupation xml:lang="en">Property developer, realtor</occupation>
+                </person>
+                
+                <person sex="1" role="owner" xml:id="AleTho001">
+                <persName xml:lang="en">
+                <forename sort="1">Aleck</forename>
+                <forename sort="3">Sigursteinn</forename>
+                <surname sort="2">Thorarinson</surname>
+                </persName>
+                <birth when="1921-02-21">21 February 1921</birth>
+                <death when="1998-09-10">10 September 1998</death>
+                <residence>
+                <placeName>
+                <settlement type="city">Winnipeg</settlement>
+                <region type="province">Manitoba</region>
+                <country key="CA" xml:lang="en">Canada</country>
+                </placeName>
+                </residence>
+                <occupation xml:lang="en">Solicitor and attorney-at-law</occupation>
+                </person>
+                -->
+            </publicationStmt>
+            <sourceDesc>
+                <msDesc xml:id="Winnipeg-0001-en" xml:lang="en">
+                    <msIdentifier>
+                        <country key="CA">Canada</country>
+                        <settlement>Winnipeg, Manitoba</settlement>
+                        <repository>Privately owned</repository>
+                        <idno>Winnipeg 1</idno>
+                    </msIdentifier>
+                    <msContents>
+                        <summary>Sketchbook of Víglundur Andrésson</summary>
+                        <textLang mainLang="is">Icelandic</textLang>
+                        <msItem n="1" class="myndl">
+                            <locus from="1r" to="16v">1r-16v</locus>
+                            <title type="supplied">Sketches of people, animals, ships and Reykjavík buildings</title>
+                            <colophon>Teiknibók Víglundur Andrésson Reykjavík Ísland árið 1897</colophon>
+                        </msItem>
+                    </msContents>
+                    <physDesc>
+                        <objectDesc form="codex">
+                            <supportDesc material="chart">
+                                <support>
+                                    <num type="book-block" value="16">12</num>
+                                    <watermark ana="no"/>
+                                    <dimensions type="leaf">
+                                        <height unit="mm" atLeast="182" atMost="187">182-187</height>
+                                        <width unit="mm" atLeast="120" atMost="122">120-122</width>
+                                    </dimensions>
+                                </support>
+                                <foliation ana="contemporary pag"/>
+                            </supportDesc>
+                        </objectDesc>
+                        <handDesc hands="1">
+                            <p>Drawings and text by Víglundur Andrésson.</p>
+                        </handDesc>
+                        <decoDesc ana="high">
+                            <decoNote type="illustration">
+                                <p>Coloured pencil drawings of ships, buildings, people (including soldiers), animals, birds and flowers.</p>
+                            </decoNote>
+                        </decoDesc>
+                        <additions ana="low">
+                            <p>The owner's name, Víglundur, is written on several pages.</p>
+                        </additions>
+                        <bindingDesc>
+                            <binding ana="moderate" contemporary="true">
+                                <p>The sketchbook was printed in Copenhagen by H. C. Roms Forlagsforretning and is decorated with prints on the front and back covers ("En Landsby-Musikant" and "Bambusskov").</p>
+                            </binding>
+                        </bindingDesc>
+                        <accMat>
+                            <list>
+                                <item n="1">Hand-drawn sign advertising <persName key="#AndDav001">Andrés Davíðsson</persName>'s apothecary in <placeName key="#Reykj01">Reykjavík</placeName>: "Homøopatiskt Apothek. Andrés Davíðsson. 1887."</item>
+                                <item n="2">Piece of lined paper with pencil drawing of a person smoking and the name Lárus written several times. On the back is a drawing of a soldier on horseback and a bird.</item>
+                            </list>
+                        </accMat>
+                    </physDesc>
+                    <history>
+                        <origin>
+                            <origDate when="1897" evidence="internal" cert="high">1897</origDate>
+                            <origPlace key="#Reykj01" evidence="internal" cert="high">Reykjavík</origPlace>
+                        </origin>
+                        <provenance>Owner emigrated to Canada in <date when="1903">1903</date> from <placeName key="#NorMúl01">Norður-Múlasýsla</placeName>. Víglundur's nephew, Aleck Sigursteinn Thorarinson, inherited the manuscript.</provenance>
+                    </history>
+                    <additional>
+                        <adminInfo>
+                            <custodialHist>
+                                <p>Owned by Ainsley Alexis Thorarinson Scowen Bloomer and family.</p>
+                            </custodialHist>
+                        </adminInfo>
+                    </additional>
+                </msDesc>
+            </sourceDesc>
+        </fileDesc>
+        <revisionDesc>
+            <change when="2015-03-30" who="#KMP">Created entry based on examination of original manuscript.</change>
+        </revisionDesc>
+    </teiHeader>
+    <text>
+        <body>
+            <p/>
+        </body>
+    </text>
+</TEI>

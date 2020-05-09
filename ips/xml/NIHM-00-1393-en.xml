@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title type="main">NIHM 002000-1393</title>
+            </titleStmt>
+            <publicationStmt>
+                <p>Not ready for publication</p>
+                <!-- to do: add NIHM, personal names: B.B. Ágústsson; check objectDesc form="letter" -->
+            </publicationStmt>
+            <sourceDesc>
+                <msDesc xml:id="NIHM-00-1393-en" xml:lang="en">
+                    <msIdentifier>
+                        <country key="CA">Canada</country>
+                        <settlement>Gimli</settlement>
+                        <repository>New Iceland Heritage Museum</repository>
+                        <idno>NIHM 002000-1393</idno>
+                    </msIdentifier>
+                    <msContents>
+                        <summary>
+                            <title/>
+                        </summary>
+                        <textLang mainLang="is">Icelandic</textLang>
+                        <msItem n="1" defective="true" class="sendbr">
+                            <title type="supplied">Final page of a letter</title>
+                            <incipit>… við höfðum "jolly" tíma við þreskinguna þettað haust því fyrstu þrjár vikurnar voru svo miklar rigningar …</incipit>
+                            <respStmt>
+                                <resp key="crp"/>
+                                <name type="person">B.B. Ágústsson</name>
+                                <!-- Vesturfaraskrá: Bjarni Ágústsson (p. 236), Björgvin Ágústsson (p. 31), Brynjólfur Ágústsson (p. 351)? -->
+                            </respStmt>
+                            <respStmt>
+                                <resp key="rcp"/>
+                                <name type="person">Unnamed friend</name>
+                            </respStmt>
+                        </msItem>
+                    </msContents>
+                    <physDesc>
+                        <objectDesc form="letter"> <!-- objectDesc form="codex" ? -->
+                            <supportDesc material="chart">
+                                <support>
+                                    <num type="book-block" value="1">1</num>
+                                    <watermark ana="no"/>
+                                </support>
+                                <foliation ana="no"/>
+                                <condition ana="good"/>
+                            </supportDesc>
+                        </objectDesc>
+                        <handDesc hands="1">
+                            <handNote scope="sole" scribeRef="unknown" script="unknown">B.B. Ágústsson</handNote>
+                        </handDesc>
+                        <decoDesc ana="no">
+                            <p>No decorative elements.</p>
+                        </decoDesc>
+                        <additions ana="no"/>
+                    </physDesc>
+                    <history>
+                        <origin>
+                            <origPlace key="CA US">Canada or United States</origPlace>
+                        </origin>
+                    </history>
+                    <additional>
+                        <adminInfo>
+                            <availability>
+                                <p>No access restrictions.</p>
+                            </availability>
+                        </adminInfo>
+                        <surrogates>
+                            <p>Photographs at the Árni Magnússon Institute for Icelandic Studies in Reykjavík. May be accessed for research purposes.</p>
+                        </surrogates>
+                    </additional>
+                </msDesc>
+            </sourceDesc>
+        </fileDesc>
+        <revisionDesc>
+            <change when="2015-09-15" who="#KMP">Created entry based on examination of original document.</change>
+        </revisionDesc>
+    </teiHeader>
+    <facsimile xml:base="http://www.ImageDirectory.is"><surface> </surface></facsimile>
+</TEI>

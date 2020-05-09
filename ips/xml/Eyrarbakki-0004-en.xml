@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Eyrarbakki 4</title>
+            </titleStmt>
+            <publicationStmt><p>Draft version. Provisional shelfmark.</p></publicationStmt>
+            <!-- from North Dakota: "Siggi Ísöld > afi = skáld Sigurður Ísfeld gamla húsið stóð ennþá og fullt af bókum þetta var í kofforti -->
+            <sourceDesc>
+                <msDesc xml:id="Eyrarbakki-0004-en" xml:lang="en">
+                    <msIdentifier>
+                        <country key="CA">Canada</country>
+                        <settlement>Eyrarbakki, Manitoba</settlement>
+                        <repository>Privately owned</repository>
+                        <idno>Eyrarbakki 4</idno>
+                    </msIdentifier>
+                    <msContents>
+                        <summary>
+                            <title type="supplied">Rímur og kvæði</title>
+                        </summary>
+                        <textLang mainLang="is"/>
+                        <titlePage type="ms">
+                            <docTitle>
+                                <titlePart type="main">Þrjár einstakar rímur af ýmsum og smákveðlingar ort af Dannibrogsmanni Sigfúsa Jónssyni</titlePart>
+                            </docTitle>
+                        </titlePage>
+                        <msItem n="1" class="rimur">
+                            <locus from="2r" to="11v">2r-11v (3-22)</locus>
+                            <title type="uniform">Ríma af Símeó afríkanska</title>
+                            <author key="SigJon020">Sigfús Jónsson</author>
+                            <rubric>Ríma af Símeó afríkaníska</rubric>
+                            <incipit type="upphaf">Atburðir sem fregna ég frá / og færa oss sögur kunnar …</incipit>
+                            <note>Composed in 1843</note>
+                        </msItem>
+                        <msItem n="2" class="rimur">
+                            <locus from="12r" to="25v">12r-25v (23-50)</locus>
+                            <title type="supplied">Ríma af einum greifa</title>
+                            <author key="SigJon020">Sigfús Jónsson</author>
+                            <rubric>Ríma af einum greifa</rubric>
+                            <incipit type="upphaf">Til svo bar um tíma þá / trón þegar Rússa skreytti …</incipit>
+                            <note>Composed in 1845</note>
+                        </msItem>
+                        <msItem n="3" class="rimur">
+                            <locus from="26r" to="34r">26r-34r (51-67)</locus>
+                            <title type="supplied">Ríma af sankti Páli öðrum</title>
+                            <author key="SigJon020">Sigfús Jónsson</author>
+                            <rubric>Ríma af sankti Páli öðrum</rubric>
+                            <incipit type="upphaf">Ein í París eitthvört sinn …</incipit>
+                        </msItem>
+                        <msItem n="4" class="kvad">
+                            <locus from="34r" to="39r">34r-39r (67-77)</locus>
+                            <title type="supplied">Apakötturinn</title>
+                            <author key="SigJon020">Sigfús Jónsson</author>
+                            <rubric>Apakötturinn. Lag: Þér (?) daufir andar!</rubric>
+                            <incipit type="upphaf">Hertogi nokkur hárra valda / harðri stjórnandi Maílands …</incipit>
+                        </msItem>
+                        <msItem n="5" class="kvad">
+                            <locus from="39v" to="42r">39v-42r (78-83)</locus>
+                            <title type="supplied">Hjarðardrengurinn og soldátinn</title>
+                            <author key="SigJon020">Sigfús Jónsson</author>
+                            <rubric>Hjarðardrengurinn og soldátinn</rubric>
+                            <incipit type="upphaf">Í svokölluðu sjö ára stríði / soldát einn af rúpískum lýði …</incipit>
+                        </msItem>
+                        <msItem n="6" class="kvad">
+                            <locus from="42r" to="45v">42r-45v (83-90)</locus>
+                            <title type="supplied">Reisan til Paradísar</title>
+                            <author key="SigJon020">Sigfús Jónsson</author>
+                            <rubric>Reisan til Paradísar</rubric>
+                            <incipit type="upphaf">Það er meðal annars eitt / sem ýmsir hafa í ræður …</incipit>
+                        </msItem>
+                        <msItem n="7" class="kvad">
+                            <locus from="45v" to="47v">45v-47v (90-94)</locus>
+                            <title type="supplied">Bóndastúlkan og reifarinn</title>
+                            <author key="SigJon020">Sigfús Jónsson</author>
+                            <rubric>Bóndastúlkan og reifarinn</rubric>
+                            <incipit type="upphaf">Brúðkaup eitt sinn búið var …</incipit>
+                        </msItem>
+                    </msContents>
+                    <physDesc>
+                        <!-- extent i + 48 + 0 -->
+                        <objectDesc form="codex">
+                            <supportDesc material="chart">
+                                <support>
+                                    <num type="book-block">48</num> <!-- extent i + 48 -->
+                                    <num type="front-flyleaf">1</num>
+                                    <watermark ana="no"/>
+                                    <dimensions type="leaf">
+                                        <height unit="mm" quantity="135">135</height>
+                                        <width unit="mm" quantity="82">82</width>
+                                    </dimensions>
+                                </support>
+                                <foliation ana="pag contemporary">Numbered pages</foliation>
+                            </supportDesc>
+                            <layoutDesc>
+                                <layout columns="1" writtenLines="20 21">
+                                <num type="wpl" atLeast="3" atMost="6"/>
+                                <dimensions type="written">
+                                <height unit="mm" quantity="117">117</height>
+                                <width unit="mm" quantity="67">67</width>
+                                </dimensions>
+                                <catchwords ana="no"/>
+                                </layout>
+                            </layoutDesc>
+                        </objectDesc>
+                        <handDesc hands="1">
+                            <handNote scope="sole"/>
+                        </handDesc>
+                        <decoDesc><decoNote/></decoDesc>
+                        <bindingDesc>
+                            <binding>
+                                <p>Leather binding.</p>
+                            </binding>
+                        </bindingDesc>
+                    </physDesc>
+                    <history>
+                        <origin>
+                            <origDate notBefore="1845" notAfter="1855">Written after 1845, probably before Sigfús Jónsson's death in 1855.</origDate>
+                            <origPlace key="IS">Iceland</origPlace>
+                        </origin>
+                    </history>
+                </msDesc>
+            </sourceDesc>
+        </fileDesc>
+    </teiHeader>
+    <facsimile>
+        <surface/>
+    </facsimile>
+</TEI>
