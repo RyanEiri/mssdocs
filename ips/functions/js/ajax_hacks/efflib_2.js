@@ -1,1 +1,0 @@
- window.onload=function(){       if($("msg_screen") && $("toggle") && $("switchoff")){           $("toggle").onclick=function(){               Element.toggle($("msg_screen"));           }            $("switchoff").onclick=function(){               Effect.SwitchOff('msg_screen');           }       }}
