@@ -60,7 +60,6 @@ class UserCookie {
 			if ($_GET['header']==='cookieDel') {
 		    setcookie('login','',time()-86400);
 				setcookie('zsYjZ5RdavKHU43Xi6DbWKuAu','',time()-86400);
-				session_unset();
 				session_destroy();
 			  header('Location: ./login.php');
 			}
