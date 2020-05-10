@@ -8,6 +8,9 @@ define("DB_NAME", "test_vesturheimsrit_ips");
 define("PROGRAM_MYSQL_CLASSES", CLASSES_DIR.'classes.php');
 require_once(PROGRAM_MYSQL_CLASSES);
 
+define("PROGRAM_MYSQL_CLASSES", CLASSES_DIR.'classes.php');
+require_once(PROGRAM_MYSQL_CLASSES);
+
 // set the main database access
 // currently the upload scripts use their own mysqli access
 // but the mysql constants set here are used

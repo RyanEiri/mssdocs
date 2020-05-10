@@ -1,0 +1,47 @@
+#ProductsMenu {
+	z-index: 2;
+	position: absolute;
+	top: 41px;
+	left: 7px;
+	visibility: hidden;
+}
+
+#ServiceMenu {
+	z-index: 2;
+	position: absolute;
+	top: 41px;
+	left: 83px;
+	visibility: hidden;
+}
+
+#TrainingMenu {
+	z-index: 2;
+	position: absolute;
+	top: 41px;
+	left: 155px;
+	visibility: hidden;
+}
+
+#CommonMenu {
+	z-index: 2;
+	position: absolute;
+	top: 41px;
+	left: 235px;
+	visibility: hidden;
+}
+
+#NewsMenu {
+	z-index: 2;
+	position: absolute;
+	top: 41px;
+	left: 397px;
+	visibility: hidden;
+}
+
+#AboutMenu {
+	z-index: 2;
+	position: absolute;
+	top: 41px;
+	left: 500px;
+	visibility: hidden;
+}
