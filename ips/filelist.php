@@ -218,6 +218,7 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 </header>
 
 <main role="main" class="container">
+<div class="jumbotron jumbotron-fluid">
 <?php
 if((ADMIN_STATUS)){
 ?>
@@ -284,6 +285,7 @@ foreach ($filelist as $value) {
 <!-- end of User Table -->
 </div>
 <!-- end of User Panel -->
+</div>
 </div>
 <?php
 }
