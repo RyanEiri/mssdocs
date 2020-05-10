@@ -44,17 +44,3 @@ p.card-text {
 	text-shadow: none;
 	text-align: left;
 }
-
-/* Links */
-a.album-item {
-  color: #333;
-  text-shadow: none; /* Prevent inheritance from `body` */
-  background-color: #fff;
-  border: .05rem solid #333;
-}
-
-a.album-item:focus,
-a.album-item:hover {
-	color: #fff;
-	background-color: slategrey;
-}

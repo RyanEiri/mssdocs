@@ -1,0 +1,23 @@
+#LinksMenu {
+	z-index: 2;
+	position: absolute;
+	top: 33px;
+	left: 13px;
+	visibility: hidden;
+}
+
+#EditMenu {
+	z-index: 2;
+	position: absolute;
+	top: 33px;
+	left: 88px;
+	visibility: hidden;
+}
+
+#PrintMenu {
+	z-index: 2;
+	position: absolute;
+	top: 33px;
+	left: 159px;
+	visibility: hidden;
+}

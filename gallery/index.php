@@ -143,14 +143,16 @@
       </footer>
     </div>
 
-<!-- Include Javascript files -->
+<!-- Include base Javascript files -->
 <script src="../js/jquery.min.js"></script>
 <script src="../js/popper.min.js"></script>
 <script src="../js/bootstrap.min.js"></script>
-<!-- End of script files -->
+<!-- End of base script files -->
 
 <!-- Blueimp Gallery JS -->
-<script src="../js/jquery.blueimp-gallery.min.js"></script>
+<script src="../ips/js/canvas-to-blob.min.js"></script>
+<script src="../ips/js/load-image.all.min.js"></script>
+<script src="../ips/js/jquery.blueimp-gallery.min.js"></script>
 <script>
 document.getElementById('links').onclick = function (event) {
     event = event || window.event;
@@ -162,7 +164,7 @@ document.getElementById('links').onclick = function (event) {
 };
 </script>
 <script>
-  $('#blueimp-gallery').data('fullScreen', 'true');
+  //$('#blueimp-gallery').data('fullScreen', 'true');
 	//$('#blueimp-gallery').data('')
 </script>
 <!-- JSON Scripts -->

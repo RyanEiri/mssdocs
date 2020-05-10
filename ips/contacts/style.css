@@ -1,0 +1,229 @@
+body {
+	width: 10px;
+	margin : auto;
+	font-family: sans-serif;
+	font-variant: small-caps;
+	font-size: 10pt;
+	border: 1px;
+	background-color:#000;
+	color:#fff;
+	}
+
+td {
+	font-family:sans-serif;
+	font-size: 10pt;
+	}
+
+A:link, A:visited, A:active {
+	text-decoration: none;
+	color: white;
+	}
+	
+A:hover {
+	background-color:blue;
+	}
+
+#header {
+	margin:0;
+	margin-top:5px;
+	border:2px solid #211594;
+	background-color:#230DF6;
+	}
+
+#rightcontent {
+	width:755px;
+	margin-left : auto;
+	margin-right : auto;
+	margin-top:0;
+	padding: 10px;
+	text-align:left;
+	border:thin solid white;
+	background-color:#230DF6;
+	}
+
+
+#leftcontent {
+	margin-left : auto;
+	margin-right : auto;
+	margin-top:10px;
+	width:775px;
+	height:18px;
+	background:#000;
+	border:thin solid white;
+	}
+
+#leftbox {
+	float: left;
+	margin:0 0 0 0;
+	border:none ;
+	}
+
+#lefttitlebox {
+	width:200px;
+	float: left;
+	margin:0;
+	color:black;
+	font-size: 12pt;
+	border: thin solid white;
+	background-color:white;
+	}
+
+.menuitem {
+	float: left;
+	width: 98%;
+	font-size: 8pt;
+	border: 1px solid black;
+	}
+
+A.menuitem:link, A.menuitem:visited, A.menuitem:active {
+	background-color: white;
+	color: black;
+	font-weight: normal;
+        }
+
+A.menuitem:hover {
+	background-color: red;
+	font-weight: bolder;
+}	
+
+.bodytable {
+	margin: 5px;
+	width: 753px;
+	font-size: 12pt;
+	border:thin solid white;
+	background-color:#211594;
+	}
+
+.entrytable {
+	width: 759px;
+	position: relative;
+	font-size:12pt;
+	border:thin solid white;
+	background-color:#211594;
+	}
+
+.bodytableleftcontent {
+	margin-left:10px;
+	margin-top:5px;
+	float:left;
+	width: 325px;
+	display: inline;
+	clear: left;
+	}
+
+.bodytablerightcontent {
+	margin: auto;
+	margin-top:5px;
+	float:right;
+	width: 375px;
+	display: inline;
+	clear: right;
+	}
+
+.bodytitle {
+	background-color:gray;
+	}
+
+.bodytoptitle {
+	font-size: 12pt;
+	border: thin solid black;
+	background-color:gray;
+	}
+
+.bodytoptitletext {
+	margin-left: 5px;
+	}
+
+.bodytitleitem {
+	border:thin solid white;
+	}
+
+.bodyitem {
+	border:thin dotted black;
+	}
+
+.fixedmenu {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	width: 100px;
+	left: 10px;
+	border: thin solid #fff;
+	background: silver;
+	visibility: hidden;
+	color: #000;
+}
+
+.fixedmenubuttonoff {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	width: 10px;
+	left: 0;
+	background: blue;
+	visibility: hidden;
+}
+
+.fixedmenubuttonon {
+	position: fixed;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	width: 10px;
+	background: blue;
+}
+
+.warning {
+	width: 250px;
+	padding: 10px;
+	border: thin solid red;
+	background: yellow;
+}
+
+#ProductsMenu {
+	z-index : 2;
+	position : absolute;
+	top : 115px;
+	left : 22px;
+	visibility : hidden;
+}
+
+#ServicesMenu {
+	z-index : 2;
+	position : absolute;
+	top : 115px;
+	left : 87px;
+	visibility : hidden;
+}
+
+#TrainingMenu {
+	z-index : 2;
+	position : absolute;
+	top : 115px;
+	left : 160px;
+	visibility : hidden;
+}
+
+#CommonMenu {
+	z-index : 2;
+	position : absolute;
+	top : 115px;
+	left : 234px;
+	visibility : hidden;
+}
+
+#NewsMenu {
+	z-index : 2;
+	position : absolute;
+	top : 115px;
+	left : 390px;
+	visibility : hidden;
+}
+
+#AboutMenu {
+	z-index : 2;
+	position : absolute;
+	top : 115px;
+	left : 487px;
+	visibility : hidden;
+}
