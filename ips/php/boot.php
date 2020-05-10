@@ -1,6 +1,6 @@
 <?php
 // Set error handling
-error_reporting(E_ALL | E_STRICT);
+error_reporting(E_ALL);
 
 // Per-implementation constants
 define("PROGRAM_WEB_BASE_PROTOCOL", "HTTPS");

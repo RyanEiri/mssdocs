@@ -304,9 +304,9 @@ class FolderGrab {
 class FileList {
 	private $sql,
 		$query,
-		$result,
-		$filelist;
-	public	$id,
+		$result;
+	public	$filelist,
+		$id,
 		$name,
 		$size,
 		$type,

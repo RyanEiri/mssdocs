@@ -19,7 +19,7 @@ if($login_cookie->CheckIt()) {
 <![endif]-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FHP::Users</title>
+<title>FHP::Files Table</title>
 <meta name="author" content="Ryan Eric Johnson" >
 <meta name="date" content="2018-06-06" >
 <meta name="copyright" content="Ryan Johnson & Katelin Parsons 2018" >
@@ -219,26 +219,26 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 
 <main role="main" class="container">
 <?php
-if((ADMIN_STATUS) && ($_GET['users']) === 'list'){
+if((ADMIN_STATUS)){
 ?>
-<!-- User Panel -->
+<!-- DB Panel -->
 <div class="container mt-3">
 <div class="card">
 	<div class="card-header useradmin-buttonbar">
 		<div class="d-flex justify-content-between">
-			<div class="flex-column align-self-center">Users</div>
+			<div class="flex-column align-self-center">Entries</div>
 		  <!-- useradmin-buttonbar contains a button to add a user -->
 	    <div class="flex-column">
-	      <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addUser">
-					<span class="sr-only">add user</span>
-		      <span data-feather="plus-square" data-toggle="tooltip" data-placement="left" title="Add user"></span>
+	      <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addEntry">
+					<span class="sr-only">add entry</span>
+		      <span data-feather="plus-square" data-toggle="tooltip" data-placement="left" title="Add entry"></span>
 	      </button>
 	    </div>
 		</div>
 	</div>
 <?php
-$users = new UserList();
-$userlist = $users->userlist;
+$files = new FileList();
+$filelist = $files->filelist;
 ?>
 <!-- User Table -->
 	<div id="usertable">
@@ -246,11 +246,12 @@ $userlist = $users->userlist;
 	  <tr>
 	    <th>Functions</th>
 	    <th class="hidden-xs hidden-sm">ID</th>
-	    <th class="hidden-xs hidden-sm">Date Created</th>
-	    <th>Username</th><th>Admin Status</th>
+	    <th class="hidden-xs hidden-sm">NAME</th>
+	    <th>URL</th>
 	  </tr>
 <?php
-foreach ($userlist as $value) {
+if(!empty($filelist)){
+foreach ($filelist as $value) {
 ?>
 	  <tr>
 	    <td>
@@ -267,21 +268,15 @@ foreach ($userlist as $value) {
 		<?php echo $value['id'] ?>
 	    </td>
 	    <td class="hidden-xs hidden-sm">
-	      <?php echo $value['date'] ?>
+	      <?php echo $value['name'] ?>
 	    </td>
 	    <td>
-	      <?php echo $value['username'] ?>
+	      <?php echo $value['url'] ?>
 	    </td>
 <?php
-	if ($value['admin'] === 1) {
-?>
-	    <td>YES</td>
-<?php
-	} else {
-?>
-	    <td>NO</td>
-<?php
-	}
+}
+} else {
+	echo "Table failed to load!";
 }
 ?>
 	</table>
