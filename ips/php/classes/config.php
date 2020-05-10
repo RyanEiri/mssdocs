@@ -3,7 +3,7 @@
 define("DB_HOST", "mysql.vesturheimsrit.com");
 define("DB_USER", "fragileheritage");
 define("DB_PASS", "Z\$Y5ZJnCy6bP\$S0T");
-define("DB_NAME", "test_vesturheimsrit_ips");
+define("DB_NAME", "vesturheimsrit_ips");
 
 define("PROGRAM_MYSQL_CLASSES", CLASSES_DIR.'classes.php');
 require_once(PROGRAM_MYSQL_CLASSES);

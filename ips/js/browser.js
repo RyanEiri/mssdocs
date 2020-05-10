@@ -580,7 +580,7 @@ $(function(){
 		// Grab filesystem and database information for a single file
 
 		function singleFileGrabDB(grabfile) {
-			//console.log(grabfile);
+			console.log(grabfile);
 			var dbData = {};
 			var dirNameContext = grabfile.match(/(.*)[\/\\]/)[1]||'';
 			//console.log(grabfile);
@@ -594,7 +594,7 @@ $(function(){
 			var dbDirName = dirNameContext.match(/files.*$/i);
 			dbDirName = dbDirName[0];
 			dbData.dbDirName = dbDirName;
-			//console.log(dbData);
+			console.log(dbData);
 
 			$.ajax({
 			  type:"post",
@@ -604,7 +604,7 @@ $(function(){
 			})
 //			  success: function(data) {
 			  .done(function(data) {
-				  //console.log(data);
+				  console.log(data);
 			    if ( ! data.success) {
 						if (data.errors.database) {
 						  $('#fileFunctionsBody').addClass('has-error');
