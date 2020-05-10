@@ -3,6 +3,10 @@
 
 <head>
 
+	<!-- Tell search engines not to index the test pages
+	  REMOVE FOR PRODUCTION -->
+	<meta name="robots" content="noindex">
+	
 <!-- Force latest IE rendering engine or ChromeFrame if installed -->
 <!--[if IE]>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -13,7 +17,7 @@
 <title>Fragile Heritage Project</title>
 <meta name="author" content="Ryan E. Johnson" >
 <meta name="date" content="2017-12-04" >
-<meta name="copyright" content="Fragile Heritage Project 2016-2019" >
+<meta name="copyright" content="Fragile Heritage Project 2017" >
 <meta name="keywords" content="Fragile Heritage Project, manuscript, manuscripts, Canada, America, U.S.A., United States, United States of America, textual heritage, Icelandic, Iceland" >
 <meta name="description" content="The Fragile Heritage Project aims to create a digital collection of Icelandic language manuscripts held in public and private collections in Canada and the U.S.A." >
 <meta http-equiv="expires" content="0" >
@@ -41,7 +45,7 @@
           <nav class="nav nav-masthead justify-content-center">
             <a class="nav-link active" href="index.php">Home</a>
 						<a class="nav-link" href="/gallery">Gallery</a>
-            <a class="nav-link" href="https://vesturheimsrit.com/ips">Proofing</a>
+            <a class="nav-link" href="/ips">Proofing</a>
           </nav>
         </div>
       </header>

@@ -1,5 +1,7 @@
-ips/upload/server/php/files/*
-ips/upload/server/php/archives/*
-!ips/upload/server/php/files/.gitkeep
-!ips/upload/server/php/archives/.gitkeep
+ips/upload/files/*
+ips/upload/archives/*
+ips/backups/*
+!ips/upload/files/.gitkeep
+!ips/upload/archives/.gitkeep
+!ips/backups/.gitkeep
 
