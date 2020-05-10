@@ -16,7 +16,7 @@ if(!empty($_GET['recursive'])){
 if(!empty($_GET['dir'])){
 	$dir = $_GET['dir'];
 } else {
-	$dir = "ips/server/php/files";
+	$dir = "ips/upload/files";
 }
 if(!empty($_GET['search_ext'])){
 	$search_ext = $_GET['search_ext'];
