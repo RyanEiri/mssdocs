@@ -17,4 +17,4 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
 
 # Redirect to login if no login hash detected
 RewriteCond %{HTTP_COOKIE} !zsYjZ5RdavKHU43Xi6DbWKuAu=lhE8IXrx1Ks90w7glk0VUlqTe [NC]
-RewriteRule /*	/home/vesturheimshandrit/vesturheimsrit.com/ips/login.php
+RewriteRule /*	login.php
