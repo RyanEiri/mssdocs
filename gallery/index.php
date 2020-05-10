@@ -72,7 +72,7 @@
 										<p class="card-text">Daren's farmhouse just outside of town.</p>
 										<div class="d-flex justify-content-between align-items-center">
 											<div class="btn-group">
-												<a href="../ips/server/php/files/ryan/Daren Gislason/Book Collections/Farmhouse" class="btn btn-sm btn-outline-secondary album-item" id="farmhouse" role="button">View</a>
+												<a href="../ips/upload/files/ryan/Daren Gislason/Book Collections/Farmhouse" class="btn btn-sm btn-outline-secondary album-item" id="farmhouse" role="button">View</a>
 											</div>
 											<small class="text-muted">Farmhouse</small>
 										</div>
@@ -86,7 +86,7 @@
 										<p class="card-text">Daren's house in Minneota.</p>
 										<div class="d-flex justify-content-between align-items-center">
 											<div class="btn-group">
-												<a href="../ips/server/php/files/ryan/Daren Gislason/Book Collections/Minneota House" class="btn btn-sm btn-outline-secondary album-item" id="minneotahouse" role="button">View</a>
+												<a href="../ips/upload/files/ryan/Daren Gislason/Book Collections/Minneota House" class="btn btn-sm btn-outline-secondary album-item" id="minneotahouse" role="button">View</a>
 											</div>
 											<small class="text-muted">Minneota House</small>
 										</div>
@@ -100,7 +100,7 @@
 										<p class="card-text">The Opera House in Minneota.</p>
 										<div class="d-flex justify-content-between align-items-center">
 											<div class="btn-group">
-												<a href="../ips/server/php/files/ryan/Daren Gislason/Book Collections/Opera House" class="btn btn-sm btn-outline-secondary album-item" id="operahouse" role="button">View</a>
+												<a href="../ips/upload/files/ryan/Daren Gislason/Book Collections/Opera House" class="btn btn-sm btn-outline-secondary album-item" id="operahouse" role="button">View</a>
 											</div>
 											<small class="text-muted">Opera House</small>
 										</div>

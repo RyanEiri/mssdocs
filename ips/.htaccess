@@ -1,13 +1,13 @@
 RewriteEngine On
 # Redirect exceptions for mss. images,
 # i.e. No block on the following directories from public access.
-RewriteRule "^server/php/files/ryan/Daren Gislason/Book Collections/*" - [L]
+RewriteRule "^upload/files/ryan/Daren Gislason/Book Collections/*" - [L]
 
 # Redirect exception for css, javascript, base images, and image_server
 RewriteRule "^css/*" - [L]
 RewriteRule "^js/*" - [L]
 RewriteRule "^img/*" - [L]
-RewriteRule "^server/php/image_server.php" - [L]
+RewriteRule "^upload/image_server.php" - [L]
 
 # Redirect if HTTP is used instead of HTTPS
 #RewriteCond %{HTTPS} !=on
