@@ -100,7 +100,7 @@ class UploadHandler
             // e.g. PHP scripts, nor executed by the browser when downloaded,
             // e.g. HTML files with embedded JavaScript code.
             // Please also read the SECURITY.md document in this repository.
-            'accept_file_types' => '/\.(gif|jpe?g|png|tif?f|xml)$/i',
+            'accept_file_types' => '/\.(gif|jpe?g|png|tif?f|xml|pdf)$/i',
             // Replaces dots in filenames with the given string.
             // Can be disabled by setting it to false or an empty string.
             // Note that this is a security feature for servers that support
