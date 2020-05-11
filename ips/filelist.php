@@ -41,7 +41,7 @@ if($login_cookie->CheckIt()) {
     <![endif]-->
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
 
 <?php
 if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
@@ -236,7 +236,6 @@ aria-labelledby="removeUserLabel">
 <?php include(HTML_TEMPLATES.'navbar.php'); ?>
 </header>
 
-<main role="main" class="container">
 <div class="jumbotron jumbotron-fluid">
 <?php
 if((ADMIN_STATUS)){
@@ -314,7 +313,6 @@ foreach ($filelist as $value) {
 <?php
 }
 ?>
-</main>
 
 <!-- Footer template -->
 <?php include(HTML_TEMPLATES.'footer.php'); ?>
