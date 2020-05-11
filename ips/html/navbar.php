@@ -13,9 +13,9 @@
 			<li class="nav-item"><a class="nav-link" href="<?php echo PROGRAM_WEB_BASE ?>index.php?header=cookieDel">Sign Out</a></li>
 <?php if(ADMIN_STATUS){ ?>
 			<li class="nav-item dropdown">
-			  <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Users <span class="caret"></span></a>
+			  <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">DB Tables <span class="caret"></span></a>
 			  <div class="dropdown-menu" aria-labelledby="adminDropdown">
-			    <a class="dropdown-item" href="<?php echo PROGRAM_WEB_BASE ?>users.php?users=list">Add/Remove</a>
+			    <a class="dropdown-item" href="<?php echo PROGRAM_WEB_BASE ?>users.php?users=list">Users</a>
 			  </div>
 			</li>
 <?php } ?>
