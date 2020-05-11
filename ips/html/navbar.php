@@ -23,7 +23,7 @@
 			</li>
 <?php } ?>
 			<li class="nav-item dropdown">
-			  <a class="nav-link dropdown-toggle" href="#" id="proofingDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Proofing <span class="caret">
+			  <a class="nav-link dropdown-toggle" href="#" id="proofingDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Files <span class="caret">
 				</span></a>
 			  <div class="dropdown-menu" aria-labelledby="proofingDropdown">
 			    <a class="dropdown-item" href="<?php echo PROGRAM_WEB_BASE ?>upload.php">Upload</a>
