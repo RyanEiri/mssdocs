@@ -44,7 +44,7 @@ if($login_cookie->CheckIt()) {
 <body class="d-flex flex-column h-100">
 
 <?php
-if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
+if((ADMIN_STATUS)){
 ?>
 
 <!-- MakeChanges Modal Form -->
