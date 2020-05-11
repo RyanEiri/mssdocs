@@ -139,11 +139,9 @@ if((ADMIN_STATUS)){
 				<h1 class="display-4">Entries</h1>
 			  <!-- useradmin-buttonbar contains a button to add a user -->
 		    <div class="flex-column">
-		      <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
-					data-target="#makeChanges">
+		      <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#makeChanges">
 						<span class="sr-only">make changes</span>
-			      <span data-feather="plus-square" data-toggle="tooltip" data-placement="left"
-						title="Make changes"></span>
+			      <span data-feather="plus-square" data-toggle="tooltip" data-placement="left" title="Make changes"></span>
 		      </button>
 		    </div>
 
