@@ -41,7 +41,7 @@ if($login_cookie->CheckIt()) {
     <![endif]-->
 </head>
 
-<body class="d-flex h-100">
+<body>
 
 <?php
 if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
