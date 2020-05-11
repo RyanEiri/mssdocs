@@ -47,13 +47,15 @@ if($login_cookie->CheckIt()) {
 if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 ?>
 <!-- ChangeUser Modal Form -->
-<div class="modal fade" id="changeUser" tabindex="-1" role="dialog" aria-labelledby="changeUserLabel">
+<div class="modal fade" id="changeUser" tabindex="-1" role="dialog"
+aria-labelledby="changeUserLabel">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 		<form id="changeUserForm" method="POST" action="json/json-change_user.php" autocomplete="off">
 		<div class="modal-header">
 			<h5 class="modal-title">Edit User</h5>
-			<button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="this.form.reset(); window.location.reload();">
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close"
+			onclick="this.form.reset(); window.location.reload();">
 				<span aria-hidden="true">&times;</span>
 			</button>
 		</div>
@@ -63,7 +65,8 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 			<!-- USERNAME -->
 			<div id="change_user-group" class="form-group">
 				<label for="change_username">Username</label>
-				<input type="text" class="form-control" id="changeUserForm_username" name="change_username" autocomplete="username">
+				<input type="text" class="form-control" id="changeUserForm_username" name="change_username"
+				autocomplete="username">
 				<div id="change_user-error" class="mt-3">
 					<!-- errors will go here -->
 				</div>
@@ -71,7 +74,8 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 			<!-- EMAIL -->
 			<div id="change_email-group" class="form-group">
 				<label for="change_email">Email</label>
-				<input type="text" class="form-control" id="changeUserForm_email" name="change_email" autocomplete="email">
+				<input type="text" class="form-control" id="changeUserForm_email" name="change_email"
+				autocomplete="email">
 				<div id="change_email-error" class="mt-3">
 					<!-- errors will go here -->
 				</div>
@@ -79,7 +83,8 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 			<!-- PASSWORD -->
 			<div id="change_pass-group" class="form-group">
 				<label for="change_password">Password</label>
-				<input type="password" class="form-control" id="changeUserForm_password" name="change_password" autocomplete="new-password">
+				<input type="password" class="form-control" id="changeUserForm_password"
+				name="change_password" autocomplete="new-password">
 				<div id="change_pass-error" class="mt-3">
 					<!-- errors will go here -->
 				</div>
@@ -87,14 +92,16 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 			<!-- CPASSWORD -->
 			<div id="change_cpass-group" class="form-group">
 				<label for="change_cpassword">Confirm Password</label>
-				<input type="password" class="form-control" id="changeUserForm_cpassword" name="change_cpassword" autocomplete="off">
+				<input type="password" class="form-control" id="changeUserForm_cpassword"
+				name="change_cpassword" autocomplete="off">
 				<div id="change_cpass-error" class="mt-3">
 					<!-- errors will go here -->
 				</div>
 			</div>
 			<!-- ADMIN STATUS -->
 			<div id="change_admin-group" class="form-group custom-control custom-checkbox">
-				<input type="checkbox" class="form-control custom-control-input" id="changeUserForm_admin" name="change_admin">
+				<input type="checkbox" class="form-control custom-control-input" id="changeUserForm_admin"
+				name="change_admin">
 				<label class="custom-control-label" for="changeUserForm_admin">Admin Status</label>
 			</div>
 			<!-- DATABASE ERRORS -->
@@ -105,7 +112,8 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 
 		</div>
 		<div class="modal-footer">
-			<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="this.form.reset(); window.location.reload();">Close</button>
+			<button type="button" class="btn btn-secondary" data-dismiss="modal"
+			onclick="this.form.reset(); window.location.reload();">Close</button>
 			<button type="submit" class="btn btn-primary">Save Changes</button>
 		</div>
 		</form>
@@ -120,7 +128,8 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 		<form id="addUserForm" method="POST" action="json/json-add_user.php" autocomplete="off">
 	  <div class="modal-header">
 			<h5 class="modal-title">Add User</h5>
-			<button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="this.form.reset(); window.location.reload();">
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close"
+			onclick="this.form.reset(); window.location.reload();">
 				<span aria-hidden="true">&times;</span>
 			</button>
 	  </div>
@@ -129,7 +138,8 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 		<!-- USERNAME -->
 		<div id="add_user-group" class="form-group">
 		  <label for="add_username">Username</label>
-		  <input type="text" class="form-control" id="addUserForm_username" name="add_username" autocomplete="off">
+		  <input type="text" class="form-control" id="addUserForm_username" name="add_username"
+			autocomplete="off">
 			<div id="add_user-error" class="mt-3">
 				<!-- errors will go here -->
 			</div>
@@ -137,7 +147,8 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 		<!-- EMAIL -->
 		<div id="add_email-group" class="form-group">
 			<label for="add_email">Email</label>
-			<input type="text" class="form-control" id="addUserForm_email" name="add_email" autocomplete="email">
+			<input type="text" class="form-control" id="addUserForm_email" name="add_email"
+			autocomplete="email">
 			<div id="add_email-error" class="mt-3">
 				<!-- errors will go here -->
 			</div>
@@ -145,7 +156,8 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 		<!--PASSWORD -->
 		<div id="add_pass-group" class="form-group">
 		  <label for="add_password">Password</label>
-		  <input type="password" class="form-control" id="addUserForm_password" name="add_password" autocomplete="new-password">
+		  <input type="password" class="form-control" id="addUserForm_password" name="add_password"
+			autocomplete="new-password">
 			<div id="add_pass-error" class="mt-3">
 				<!-- errors will go here -->
 			</div>
@@ -153,14 +165,16 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 		<!-- CPASSWORD -->
 		<div id="add_cpass-group" class="form-group">
 		  <label for="add_cpassword">Confirm Password</label>
-		  <input type="password" class="form-control" id="addUserForm_cpassword" name="add_cpassword" autocomplete="off">
+		  <input type="password" class="form-control" id="addUserForm_cpassword" name="add_cpassword"
+			autocomplete="off">
 			<div id="add_cpass-error" class="mt-3">
 				<!-- errors will go here -->
 			</div>
 		</div>
 		<!-- ADMIN STATUS -->
 		<div id="add_admin-group" class="form-group custom-control custom-checkbox">
-			<input type="checkbox" class="form-control custom-control-input" id="addUserForm_admin" name="add_admin">
+			<input type="checkbox" class="form-control custom-control-input" id="addUserForm_admin"
+			name="add_admin">
 			<label class="custom-control-label" for="addUserForm_admin">Admin Status</label>
 		</div>
 		<!-- DATABASE ERRORS -->
@@ -170,7 +184,8 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 		</div>
 	  </div>
 	  <div class="modal-footer">
-		<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="this.form.reset(); window.location.reload();">Close</button>
+		<button type="button" class="btn btn-secondary" data-dismiss="modal"
+		onclick="this.form.reset(); window.location.reload();">Close</button>
 		<button type="submit" class="btn btn-primary">Save Changes</button>
 	  </div>
 	  </form>
@@ -179,13 +194,15 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 </div>
 <!-- end of AddUser Modal Form -->
 <!-- RemoveUser Modal Form -->
-<div class="modal fade" id="removeUser" tabindex="-1" role="dialog" aria-labelledby="removeUserLabel">
+<div class="modal fade" id="removeUser" tabindex="-1" role="dialog"
+aria-labelledby="removeUserLabel">
 	<div class="modal-dialog" role="document">
 	  <div class="modal-content">
 		<form id="removeUserForm" method="POST" action="json/json-remove_user.php" autocomplete="off">
 	  <div class="modal-header">
 			<h5 class="modal-title">Remove User</h5>
-			<button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="this.form.reset(); window.location.reload();">
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close"
+			onclick="this.form.reset(); window.location.reload();">
 				<span aria-hidden="true">&times;</span>
 			</button>
 	  </div>
@@ -200,7 +217,8 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 		</div>
 	  </div>
 	  <div class="modal-footer">
-		<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="this.form.reset(); window.location.reload();">Close</button>
+		<button type="button" class="btn btn-secondary" data-dismiss="modal"
+		onclick="this.form.reset(); window.location.reload();">Close</button>
 		<button type="submit" class="btn btn-danger">Remove</button>
 	  </div>
 	  </form>
@@ -230,9 +248,11 @@ if((ADMIN_STATUS)){
 			<div class="flex-column align-self-center">Entries</div>
 		  <!-- useradmin-buttonbar contains a button to add a user -->
 	    <div class="flex-column">
-	      <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addEntry">
+	      <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
+				data-target="#addEntry">
 					<span class="sr-only">add entry</span>
-		      <span data-feather="plus-square" data-toggle="tooltip" data-placement="left" title="Add entry"></span>
+		      <span data-feather="plus-square" data-toggle="tooltip" data-placement="left"
+					title="Add entry"></span>
 	      </button>
 	    </div>
 		</div>
@@ -256,13 +276,19 @@ foreach ($filelist as $value) {
 ?>
 	  <tr>
 	    <td>
-	      <button type="button" class="btn btn-info btn-sm userselector" data-toggle="modal" data-target="#changeUser" id="changeButton_<?php echo $value['id'] ?>" name="<?php echo $value['id'] ?>">
+	      <button type="button" class="btn btn-info btn-sm userselector" data-toggle="modal"
+				data-target="#changeUser" id="changeButton_<?php echo $value['id'] ?>"
+				name="<?php echo $value['id'] ?>">
 					<span class="sr-only">edit user</span>
-		      <span data-feather="edit" data-toggle="tooltip" data-placement="left" title="Edit user"></span>
+		      <span data-feather="edit" data-toggle="tooltip" data-placement="left" title="Edit user">
+					</span>
 	      </button>
-	      <button type="button" class="btn btn-danger btn-sm removeselector" data-toggle="modal" data-target="#removeUser" id="removeButton_<?php echo $value['id'] ?>" name="<?php echo $value['id'] ?>">
+	      <button type="button" class="btn btn-danger btn-sm removeselector" data-toggle="modal"
+				data-target="#removeUser" id="removeButton_<?php echo $value['id'] ?>"
+				name="<?php echo $value['id'] ?>">
 					<span class="sr-only">remove user</span>
-		      <span data-feather="delete" data-toggle="tooltip" data-placement="left" title="Remove user"></span>
+		      <span data-feather="delete" data-toggle="tooltip" data-placement="left"
+					title="Remove user"></span>
 	      </button>
 	    </td>
 	    <td class="hidden-xs hidden-sm">
