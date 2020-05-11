@@ -54,8 +54,7 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 		<form id="makeChangesForm" method="POST" action="json/json-change_database.php" autocomplete="off">
 		  <div class="modal-header">
 				<h5 class="modal-title">Make Changes</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"
-				onclick="this.form.reset(); window.location.reload();">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="this.form.reset(); window.location.reload();">
 					<span aria-hidden="true">&times;</span>
 				</button>
 		  </div>
@@ -64,8 +63,7 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 					<!-- USERNAME -->
 					<div id="add_user-group" class="form-group">
 					  <label for="add_username">Username</label>
-					  <input type="text" class="form-control" id="makeChangesForm_username" name="add_username"
-						autocomplete="off">
+					  <input type="text" class="form-control" id="makeChangesForm_username" name="add_username" autocomplete="off">
 						<div id="add_user-error" class="mt-3">
 							<!-- errors will go here -->
 						</div>
@@ -73,8 +71,7 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 					<!-- EMAIL -->
 					<div id="add_email-group" class="form-group">
 						<label for="add_email">Email</label>
-						<input type="text" class="form-control" id="makeChangesForm_email" name="add_email"
-						autocomplete="email">
+						<input type="text" class="form-control" id="makeChangesForm_email" name="add_email" autocomplete="email">
 						<div id="add_email-error" class="mt-3">
 							<!-- errors will go here -->
 						</div>
@@ -82,8 +79,7 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 					<!--PASSWORD -->
 					<div id="add_pass-group" class="form-group">
 					  <label for="add_password">Password</label>
-					  <input type="password" class="form-control" id="makeChangesForm_password" name="add_password"
-						autocomplete="new-password">
+					  <input type="password" class="form-control" id="makeChangesForm_password" name="add_password" autocomplete="new-password">
 						<div id="add_pass-error" class="mt-3">
 							<!-- errors will go here -->
 						</div>
@@ -91,16 +87,14 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 					<!-- CPASSWORD -->
 					<div id="add_cpass-group" class="form-group">
 					  <label for="add_cpassword">Confirm Password</label>
-					  <input type="password" class="form-control" id="makeChangesForm_cpassword" name="add_cpassword"
-						autocomplete="off">
+					  <input type="password" class="form-control" id="makeChangesForm_cpassword" name="add_cpassword" autocomplete="off">
 						<div id="add_cpass-error" class="mt-3">
 							<!-- errors will go here -->
 						</div>
 					</div>
 					<!-- ADMIN STATUS -->
 					<div id="add_admin-group" class="form-group custom-control custom-checkbox">
-						<input type="checkbox" class="form-control custom-control-input" id="makeChangesForm_admin"
-						name="add_admin">
+						<input type="checkbox" class="form-control custom-control-input" id="makeChangesForm_admin" name="add_admin">
 						<label class="custom-control-label" for="makeChangesForm_admin">Admin Status</label>
 					</div>
 					<!-- DATABASE ERRORS -->
@@ -110,8 +104,7 @@ if((ADMIN_STATUS) && ($_GET['users'] === 'list')){
 				</div>
 		  </div>
 		  <div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal"
-				onclick="this.form.reset(); window.location.reload();">Close</button>
+				<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="this.form.reset(); window.location.reload();">Close</button>
 				<button type="submit" class="btn btn-primary">Save Changes</button>
 		  </div>
 	  </form>
