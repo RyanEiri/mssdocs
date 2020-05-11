@@ -121,20 +121,20 @@ aria-labelledby="changeUserLabel">
 </div>
 <!-- end of ChangeUser Modal Form -->
 
-<!-- AddUser Modal Form -->
-<div class="modal fade" id="addUser" tabindex="-1" role="dialog" aria-labelledby="addUserLabel">
+<!-- MakeChanges Modal Form -->
+<div class="modal fade" id="makeChanges" tabindex="-1" role="dialog" aria-labelledby="addUserLabel">
 	<div class="modal-dialog" role="document">
 	  <div class="modal-content">
-		<form id="addUserForm" method="POST" action="json/json-add_user.php" autocomplete="off">
+		<form id="addUserForm" method="POST" action="json/json-change_database.php" autocomplete="off">
 		  <div class="modal-header">
-				<h5 class="modal-title">Add User</h5>
+				<h5 class="modal-title">Make Changes</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"
 				onclick="this.form.reset(); window.location.reload();">
 					<span aria-hidden="true">&times;</span>
 				</button>
 		  </div>
 		  <div class="modal-body">
-				<div id="UserAdd">
+				<div id="ChangeDB">
 					<!-- USERNAME -->
 					<div id="add_user-group" class="form-group">
 					  <label for="add_username">Username</label>
@@ -192,7 +192,7 @@ aria-labelledby="changeUserLabel">
 	  </div>
 	</div>
 </div>
-<!-- end of AddUser Modal Form -->
+<!-- end of MakeChanges Modal Form -->
 
 <!-- RemoveUser Modal Form -->
 <div class="modal fade" id="removeUser" tabindex="-1" role="dialog"
@@ -242,26 +242,24 @@ aria-labelledby="removeUserLabel">
 if((ADMIN_STATUS)){
 ?>
 <!-- DB Panel -->
-<div class="container mt-3">
-<div class="card">
-	<div class="card-header useradmin-buttonbar">
-		<div class="d-flex justify-content-between">
-			<div class="flex-column align-self-center">Entries</div>
+<div class="container">
+
+			<h1 class="display-4">Entries</h1>
 		  <!-- useradmin-buttonbar contains a button to add a user -->
 	    <div class="flex-column">
 	      <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
-				data-target="#addEntry">
-					<span class="sr-only">add entry</span>
+				data-target="#makeChanges">
+					<span class="sr-only">make changes</span>
 		      <span data-feather="plus-square" data-toggle="tooltip" data-placement="left"
-					title="Add entry"></span>
+					title="Make changes"></span>
 	      </button>
 	    </div>
-		</div>
-	</div>
+
 <?php
 $files = new FileList();
 $filelist = $files->filelist;
 ?>
+
 <!-- User Table -->
 	<div id="usertable">
 	<table class="table table-striped table-hover table-condensed">
@@ -311,8 +309,7 @@ foreach ($filelist as $value) {
 	</div>
 <!-- end of User Table -->
 </div>
-<!-- end of User Panel -->
-</div>
+<!-- end of jumbotron -->
 </div>
 <?php
 }
@@ -327,12 +324,15 @@ foreach ($filelist as $value) {
 
 <!-- JSON scripts -->
 <?php
-if((ADMIN_STATUS) && ($_GET['users'])){
+if((ADMIN_STATUS)){
 ?>
-<script src="<?php echo PROGRAM_JSON_BASE ?>json_request-user_info.js"></script>
-<script src="<?php echo PROGRAM_JSON_BASE ?>json_request-form-change_user.js"></script>
-<script src="<?php echo PROGRAM_JSON_BASE ?>json_request-form-add_user.js"></script>
-<script src="<?php echo PROGRAM_JSON_BASE ?>json_request-form-remove_user.js"></script>
+<!--
+<script src="<?php //echo PROGRAM_JSON_BASE ?>json_request-user_info.js"></script>
+<script src="<?php //echo PROGRAM_JSON_BASE ?>json_request-form-change_user.js"></script>
+<script src="<?php //echo PROGRAM_JSON_BASE ?>json_request-form-add_user.js"></script>
+<script src="<?php //echo PROGRAM_JSON_BASE ?>json_request-form-remove_user.js"></script>
+-->
+<script src="<?php echo PROGRAM_JSON_BASE ?>json_request-form-change_database.js"></script>
 <?php
 }
 ?>
