@@ -122,7 +122,8 @@ aria-labelledby="changeUserLabel">
 <!-- end of ChangeUser Modal Form -->
 
 <!-- MakeChanges Modal Form -->
-<div class="modal fade" id="makeChanges" tabindex="-1" role="dialog" aria-labelledby="addUserLabel">
+<div class="modal fade" id="makeChanges" tabindex="-1" role="dialog"
+aria-labelledby="makeChangesLabel">
 	<div class="modal-dialog" role="document">
 	  <div class="modal-content">
 		<form id="addUserForm" method="POST" action="json/json-change_database.php" autocomplete="off">
@@ -241,73 +242,73 @@ aria-labelledby="removeUserLabel">
 if((ADMIN_STATUS)){
 ?>
 <!-- DB Panel -->
-<div class="container">
+	<div class="container">
 
-			<h1 class="display-4">Entries</h1>
-		  <!-- useradmin-buttonbar contains a button to add a user -->
-	    <div class="flex-column">
-	      <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
-				data-target="#makeChanges">
-					<span class="sr-only">make changes</span>
-		      <span data-feather="plus-square" data-toggle="tooltip" data-placement="left"
-					title="Make changes"></span>
-	      </button>
-	    </div>
+				<h1 class="display-4">Entries</h1>
+			  <!-- useradmin-buttonbar contains a button to add a user -->
+		    <div class="flex-column">
+		      <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
+					data-target="#makeChanges">
+						<span class="sr-only">make changes</span>
+			      <span data-feather="plus-square" data-toggle="tooltip" data-placement="left"
+						title="Make changes"></span>
+		      </button>
+		    </div>
 
-<?php
-$files = new FileList();
-$filelist = $files->filelist;
-?>
+	<?php
+	$files = new FileList();
+	$filelist = $files->filelist;
+	?>
 
-<!-- User Table -->
-	<div id="usertable">
-	<table class="table table-striped table-hover table-condensed">
-	  <tr>
-	    <th>Functions</th>
-	    <th class="hidden-xs hidden-sm">ID</th>
-	    <th class="hidden-xs hidden-sm">NAME</th>
-	    <th>URL</th>
-	  </tr>
-<?php
-if(!empty($filelist)){
-foreach ($filelist as $value) {
-?>
-	  <tr>
-	    <td>
-	      <button type="button" class="btn btn-info btn-sm userselector" data-toggle="modal"
-				data-target="#changeUser" id="changeButton_<?php echo $value['id'] ?>"
-				name="<?php echo $value['id'] ?>">
-					<span class="sr-only">edit user</span>
-		      <span data-feather="edit" data-toggle="tooltip" data-placement="left" title="Edit user">
-					</span>
-	      </button>
-	      <button type="button" class="btn btn-danger btn-sm removeselector" data-toggle="modal"
-				data-target="#removeUser" id="removeButton_<?php echo $value['id'] ?>"
-				name="<?php echo $value['id'] ?>">
-					<span class="sr-only">remove user</span>
-		      <span data-feather="delete" data-toggle="tooltip" data-placement="left"
-					title="Remove user"></span>
-	      </button>
-	    </td>
-	    <td class="hidden-xs hidden-sm">
-		<?php echo $value['id'] ?>
-	    </td>
-	    <td class="hidden-xs hidden-sm">
-	      <?php echo $value['name'] ?>
-	    </td>
-	    <td>
-	      <?php echo $value['url'] ?>
-	    </td>
-<?php
-}
-} else {
-	echo "Table failed to load!";
-}
-?>
-	</table>
+	<!-- User Table -->
+		<div id="usertable">
+		<table class="table table-striped table-hover table-condensed">
+		  <tr>
+		    <th>Functions</th>
+		    <th class="hidden-xs hidden-sm">ID</th>
+		    <th class="hidden-xs hidden-sm">NAME</th>
+		    <th>URL</th>
+		  </tr>
+	<?php
+	if(!empty($filelist)){
+	foreach ($filelist as $value) {
+	?>
+		  <tr>
+		    <td>
+		      <button type="button" class="btn btn-info btn-sm userselector" data-toggle="modal"
+					data-target="#changeUser" id="changeButton_<?php echo $value['id'] ?>"
+					name="<?php echo $value['id'] ?>">
+						<span class="sr-only">edit user</span>
+			      <span data-feather="edit" data-toggle="tooltip" data-placement="left" title="Edit user">
+						</span>
+		      </button>
+		      <button type="button" class="btn btn-danger btn-sm removeselector" data-toggle="modal"
+					data-target="#removeUser" id="removeButton_<?php echo $value['id'] ?>"
+					name="<?php echo $value['id'] ?>">
+						<span class="sr-only">remove user</span>
+			      <span data-feather="delete" data-toggle="tooltip" data-placement="left"
+						title="Remove user"></span>
+		      </button>
+		    </td>
+		    <td class="hidden-xs hidden-sm">
+			<?php echo $value['id'] ?>
+		    </td>
+		    <td class="hidden-xs hidden-sm">
+		      <?php echo $value['name'] ?>
+		    </td>
+		    <td>
+		      <?php echo $value['url'] ?>
+		    </td>
+	<?php
+	}
+	} else {
+		echo "Table failed to load!";
+	}
+	?>
+		</table>
+		</div>
+	<!-- end of User Table -->
 	</div>
-<!-- end of User Table -->
-</div>
 <!-- end of jumbotron -->
 </div>
 <?php
