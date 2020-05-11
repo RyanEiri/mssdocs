@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
 	// process the form
-	$('#addUserForm').submit(function(event) {
+	$('#makeChangesForm').submit(function(event) {
 
 		//$('.form-group').removeClass('has-error'); // remove the error class from a prior submission
 		//$('.help-block').remove(); // remove the error text from a prior submission
