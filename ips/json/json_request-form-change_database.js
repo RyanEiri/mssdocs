@@ -16,7 +16,7 @@ $(document).ready(function() {
 			// not needed for add function			'id'			: $('input[name=add_id]').val(),
 			// passing file_url[] with SESSION in php
 			//'fileURL'		: $('input[name=change_file_url]').val(),
-			'changeURLs'			: $('input[name=change_url]').prop('checked')
+			'change_urls'			: $('input[name=change_url]').prop('checked')
 		};
 
 		// process the form

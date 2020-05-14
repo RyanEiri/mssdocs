@@ -24,47 +24,16 @@ if(ADMIN_STATUS){
   // If any of these variables don't exist, add an error to the
   // $errors array.
 
-  if (empty($_POST['username'])) {
-		$errors['username'] = 'A username is required.';
+  if (empty($_SESSION['file_urls'])) {
+		$errors['file_urls'] = 'Missing file URL data.';
 	} else {
-		$_SESSION['username'] = test_input($_POST['username']);
+		$file_urls = $_SESSION['file_urls'];
 	}
 
-	if (empty($_POST["email"])) {
-			$errors['email'] = "An email address is required.";
-	} else {
-			$_SESSION['email'] = test_input($_POST["email"]);
-			// check if e-mail address syntax is valid
-			if (!filter_var($_SESSION['email'], FILTER_VALIDATE_EMAIL)) {
-					$errors['email'] = "The email address entered is invalid.";
-			}
-	}
-
-	if(!empty($_POST['password']) && ($_POST['password'] === $_POST['cpassword'])) {
-    $_SESSION['password'] = test_input($_POST['password']);
-    $_SESSION['cpassword'] = test_input($_POST['cpassword']);
-    if (strlen($_SESSION['password']) < '8') {
-			$errors['password'] = 'The password must contain at least 8 characters!';
-    }
-    elseif(!preg_match('#[0-9]+#', $_SESSION['password'])) {
-			$errors['password'] = 'The password must contain at least 1 number!';
-    }
-    elseif(!preg_match('#[A-Z]+#', $_SESSION['password'])) {
-			$errors['password'] = 'The password must contain at least 1 capital letter!';
-    }
-    elseif(!preg_match('#[a-z]+#', $_SESSION['password'])) {
-			$errors['password'] = 'The password must contain at least 1 lowercase letter!';
-    }
-	} elseif(!empty($_POST['password'])) {
-		$errors['cpassword'] = 'Confirm the password!';
-	} else {
-		$errors['password'] = 'Please enter a password!';
-	}
-
-  if ($_POST['admin'] === 'true') {
-		$_SESSION['admin'] = 1;
+  if ($_POST['change_urls'] === 'true') {
+		$_SESSION['change_urls'] = 1;
   } else {
-		$_SESSION['admin'] = 0;
+		$_SESSION['change_urls'] = 0;
   }
 
 // return a validation response =============================================
