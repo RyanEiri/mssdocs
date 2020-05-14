@@ -59,7 +59,7 @@ if((ADMIN_STATUS)){
 				</button>
 		  </div>
 		  <div class="modal-body">
-				<div id="ChangeDB">
+				<div id="ChangeDB" class="col-auto my-1">
 					<!-- URL -->
 					<div id="change_url-group" class="custom-control custom-checkbox mr-sm-2">
 					  <input type="checkbox" class="custom-control-input" id="makeChangesForm_url">
