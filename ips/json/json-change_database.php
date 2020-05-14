@@ -41,18 +41,18 @@ if(ADMIN_STATUS){
 
   // if there are any errors in our errors array,
   // return a success boolean of false
-  if (!empty($errors)) {
+  if (!empty($errors) || !empty($warnings)) {
 
 		// if there are items in our errors array,
 		// return those errors
 		$data['success'] = false;
 		$data['errors'] = $errors;
 
-  } else {
+		if (!empty($warnings)) {
+			$data['warnings'] = $warnings;
+		}
 
-	if (!empty($warnings)) {
-		$data['warnings'] = $warnings
-	}
+  } else {
 
 // If there are no validation errors submit to database.
 // DATABASE PROCESSING
