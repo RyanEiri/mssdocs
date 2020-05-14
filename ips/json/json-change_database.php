@@ -34,7 +34,7 @@ if(ADMIN_STATUS){
 		$_SESSION['change_urls'] = 1;
   } else {
 		$_SESSION['change_urls'] = 0;
-		$warnings['change_urls'] = 'If you want to make the changes, confirm by checking the URL checkbox!'
+		$warnings['change_urls'] = 'If you want to make the changes, confirm by checking the URL checkbox!';
   }
 
 // return a validation response =============================================
