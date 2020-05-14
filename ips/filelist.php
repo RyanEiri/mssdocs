@@ -29,7 +29,7 @@ if($login_cookie->CheckIt()) {
 <link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>bootstrap/bootstrap.min.css">
 <!-- Custom styles for this page -->
 <link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>bootstrap/sticky-footer-navbar.css">
-<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>bootstrap/jumbotron.css">
+<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>bootstrap/dashboard.css">
 
 <!-- Internet Explorer Tweaks -->
 <!-- IE10 CSS Viewport Workaround -->
