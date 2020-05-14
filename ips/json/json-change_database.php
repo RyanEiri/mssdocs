@@ -18,7 +18,6 @@ if(ADMIN_STATUS){
   // begin our ajax handling
   $errors	= array();	// array to hold validation errors
   $data		= array();	// array to pass back data
-  $value	= array();
 
   // validate the variables ========================================
   // If any of these variables don't exist, add an error to the
@@ -42,22 +41,20 @@ if(ADMIN_STATUS){
   // return a success boolean of false
   if (!empty($errors)) {
 
-	// if there are items in our errors array,
-	// return those errors
-	$data['success'] = false;
-	$data['errors'] = $errors;
-	$data['value'] = $value;
+		// if there are items in our errors array,
+		// return those errors
+		$data['success'] = false;
+		$data['errors'] = $errors;
+
   } else {
 
 // If there are no validation errors submit to database.
 // DATABASE PROCESSING
 		if($user_object->addUser() !== FALSE){
-
 		  // show a message of success and provide a true
 		  // success variable
 		  $data['success'] = true;
 		  $data['message'] = 'Success!';
-		  $data['value'] = $value;
 		} else {
 			if($user_object->mysqlError){
 				$errors['database'] = $user_object->mysqlError;
@@ -67,7 +64,6 @@ if(ADMIN_STATUS){
 			}
 		  $data['success'] = false;
 		  $data['errors'] = $errors;
-		  $data['value'] = $value;
 		}
   }
 
