@@ -17,6 +17,7 @@ if(ADMIN_STATUS){
   }
   // begin our ajax handling
   $errors	= array();	// array to hold validation errors
+	$warnings = array(); // array to hold validation warnings
   $data		= array();	// array to pass back data
 
   // validate the variables ========================================
@@ -29,10 +30,11 @@ if(ADMIN_STATUS){
 		$file_urls = $_SESSION['file_urls'];
 	}
 
-  if ($_POST['change_urls'] === 'true') {
+  if ($_POST['change_url'] === 'true') {
 		$_SESSION['change_urls'] = 1;
   } else {
 		$_SESSION['change_urls'] = 0;
+		$warnings['change_urls'] = 'If you want to make the changes, confirm by checking the URL checkbox!'
   }
 
 // return a validation response =============================================
@@ -47,6 +49,10 @@ if(ADMIN_STATUS){
 		$data['errors'] = $errors;
 
   } else {
+
+	if (!empty($warnings)) {
+		$data['warnings'] = $warnings
+	}
 
 // If there are no validation errors submit to database.
 // DATABASE PROCESSING
