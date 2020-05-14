@@ -60,42 +60,13 @@ if((ADMIN_STATUS)){
 		  </div>
 		  <div class="modal-body">
 				<div id="ChangeDB">
-					<!-- USERNAME -->
-					<div id="add_user-group" class="form-group">
-					  <label for="add_username">Username</label>
-					  <input type="text" class="form-control" id="makeChangesForm_username" name="add_username" autocomplete="off">
-						<div id="add_user-error" class="mt-3">
+					<!-- URL -->
+					<div id="change_url-group" class="form-check">
+					  <input type="checkbox" class="form-check-input" id="makeChangesForm_url">
+						<label class="form-check-label" for="makeChangesForm_url">URL</label>
+						<div id="change-error" class="mt-3">
 							<!-- errors will go here -->
 						</div>
-					</div>
-					<!-- EMAIL -->
-					<div id="add_email-group" class="form-group">
-						<label for="add_email">Email</label>
-						<input type="text" class="form-control" id="makeChangesForm_email" name="add_email" autocomplete="email">
-						<div id="add_email-error" class="mt-3">
-							<!-- errors will go here -->
-						</div>
-					</div>
-					<!--PASSWORD -->
-					<div id="add_pass-group" class="form-group">
-					  <label for="add_password">Password</label>
-					  <input type="password" class="form-control" id="makeChangesForm_password" name="add_password" autocomplete="new-password">
-						<div id="add_pass-error" class="mt-3">
-							<!-- errors will go here -->
-						</div>
-					</div>
-					<!-- CPASSWORD -->
-					<div id="add_cpass-group" class="form-group">
-					  <label for="add_cpassword">Confirm Password</label>
-					  <input type="password" class="form-control" id="makeChangesForm_cpassword" name="add_cpassword" autocomplete="off">
-						<div id="add_cpass-error" class="mt-3">
-							<!-- errors will go here -->
-						</div>
-					</div>
-					<!-- ADMIN STATUS -->
-					<div id="add_admin-group" class="form-group custom-control custom-checkbox">
-						<input type="checkbox" class="form-control custom-control-input" id="makeChangesForm_admin" name="add_admin">
-						<label class="custom-control-label" for="makeChangesForm_admin">Admin Status</label>
 					</div>
 					<!-- DATABASE ERRORS -->
 					<div id="add_database-error" class="mt-3">
