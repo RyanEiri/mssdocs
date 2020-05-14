@@ -21,14 +21,14 @@ if($login_cookie->CheckIt()) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FHP::Files Table</title>
 <meta name="author" content="Ryan Eric Johnson" >
-<meta name="date" content="2018-06-06" >
-<meta name="copyright" content="Ryan Johnson & Katelin Parsons 2018" >
+<meta name="date" content="2020-05-14" >
+<meta name="copyright" content="Ryan Eric Johnson & Katelin Parsons 2018-2020" >
 <meta http-equiv="expires" content="0" >
 
 <!-- Bootstrap for CSS -->
 <link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>bootstrap/bootstrap.min.css">
 <!-- Custom styles for this page -->
-<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>bootstrap/sticky-footer-navbar.css">
+<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>bootstrap/dashboard.css">
 
 <!-- Internet Explorer Tweaks -->
 <!-- IE10 CSS Viewport Workaround -->
@@ -133,32 +133,32 @@ if((ADMIN_STATUS)){
 		  </tr>
 	<?php
 	if(!empty($filelist)){
-	foreach ($filelist as $value) {
-	?>
-		  <tr>
-		    <td>
-		      <button type="button" class="btn btn-info btn-sm userselector" data-toggle="modal"
-					data-target="#inactiveModal" id="inactiveButton_<?php echo $value['id'] ?>"
-					name="<?php echo $value['id'] ?>">
-						<span class="sr-only">deactivated</span>
-			      <span data-feather="edit" data-toggle="tooltip" data-placement="left" title="Deactivated button">
-						</span>
-		      </button>
-		    </td>
-		    <td class="hidden-xs hidden-sm">
-			<?php echo $value['id'] ?>
-		    </td>
-		    <td class="hidden-xs hidden-sm">
-		      <?php echo $value['name'] ?>
-		    </td>
-		    <td>
-		      <?php echo $value['url'] ?>
-		    </td>
-	<?php
-	}
-	} else {
-		echo "Table failed to load!";
-	}
+		foreach ($filelist as $value) {
+		?>
+			  <tr>
+			    <td>
+			      <button type="button" class="btn btn-info btn-sm userselector" data-toggle="modal"
+						data-target="#inactiveModal" id="inactiveButton_<?php echo $value['id'] ?>"
+						name="<?php echo $value['id'] ?>">
+							<span class="sr-only">deactivated</span>
+				      <span data-feather="edit" data-toggle="tooltip" data-placement="left" title="Deactivated button">
+							</span>
+			      </button>
+			    </td>
+			    <td class="hidden-xs hidden-sm">
+				<?php echo $value['id'] ?>
+			    </td>
+			    <td class="hidden-xs hidden-sm">
+			      <?php echo $value['name'] ?>
+			    </td>
+			    <td>
+			      <?php echo $value['url'] ?>
+			    </td>
+		<?php
+		}
+		} else {
+			echo "Table failed to load!";
+		}
 	?>
 		</table>
 		</div>

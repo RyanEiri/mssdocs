@@ -13,10 +13,7 @@ $(document).ready(function() {
 		// there are many ways to get this data using jQuery (you can use the class or id also)
 
 		var formData = {
-// not needed for add function			'id'			: $('input[name=add_id]').val(),
-			'username'		: $('input[name=add_username]').val(),
-			'email'				: $('input[name=add_email]').val(),
-			'password'		: $('input[name=add_password]').val(),
+			// not needed for add function			'id'			: $('input[name=add_id]').val(),
 			'cpassword'		: $('input[name=add_cpassword]').val(),
 			'admin'			: $('input[name=add_admin]').prop('checked')
 		};
@@ -24,7 +21,7 @@ $(document).ready(function() {
 		// process the form
 		$.ajax({
 			type		: 'POST', //define the type of HTTP verb we want to use (POST for our form)
-			url		: 'json/json-add_user.php', //the url where we want to POST
+			url		: 'json/json-change_database.php', //the url where we want to POST
 			data		: formData, // our data object
 			dataType	: 'json', // what type of data do we expect back from the server
 			encode		: true
