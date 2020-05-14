@@ -146,8 +146,8 @@ if((ADMIN_STATUS)){
 		$url = $value['url'];
 		$pattern = 'server\/php';
 		$replacement = 'upload';
-		$url = preg_replace($pattern, $replacement, $url);
-		$filelist[$key]['url'] = $url;
+		$url_new = preg_replace($pattern, $replacement, $url);
+		$filelist[$key]['url'] = $url_new;
 	}
 	?>
 
