@@ -36,10 +36,14 @@ $(document).ready(function() {
 				// here we will handle errors and validation messages
 				if ( ! data.success) {
 
+					// handle file_urls errors --
+					if (data.errors.file_urls) {
+						$'#change_error').append('<div class="alert alert-danger" role="alert">' + data.errors.file_urls + '</div>');
+					}
 					// handle database errors --
 					if (data.errors.database) {
 						//$('#add_errors-group').addClass('has-error'); // add the error class
-						$('#add_database-error').append('<div class="alert alert-danger" role="alert">' + data.errors.database + '</div>'); // add the actual error message
+						$('#change_database-error').append('<div class="alert alert-danger" role="alert">' + data.errors.database + '</div>'); // add the actual error message
 					}
 
 				} else {

@@ -69,7 +69,7 @@ if((ADMIN_STATUS)){
 						</div>
 					</div>
 					<!-- DATABASE ERRORS -->
-					<div id="add_database-error" class="mt-3">
+					<div id="change_database-error" class="mt-3">
 						<!-- errors will go here -->
 					</div>
 				</div>
