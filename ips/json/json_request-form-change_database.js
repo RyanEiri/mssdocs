@@ -40,7 +40,7 @@ $(document).ready(function() {
 					if (data.errors.file_urls) {
 						$('#change-error').append('<div class="alert alert-danger" role="alert">' + data.errors.file_urls + '</div>');
 					}
-					// handle change_url warnings --
+					// handle change_urls warnings --
 					if (data.warnings.change_urls) {
 						$('#change-error').append('<div class="alert alert-warning" role="alert"' + data.warnings.change_urls + '</div>');
 					}
