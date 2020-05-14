@@ -159,18 +159,11 @@ if((ADMIN_STATUS)){
 		  <tr>
 		    <td>
 		      <button type="button" class="btn btn-info btn-sm userselector" data-toggle="modal"
-					data-target="#changeUser" id="changeButton_<?php echo $value['id'] ?>"
+					data-target="#inactiveModal" id="inactiveButton_<?php echo $value['id'] ?>"
 					name="<?php echo $value['id'] ?>">
-						<span class="sr-only">edit user</span>
-			      <span data-feather="edit" data-toggle="tooltip" data-placement="left" title="Edit user">
+						<span class="sr-only">deactivated</span>
+			      <span data-feather="edit" data-toggle="tooltip" data-placement="left" title="Deactivated button">
 						</span>
-		      </button>
-		      <button type="button" class="btn btn-danger btn-sm removeselector" data-toggle="modal"
-					data-target="#removeUser" id="removeButton_<?php echo $value['id'] ?>"
-					name="<?php echo $value['id'] ?>">
-						<span class="sr-only">remove user</span>
-			      <span data-feather="delete" data-toggle="tooltip" data-placement="left"
-						title="Remove user"></span>
 		      </button>
 		    </td>
 		    <td class="hidden-xs hidden-sm">
