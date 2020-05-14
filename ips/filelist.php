@@ -61,11 +61,13 @@ if((ADMIN_STATUS)){
 		  <div class="modal-body">
 				<div id="ChangeDB" class="col-auto my-1">
 					<!-- URL -->
-					<div id="change_url-group" class="custom-control custom-checkbox mr-sm-2">
-					  <input type="checkbox" class="custom-control-input" id="makeChangesForm_url">
-						<label class="form-check-label" for="makeChangesForm_url">URL</label>
-						<div id="change-error" class="mt-3">
-							<!-- errors will go here -->
+					<div class="form-row align-items-center">
+						<div id="change_url-group" class="custom-control custom-checkbox mr-sm-2">
+						  <input type="checkbox" class="custom-control-input" id="makeChangesForm_url">
+							<label class="form-check-label" for="makeChangesForm_url">URL</label>
+							<div id="change-error" class="mt-3">
+								<!-- errors will go here -->
+							</div>
 						</div>
 					</div>
 					<!-- DATABASE ERRORS -->
