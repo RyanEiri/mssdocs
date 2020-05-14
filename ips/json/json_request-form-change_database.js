@@ -7,6 +7,7 @@ $(document).ready(function() {
 		//$('.help-block').remove(); // remove the error text from a prior submission
 
 		$('.alert-danger').remove();
+		$('.alert-warning').remove();
 		$('.alert-success').remove();
 
 		// get the form data

@@ -75,7 +75,7 @@ if((ADMIN_STATUS)){
 				</div>
 		  </div>
 		  <div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="this.form.reset(); window.location.reload();">Close</button>
+				<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="this.form.reset();">Close</button>
 				<button type="submit" class="btn btn-primary">Save Changes</button>
 		  </div>
 	  </form>
