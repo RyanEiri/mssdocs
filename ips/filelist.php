@@ -141,6 +141,14 @@ if((ADMIN_STATUS)){
 	<?php
 	$files = new FileList();
 	$filelist = $files->filelist;
+
+	foreach ($filelist as $key => $value) {
+		$url = $value['url'];
+		$pattern = 'server\/php';
+		$replacement = 'upload';
+		$url = preg_replace($pattern, $replacement, $url);
+		$filelist[$key]['url'] = $url;
+	}
 	?>
 
 	<!-- User Table -->
