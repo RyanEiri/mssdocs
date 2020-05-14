@@ -38,7 +38,7 @@ $(document).ready(function() {
 
 					// handle file_urls errors --
 					if (data.errors.file_urls) {
-						$'#change-error').append('<div class="alert alert-danger" role="alert">' + data.errors.file_urls + '</div>');
+						$('#change-error').append('<div class="alert alert-danger" role="alert">' + data.errors.file_urls + '</div>');
 					}
 					// handle database errors --
 					if (data.errors.database) {
