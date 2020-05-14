@@ -144,10 +144,10 @@ if((ADMIN_STATUS)){
 
 	foreach ($filelist as $key => $value) {
 		$url = $value['url'];
-		$pattern = 'server\/php';
+		$pattern = '/server\/php/';
 		$replacement = 'upload';
-		$url_new = preg_replace($pattern, $replacement, $url);
-		$filelist[$key]['url'] = $url_new;
+		$url = preg_replace($pattern, $replacement, $url);
+		$filelist[$key]['url'] = $url;
 	}
 	?>
 
