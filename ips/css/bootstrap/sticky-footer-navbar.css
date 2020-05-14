@@ -23,9 +23,9 @@ html {
 body {
   /* Margin bottom by footer height */
   margin-bottom: 60px;
-  /* Move down content because we have a fixed navbar that is 3.5rem tall */
-  padding-top: 2.5rem;
-  font-size: .875rem;
+  /* Move down content because we have a fixed navbar that is 3.5rem tall
+  padding-top: 2.5rem; */
+  font-size: .75rem;
 }
 
 .footer {

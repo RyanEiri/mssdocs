@@ -14,8 +14,9 @@ $(document).ready(function() {
 
 		var formData = {
 			// not needed for add function			'id'			: $('input[name=add_id]').val(),
-			'cpassword'		: $('input[name=add_cpassword]').val(),
-			'admin'			: $('input[name=add_admin]').prop('checked')
+			// passing file_url[] with SESSION in php
+			//'fileURL'		: $('input[name=change_file_url]').val(),
+			'changeURLs'			: $('input[name=change_url]').prop('checked')
 		};
 
 		// process the form
@@ -35,34 +36,6 @@ $(document).ready(function() {
 				// here we will handle errors and validation messages
 				if ( ! data.success) {
 
-					// handle errors for username -------
-					if (data.errors.username) {
-						//$('#add_user-group').addClass('has-error'); // add the error class to show red input
-						$('#add_user-error').append('<div class="alert alert-danger" role="alert">' + data.errors.username + '</div>'); // add the actual error message under our input
-					}
-					if (data.errors.duplicate) {
-						//$('#add_user-group').addClass('has-error'); // add the error class
-						$('#add_user-error').append('<div class="alert alert-danger" role="alert">' + data.errors.duplicate + '</div>'); // add the actual error message
-					}
-
-					// handle errors for email ---------
-					if (data.errors.email) {
-						//$('#change_user-group').addClass('has-error'); // add the error class
-						$('#add_email-error').append('<div class="alert alert-danger" role="alert">' + data.errors.email + '</div>'); // add the actual error message
-					}
-
-					// handle errors for password ------
-					if (data.errors.password) {
-						//$('#add_pass-group').addClass('has-error'); // add the error class to show red input
-						$('#add_pass-error').append('<div class="alert alert-danger" role="alert">' + data.errors.password + '</div>'); // add the actual error message under our input
-					}
-
-					// handle errors for cpassword --
-					if (data.errors.cpassword) {
-						//$('#add_cpass-group').addClass('has-error'); // add the error class to show red input
-						$('#add_cpass-error').append('<div class="alert alert-danger" role="alert">' + data.errors.cpassword + '</div>'); // add the actual error message under our input
-					}
-
 					// handle database errors --
 					if (data.errors.database) {
 						//$('#add_errors-group').addClass('has-error'); // add the error class
@@ -72,7 +45,7 @@ $(document).ready(function() {
 				} else {
 
 					// ALL GOOD! just show the success message!
-					$('#UserAdd').append('<div class="alert alert-success" role="alert">' + data.message + '</div>');
+					$('#ChangeDB').append('<div class="alert alert-success" role="alert">' + data.message + '</div>');
 
 				}
 			})
