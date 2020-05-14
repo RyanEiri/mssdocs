@@ -54,7 +54,7 @@ if((ADMIN_STATUS)){
 		<form id="makeChangesForm" method="POST" action="json/json-change_database.php" autocomplete="off">
 		  <div class="modal-header">
 				<h5 class="modal-title">Make Changes</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="this.form.reset(); window.location.reload();">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="this.form.reset();">
 					<span aria-hidden="true">&times;</span>
 				</button>
 		  </div>
