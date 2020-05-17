@@ -43,7 +43,7 @@ $(document).ready(function() {
 					}
 					// handle change_urls warnings --
 					if (data.warnings.change_urls) {
-						$('#change-error').append('<div class="alert alert-warning" role="alert"' + data.warnings.change_urls + '</div>');
+						$('#change-error').append('<div class="alert alert-warning" role="alert">' + data.warnings.change_urls + '</div>');
 					}
 					// handle database errors --
 					if (data.errors.database) {
