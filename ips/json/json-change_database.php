@@ -30,7 +30,7 @@ if(ADMIN_STATUS){
 		$file_urls = $_SESSION['file_urls'];
 	}
 
-  if ($_POST['change_url'] === 'true') {
+  if ($_POST['change_urls'] === 'true') {
 		$_SESSION['change_urls'] = 1;
   } else {
 		$_SESSION['change_urls'] = 0;
