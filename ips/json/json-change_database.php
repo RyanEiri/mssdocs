@@ -12,8 +12,8 @@ if($login_cookie->CheckIt()) {
 
 if(ADMIN_STATUS){
   // instantiate an ActOnSingleUser object
-  if(!isset($user_object)) {
-  	$user_object = new ActOnSingleUser();
+  if(!isset($files_object)) {
+  	$files_object = new FileList();
   }
   // begin our ajax handling
   $errors	= array();	// array to hold validation errors
@@ -54,29 +54,38 @@ if(ADMIN_STATUS){
 
   } else {
 
-// If there are no validation errors submit to database.
-// DATABASE PROCESSING
-		if($user_object->addUser() !== FALSE){
+		// If there are no validation errors submit to database.
+		// DATABASE PROCESSING
+		if($files_object->changeURLs($file_urls) !== FALSE){
 		  // show a message of success and provide a true
 		  // success variable
 		  $data['success'] = true;
 		  $data['message'] = 'Success!';
 		} else {
-			if($user_object->mysqlError){
-				$errors['database'] = $user_object->mysqlError;
-			}
-			if($user_object->duplicateError){
-		  	$errors['duplicate'] = 'Username unavailable! Please choose another';
-			}
 		  $data['success'] = false;
 		  $data['errors'] = $errors;
 		}
   }
 
+	function changeURLs($filelist) {
+		foreach($filelist as $value) {
+			if($files_object->changeFileSystemDB($value['id'], $value['name'], $value['url'], $value['folder_id']) !== FALSE){
+				continue;
+			} else {
+				if(files_object->change_file_mysql_error){
+					$errors['database'] = $files_object->change_file_mysql_error;
+				}
+				return false;
+			}
+			])
+		}
+	}
+
   // complete our ajax handling with our json output
   // return all our data to an AJAX call
   header('Content-Type: application/json');
   echo json_encode($data);
+
 }
 }
 ?>
