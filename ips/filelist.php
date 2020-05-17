@@ -119,7 +119,9 @@ if((ADMIN_STATUS)){
 		$replacement = 'upload';
 		$url = preg_replace($pattern, $replacement, $url);
 		$filelist[$key]['url'] = $url;
-		$_SESSION['file_urls'][$key] = $url;
+		$_SESSION['file_urls'][$key]['id'] = $value['id'];
+		$_SESSION['file_urls'][$key]['name'] = $value['name'];
+		$_SESSION['file_urls'][$key]['url'] = $url;
 	}
 	?>
 
