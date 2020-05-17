@@ -136,6 +136,7 @@ if((ADMIN_STATUS)){
 		  </tr>
 	<?php
 	if(!empty($_SESSION['file_urls'])){
+		var_dump($_SESSION['file_urls']);
 		foreach ($_SESSION['file_urls'] as $value) {
 		?>
 			  <tr>
