@@ -63,7 +63,7 @@ if((ADMIN_STATUS)){
 					<!-- URL -->
 					<div id="change_url-group" class="form-check">
 					  <input type="checkbox" class="form-check-input" id="makeChangesForm_url">
-						<label class="form-check-label" for="makeChangesForm_url" name="change_url">URL</label>
+						<label class="form-check-label" for="makeChangesForm_url" name="change_urls">URL</label>
 						<div id="change-error" class="mt-3">
 							<!-- errors will go here -->
 						</div>
