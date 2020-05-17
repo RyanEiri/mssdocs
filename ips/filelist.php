@@ -119,6 +119,7 @@ if((ADMIN_STATUS)){
 		$replacement = 'upload';
 		$url = preg_replace($pattern, $replacement, $url);
 		$filelist[$key]['url'] = $url;
+		$_SESSION['file_urls'][$key] = $url;
 	}
 	?>
 
@@ -132,8 +133,8 @@ if((ADMIN_STATUS)){
 		    <th>URL</th>
 		  </tr>
 	<?php
-	if(!empty($filelist)){
-		foreach ($filelist as $value) {
+	if(!empty($_SESSION['file_urls'])){
+		foreach ($_SESSION['file_urls'] as $value) {
 		?>
 			  <tr>
 			    <td>
