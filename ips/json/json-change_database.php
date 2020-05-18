@@ -11,6 +11,21 @@ if($login_cookie->CheckIt()) {
 	define("ADMIN_STATUS", $userval->admin);
 
 	if(ADMIN_STATUS){
+
+		// Declare our function(s)
+		function changeURLs($filelist) {
+			foreach($filelist as $value) {
+				if($files_object->changeFileSystemDB($value['id'], $value['name'], $value['url'], $value['folder_id']) !== FALSE){
+					continue;
+				} else {
+					if($files_object->change_file_mysql_error){
+						$errors['database'] = $files_object->change_file_mysql_error;
+					}
+					return false;
+				}
+			}
+		}
+
 	  // instantiate an ActOnSingleUser object
 	  if(!isset($files_object)) {
 	  	$files_object = new FileList();
@@ -66,19 +81,6 @@ if($login_cookie->CheckIt()) {
 			  $data['errors'] = $errors;
 			}
 	  }
-
-		function changeURLs($filelist) {
-			foreach($filelist as $value) {
-				if($files_object->changeFileSystemDB($value['id'], $value['name'], $value['url'], $value['folder_id']) !== FALSE){
-					continue;
-				} else {
-					if($files_object->change_file_mysql_error){
-						$errors['database'] = $files_object->change_file_mysql_error;
-					}
-					return false;
-				}
-			}
-		}
 
 	  // complete our ajax handling with our json output
 	  // return all our data to an AJAX call
