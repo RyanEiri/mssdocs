@@ -56,7 +56,7 @@ if($login_cookie->CheckIt()) {
 
 			// If there are no validation errors submit to database.
 			// DATABASE PROCESSING
-			if($files_object->changeURLs($file_urls) !== FALSE){
+			if(changeURLs($file_urls) !== FALSE){
 			  // show a message of success and provide a true
 			  // success variable
 			  $data['success'] = true;

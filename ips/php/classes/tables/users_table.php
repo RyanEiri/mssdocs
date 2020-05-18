@@ -83,7 +83,7 @@ class UserCookie {
 
 	function CheckIt(){
 		if (isset($_COOKIE['login'])){
-		        list($username,$hash) = preg_split('/\,/',$_COOKIE['login']);
+		  list($username,$hash) = preg_split('/\,/', $_COOKIE['login']);
 			$this->username = $username;
 			$this->SecretWord();
 	    if (hash("sha512", $username.$this->secretword) == $hash){
