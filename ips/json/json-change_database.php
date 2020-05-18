@@ -77,7 +77,6 @@ if(ADMIN_STATUS){
 				}
 				return false;
 			}
-			])
 		}
 	}
 
