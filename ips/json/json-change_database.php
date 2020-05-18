@@ -12,6 +12,11 @@ if($login_cookie->CheckIt()) {
 
 	if(ADMIN_STATUS){
 
+		// instantiate an ActOnSingleUser object
+	  if(!isset($files_object)) {
+	  	$files_object = new FileList();
+	  }
+
 		// Declare our function(s)
 		function changeURLs($filelist) {
 			foreach($filelist as $value) {
@@ -26,10 +31,6 @@ if($login_cookie->CheckIt()) {
 			}
 		}
 
-	  // instantiate an ActOnSingleUser object
-	  if(!isset($files_object)) {
-	  	$files_object = new FileList();
-	  }
 	  // begin our ajax handling
 	  $errors	= array();	// array to hold validation errors
 		$warnings = array(); // array to hold validation warnings
