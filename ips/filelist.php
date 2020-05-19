@@ -151,10 +151,10 @@ if((ADMIN_STATUS)){
 				<?php echo $value['id'] ?>
 			    </td>
 			    <td class="hidden-xs hidden-sm">
-			      <?php echo $value['url'] ?>
+						<?php echo $old_filelist[$key]['url'] ?>
 			    </td>
 			    <td>
-			      <?php echo $old_filelist[$key]['url'] ?>
+			      <?php echo $value['url'] ?>
 			    </td>
 		<?php
 		}
