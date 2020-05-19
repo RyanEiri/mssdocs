@@ -117,6 +117,7 @@ if((ADMIN_STATUS)){
 
 	foreach ($filelist as $key => $value) {
 		$url = $value['url'];
+		$name = $value['name'];
 		// replace old file system hierarchy with new one
 		$pattern = '/server\/php/';
 		$replacement = 'upload';
@@ -126,20 +127,32 @@ if((ADMIN_STATUS)){
 		$replacement = '\1/';
 		$url = preg_replace($pattern, $replacement, $url);
 		// replace PetriÌna_GuÃ°mundsdoÌttir with Petrína_Guðmundsdóttir
-		$pattern = '/PetriÌna_GuÃ°mundsdoÌttir/i';
+		$pattern = '/PetriÌna_GuÃ°mundsdoÌttir/';
 		$replacement = 'Petrína_Guðmundsdóttir';
 		$url = preg_replace($pattern, $replacement, $url);
 		// replace PetriÌna-GuÃ°mundsdoÌttir with Petrína-Guðmundsdóttir
-		$pattern = '/PetriÌna-GuÃ°mundsdoÌttir/i';
+		$pattern = '/PetriÌna-GuÃ°mundsdoÌttir/';
 		$replacement = 'Petrína-Guðmundsdóttir';
 		$url = preg_replace($pattern, $replacement, $url);
+		// replace /PetriÌna_GuÃ°mundsdoÌttir in name value with Petrína_Guðmundsdóttir
+		$pattern = '/\/PetriÌna_GuÃ°mundsdoÌttir/';
+		$replacement = 'Petrína_Guðmundsdóttir';
+		$name = preg_replace($pattern, $replacement, $name);
+		// replace /PetriÌna-GuÃ°mundsdoÌttir in name value with
+		// Petrína-Guðmundsdóttir
+		$pattern = '/\/PetriÌna-GuÃ°mundsdoÌttir/';
+		$replacement = 'Petrína-Guðmundsdóttir';
+		$name = preg_replace($pattern, $replacement, $name);
 		//populate the $new_filelist array
 		if ($filelist[$key]['url'] !== $url) {
-			$new_filelist[$key]['id'] = $filelist[$key]['id'];
-			$new_filelist[$key]['name'] = $filelist[$key]['name'];
 			$new_filelist[$key]['url'] = $url;
-			$new_filelist[$key]['folder_id'] = $filelist[$key]['folder_id'];
 		}
+		if ($filelist[$key]['name'] !== $name) {
+			$new_filelist[$key]['name'] = $name;
+		}
+		$new_filelist[$key]['id'] = $filelist[$key]['id'];
+		$new_filelist[$key]['name'] = $filelist[$key]['name'];
+		$new_filelist[$key]['folder_id'] = $filelist[$key]['folder_id'];
 	}
 	$_SESSION['file_urls'] = $new_filelist;
 	?>
