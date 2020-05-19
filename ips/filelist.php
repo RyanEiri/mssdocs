@@ -112,7 +112,7 @@ if((ADMIN_STATUS)){
 	<?php
 	$files = new FileList();
 	$filelist = $files->filelist;
-	$old_filelist = $filelist
+	$old_filelist = $filelist;
 
 	foreach ($filelist as $key => $value) {
 		$url = $value['url'];
