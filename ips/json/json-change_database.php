@@ -37,25 +37,26 @@ if($login_cookie->CheckIt()) {
 			$warnings['change_urls'] = 'If you want to make the changes, confirm by checking the URL checkbox!';
 	  }
 
-		$fileChange = new ActOnSingleFile();
-		// Make the requested changes to DATABASE
-		foreach($file_urls as $value) {
-			if($fileChange->changeFileSystemDB($value['id'], $value['name'], $value['url'], $value['folder_id']) !== FALSE){
-				continue;
-			} else {
-				if($fileChange->change_file_mysql_error){
-					$errors['database'] = $fileChange->change_file_mysql_error;
-				}
-				break;
-			}
-		}
-
 	// return a validation response =============================================
 
 	  // if there are any errors in our errors array,
 	  // return a success boolean of false
 	  if (!empty($errors) || !empty($warnings)) {
 
+			// Database query
+			$fileChange = new ActOnSingleFile();
+			// Make the requested changes to DATABASE
+			foreach($file_urls as $value) {
+				if($fileChange->changeFileSystemDB($value['id'], $value['name'], $value['url'], $value['folder_id']) !== FALSE){
+					continue;
+				} else {
+					if($fileChange->change_file_mysql_error){
+						$errors['database'] = $fileChange->change_file_mysql_error;
+					}
+					break;
+				}
+			}
+			
 			// if there are items in our errors array,
 			// return those errors
 			$data['success'] = false;
