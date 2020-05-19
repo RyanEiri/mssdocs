@@ -113,15 +113,21 @@ if((ADMIN_STATUS)){
 	$files = new FileList();
 	$filelist = $files->filelist;
 	$old_filelist = $filelist;
+	$new_filelist = array();
 
 	foreach ($filelist as $key => $value) {
 		$url = $value['url'];
 		$pattern = '/server\/php/';
 		$replacement = 'upload';
 		$url = preg_replace($pattern, $replacement, $url);
-		$filelist[$key]['url'] = $url;
+		if ($filelist[$key]['url'] !== $url) {
+			$new_filelist[$key]['id'] = $filelist[$key]['id'];
+			$new_filelist[$key]['name'] = $filelist[$key]['name'];
+			$new_filelist[$key]['url'] = $url;
+			$new_filelist[$key]['folder_id'] = $filelist[$key]['folder_id'];
+		}
 	}
-	$_SESSION['file_urls'] = $filelist;
+	$_SESSION['file_urls'] = $new_filelist;
 	?>
 
 	<!-- User Table -->
