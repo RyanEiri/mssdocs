@@ -121,7 +121,6 @@ if((ADMIN_STATUS)){
 		$url = preg_replace($pattern, $replacement, $url);
 		$filelist[$key]['url'] = $url;
 	}
-	var_dump($filelist);
 	$_SESSION['file_urls'] = $filelist;
 	?>
 
@@ -135,7 +134,7 @@ if((ADMIN_STATUS)){
 		    <th>NEW URL</th>
 		  </tr>
 	<?php
-	/*if(!empty($_SESSION['file_urls'])){
+	if(!empty($_SESSION['file_urls'])){
 		foreach ($_SESSION['file_urls'] as $key => $value) {
 		?>
 			  <tr>
@@ -161,7 +160,7 @@ if((ADMIN_STATUS)){
 		}
 		} else {
 			echo "Table failed to load!";
-		}*/
+		}
 	?>
 		</table>
 		</div>
