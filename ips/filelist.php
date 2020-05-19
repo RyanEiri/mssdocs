@@ -123,7 +123,7 @@ if((ADMIN_STATUS)){
 		$url = preg_replace($pattern, $replacement, $url);
 		// replace double slashes with stingle
 		$pattern = '/([a-z])(\/\/)/i';
-		$replacement = '\1\/';
+		$replacement = '\1/';
 		$url = preg_replace($pattern, $replacement, $url);
 		if ($filelist[$key]['url'] !== $url) {
 			$new_filelist[$key]['id'] = $filelist[$key]['id'];
