@@ -17,24 +17,24 @@ if($login_cookie->CheckIt()) {
 	  	$files_object = new FileList();
 	  }
 
+	  // begin our ajax handling
+	  $errors	= array();	// array to hold validation errors
+		$warnings = array(); // array to hold validation warnings
+	  $data		= array();	// array to pass back data
+
 		// Declare our function(s)
-		function changeURLs($filelist) {
-			foreach($filelist as $value) {
-				if($files_object->changeFileSystemDB($value['id'], $value['name'], $value['url'], $value['folder_id']) !== FALSE){
+		function changeURLs($list, $object) {
+			foreach($list as $value) {
+				if($object->changeFileSystemDB($value['id'], $value['name'], $value['url'], $value['folder_id']) !== FALSE){
 					continue;
 				} else {
-					if($files_object->change_file_mysql_error){
-						$errors['database'] = $files_object->change_file_mysql_error;
+					if($object->change_file_mysql_error){
+						$errors['database'] = $object->change_file_mysql_error;
 					}
 					return false;
 				}
 			}
 		}
-
-	  // begin our ajax handling
-	  $errors	= array();	// array to hold validation errors
-		$warnings = array(); // array to hold validation warnings
-	  $data		= array();	// array to pass back data
 
 	  // validate the variables ========================================
 	  // If any of these variables don't exist, add an error to the
@@ -72,7 +72,7 @@ if($login_cookie->CheckIt()) {
 
 			// If there are no validation errors submit to database.
 			// DATABASE PROCESSING
-			if(changeURLs($file_urls) !== FALSE){
+			if(changeURLs($file_urls, $files_object) !== FALSE){
 			  // show a message of success and provide a true
 			  // success variable
 			  $data['success'] = true;
