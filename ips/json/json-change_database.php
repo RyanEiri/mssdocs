@@ -43,7 +43,19 @@ if($login_cookie->CheckIt()) {
 	  // return a success boolean of false
 	  if (!empty($errors) || !empty($warnings)) {
 
-			// Database query
+			// if there are items in our errors array,
+			// return those errors
+			$data['success'] = false;
+			if(!empty($errors)) {
+				$data['errors'] = $errors;
+			}
+			if (!empty($warnings)) {
+				$data['warnings'] = $warnings;
+			}
+
+	  } else {
+
+			// Perform DB query upon validation
 			$fileChange = new ActOnSingleFile();
 			// Make the requested changes to DATABASE
 			foreach($file_urls as $value) {
@@ -56,18 +68,7 @@ if($login_cookie->CheckIt()) {
 					break;
 				}
 			}
-			
-			// if there are items in our errors array,
-			// return those errors
-			$data['success'] = false;
-			if(!empty($errors)) {
-				$data['errors'] = $errors;
-			}
-			if (!empty($warnings)) {
-				$data['warnings'] = $warnings;
-			}
 
-	  } else {
 		  // show a message of success and provide a true
 		  // success variable
 		  $data['success'] = true;
