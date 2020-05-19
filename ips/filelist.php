@@ -149,7 +149,7 @@ if((ADMIN_STATUS)){
 		<table class="table table-striped table-hover table-condensed">
 		  <tr>
 		    <th>Functions</th>
-		    <th class="hidden-xs hidden-sm">ID</th>
+		    <th class="hidden-xs hidden-sm">NAME</th>
 		    <th class="hidden-xs hidden-sm">OLD URL</th>
 		    <th>NEW URL</th>
 		  </tr>
@@ -168,7 +168,7 @@ if((ADMIN_STATUS)){
 			      </button>
 			    </td>
 			    <td class="hidden-xs hidden-sm">
-				<?php echo $value['id'] ?>
+				<?php echo $value['name'] ?>
 			    </td>
 			    <td class="hidden-xs hidden-sm">
 						<?php echo $old_filelist[$key]['url'] ?>
