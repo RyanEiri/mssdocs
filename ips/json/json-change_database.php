@@ -11,30 +11,14 @@ if($login_cookie->CheckIt()) {
 	define("ADMIN_STATUS", $userval->admin);
 
 	if(ADMIN_STATUS){
-
-		// instantiate an ActOnSingleUser object
+	  // instantiate an ActOnSingleUser object
 	  if(!isset($files_object)) {
 	  	$files_object = new FileList();
 	  }
-
 	  // begin our ajax handling
 	  $errors	= array();	// array to hold validation errors
 		$warnings = array(); // array to hold validation warnings
 	  $data		= array();	// array to pass back data
-
-		// Declare our function(s)
-		function changeURLs($list, $object) {
-			foreach($list as $value) {
-				if($object->changeFileSystemDB($value['id'], $value['name'], $value['url'], $value['folder_id']) !== FALSE){
-					continue;
-				} else {
-					if($object->change_file_mysql_error){
-						$errors['database'] = $object->change_file_mysql_error;
-					}
-					return false;
-				}
-			}
-		}
 
 	  // validate the variables ========================================
 	  // If any of these variables don't exist, add an error to the
@@ -53,6 +37,18 @@ if($login_cookie->CheckIt()) {
 			$warnings['change_urls'] = 'If you want to make the changes, confirm by checking the URL checkbox!';
 	  }
 
+		// Make the requested changes to DATABASE
+		foreach($file_urls as $value) {
+			if($files_object->changeFileSystemDB($value['id'], $value['name'], $value['url'], $value['folder_id']) !== FALSE){
+				continue;
+			} else {
+				if($files_object->change_file_mysql_error){
+					$errors['database'] = $files_object->change_file_mysql_error;
+				}
+				break;
+			}
+		}
+
 	// return a validation response =============================================
 
 	  // if there are any errors in our errors array,
@@ -62,25 +58,18 @@ if($login_cookie->CheckIt()) {
 			// if there are items in our errors array,
 			// return those errors
 			$data['success'] = false;
-			$data['errors'] = $errors;
-
+			if(!empty($errors)) {
+				$data['errors'] = $errors;
+			}
 			if (!empty($warnings)) {
 				$data['warnings'] = $warnings;
 			}
 
 	  } else {
-
-			// If there are no validation errors submit to database.
-			// DATABASE PROCESSING
-			if(changeURLs($file_urls, $files_object) !== FALSE){
-			  // show a message of success and provide a true
-			  // success variable
-			  $data['success'] = true;
-			  $data['message'] = 'Success!';
-			} else {
-			  $data['success'] = false;
-			  $data['errors'] = $errors;
-			}
+		  // show a message of success and provide a true
+		  // success variable
+		  $data['success'] = true;
+		  $data['message'] = 'Success!';
 	  }
 
 	  // complete our ajax handling with our json output
