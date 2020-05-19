@@ -415,7 +415,7 @@ class ActOnSingleFile {
 		//$db->query($changeSQL) or die ('Update statement failed: Entry not updated');
 		$this->change_file_result = $db->query($this->change_file_sql);
 		if($this->change_file_result->isError()) {
-			$this->change_file_mysql_error = $change_file_result->queryErrorMessage();
+			$this->change_file_mysql_error = $this->change_file_result->queryErrorMessage();
 			return false;
 		} else {
 			return true;

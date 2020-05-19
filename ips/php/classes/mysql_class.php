@@ -135,8 +135,11 @@ class SQL {
 
 	function queryErrorMessage(){
 		if ($this->queryError) {
-			return ('Query failed: ' . mysqli_error($this->dbConn)
-                   		. ' SQL: ' . $this->previousStatement);
+      if($this->previousStatement){
+        return ('Query failed: ' . mysqli_error($this->dbConn) . ' SQL: ' .
+                $this->previousStatement);
+      } else {
+        return ('Query failed: ' . mysql_error($this->dbConn));
 		}
 	}
 
