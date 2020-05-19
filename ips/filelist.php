@@ -144,15 +144,20 @@ if((ADMIN_STATUS)){
 		$replacement = 'Petrína-Guðmundsdóttir';
 		$name = preg_replace($pattern, $replacement, $name);
 		//populate the $new_filelist array
-		if ($filelist[$key]['url'] !== $url) {
-			$new_filelist[$key]['url'] = $url;
+		if ($filelist[$key]['url'] !== $url || $filelist[$key]['name'] !== $name) {
+			if ($filelist[$key]['url'] !== $url) {
+				$new_filelist[$key]['url'] = $url;
+			} else {
+				$new_filelist[$key]['url'] = $filelist[$key]['url'];
+			}
+			if ($filelist[$key]['name'] !== $name) {
+				$new_filelist[$key]['name'] = $name;
+			} else {
+				$new_filelist[$key]['name'] = $filelist[$key]['name'];
+			}
+			$new_filelist[$key]['id'] = $filelist[$key]['id'];
+			$new_filelist[$key]['folder_id'] = $filelist[$key]['folder_id'];
 		}
-		if ($filelist[$key]['name'] !== $name) {
-			$new_filelist[$key]['name'] = $name;
-		}
-		$new_filelist[$key]['id'] = $filelist[$key]['id'];
-		$new_filelist[$key]['name'] = $filelist[$key]['name'];
-		$new_filelist[$key]['folder_id'] = $filelist[$key]['folder_id'];
 	}
 	$_SESSION['file_urls'] = $new_filelist;
 	?>
