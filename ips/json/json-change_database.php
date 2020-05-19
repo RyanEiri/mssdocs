@@ -37,13 +37,14 @@ if($login_cookie->CheckIt()) {
 			$warnings['change_urls'] = 'If you want to make the changes, confirm by checking the URL checkbox!';
 	  }
 
+		$fileChange = new ActOnSingleFile();
 		// Make the requested changes to DATABASE
 		foreach($file_urls as $value) {
-			if($files_object->changeFileSystemDB($value['id'], $value['name'], $value['url'], $value['folder_id']) !== FALSE){
+			if($fileChange->changeFileSystemDB($value['id'], $value['name'], $value['url'], $value['folder_id']) !== FALSE){
 				continue;
 			} else {
-				if($files_object->change_file_mysql_error){
-					$errors['database'] = $files_object->change_file_mysql_error;
+				if($fileChange->change_file_mysql_error){
+					$errors['database'] = $fileChange->change_file_mysql_error;
 				}
 				break;
 			}
