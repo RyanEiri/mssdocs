@@ -140,6 +140,7 @@ class SQL {
                 $this->previousStatement);
       } else {
         return ('Query failed: ' . mysql_error($this->dbConn));
+      }
 		}
 	}
 
