@@ -117,8 +117,13 @@ if((ADMIN_STATUS)){
 
 	foreach ($filelist as $key => $value) {
 		$url = $value['url'];
+		// replace old file system hierarchy with new one
 		$pattern = '/server\/php/';
 		$replacement = 'upload';
+		$url = preg_replace($pattern, $replacement, $url);
+		// replace double slashes with stingle
+		$pattern = '/\/\//';
+		$replacement = '\/';
 		$url = preg_replace($pattern, $replacement, $url);
 		if ($filelist[$key]['url'] !== $url) {
 			$new_filelist[$key]['id'] = $filelist[$key]['id'];
