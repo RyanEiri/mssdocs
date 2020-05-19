@@ -112,6 +112,7 @@ if((ADMIN_STATUS)){
 	<?php
 	$files = new FileList();
 	$filelist = $files->filelist;
+	$old_filelist = $filelist
 
 	foreach ($filelist as $key => $value) {
 		$url = $value['url'];
@@ -129,12 +130,12 @@ if((ADMIN_STATUS)){
 		  <tr>
 		    <th>Functions</th>
 		    <th class="hidden-xs hidden-sm">ID</th>
-		    <th class="hidden-xs hidden-sm">NAME</th>
-		    <th>URL</th>
+		    <th class="hidden-xs hidden-sm">OLD URL</th>
+		    <th>NEW URL</th>
 		  </tr>
 	<?php
 	if(!empty($_SESSION['file_urls'])){
-		foreach ($_SESSION['file_urls'] as $value) {
+		foreach ($_SESSION['file_urls'] as $key => $value) {
 		?>
 			  <tr>
 			    <td>
@@ -150,10 +151,10 @@ if((ADMIN_STATUS)){
 				<?php echo $value['id'] ?>
 			    </td>
 			    <td class="hidden-xs hidden-sm">
-			      <?php echo $value['name'] ?>
+			      <?php echo $value['url'] ?>
 			    </td>
 			    <td>
-			      <?php echo $value['url'] ?>
+			      <?php echo $old_filelist[$key]['url'] ?>
 			    </td>
 		<?php
 		}
