@@ -126,8 +126,10 @@ if((ADMIN_STATUS)){
 		$replacement = '\1/';
 		$url = preg_replace($pattern, $replacement, $url);
 		// replace PetriÌna_GuÃ°mundsdoÌttir with Petrína Guðmundsdóttir
-		$pattern = '/PetriÌna_GuÃ°mundsdoÌttir/';
+		$pattern = '/PetriÌna_GuÃ°mundsdoÌttir/i';
 		$replacement = 'Petrína Guðmundsdóttir';
+		$url = preg_replace($pattern, $replacement, $url);
+		//populate the $new_filelist array 
 		if ($filelist[$key]['url'] !== $url) {
 			$new_filelist[$key]['id'] = $filelist[$key]['id'];
 			$new_filelist[$key]['name'] = $filelist[$key]['name'];
