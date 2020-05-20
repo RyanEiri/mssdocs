@@ -69,10 +69,18 @@ if($login_cookie->CheckIt()) {
 				}
 			}
 
-		  // show a message of success and provide a true
-		  // success variable
-		  $data['success'] = true;
-		  $data['message'] = 'Success!';
+			if (!empty($errors)) {
+				// show error messages and provide a false
+				// success variable
+				$data['success'] = false;
+				$data['errors'] = $errors;
+			} else {
+				// show a message of success and provide a true
+				// success variable
+				$data['success'] = true;
+				$data['message'] = 'Success!';
+			}
+
 	  }
 
 	  // complete our ajax handling with our json output
