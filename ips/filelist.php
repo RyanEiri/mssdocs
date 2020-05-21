@@ -155,6 +155,30 @@ if((ADMIN_STATUS)){
 		$pattern = '/MarÃ­a JÃ³nsdÃ³ttir - GrettisrÃ­mur frÃ¡ 15, 17 og 19 Ã¶ld/';
 		$replacement = 'María Jónsdóttir - Grettisrímur frá 15, 17 og 19 öld';
 		$name = preg_replace($pattern, $replacement, $name);
+		// replace "GuÃ°jÃ³n" with "Guðjón" in url
+		$pattern = '/GuÃ°jÃ³n/';
+		$replacement = 'Guðjón';
+		$url = preg_replace($pattern, $replacement, $url);
+		// replace "GuÃ°jÃ³n" with "Guðjón" in name
+		$pattern = '/GuÃ°jÃ³n/';
+		$replacement = 'Guðjón';
+		$name = preg_replace($pattern, $replacement, $name);
+		// replace "Ãrmann" with "Ármann" in url
+		$pattern = '/Ãrmann/';
+		$replacement = 'Ármann';
+		$url = preg_replace($pattern, $replacement, $url);
+		// replace "Ãrmann" with "Ármann" in name
+		$pattern = '/Ãrmann/';
+		$replacement = 'Ármann';
+		$name = preg_replace($pattern, $replacement, $name);
+		// replace "JÃ³nsson" with "Jónsson" in url
+		$pattern = '/JÃ³nsson/';
+		$replacement = 'Jónsson';
+		$url = preg_replace($pattern, $replacement, $url);
+		// replace "JÃ³nsson" with "Jónsson" in name
+		$pattern = '/JÃ³nsson/';
+		$replacement = 'Jónsson';
+		$name = preg_replace($pattern, $replacement, $name);
 		//populate the $new_filelist array
 		if ($filelist[$key]['url'] !== $url || $filelist[$key]['name'] !== $name) {
 			if ($filelist[$key]['url'] !== $url) {
