@@ -179,6 +179,14 @@ if((ADMIN_STATUS)){
 		$pattern = '/JÃ³nsson/';
 		$replacement = 'Jónsson';
 		$name = preg_replace($pattern, $replacement, $name);
+		// replace "SÃ³lveig SnorradÃ³ttir" with "Sólveig Snorradóttir" in url
+		$pattern = '/SÃ³lveig SnorradÃ³ttir/';
+		$replacement = 'Sólveig Snorradóttir';
+		$url = preg_replace($pattern, $replacement, $url);
+		// replace "SÃ³lveig SnorradÃ³ttir" with "Sólveig Snorradóttir" in name
+		$pattern = '/SÃ³lveig SnorradÃ³ttir/';
+		$replacement = 'Sólveig Snorradóttir';
+		$name = preg_replace($pattern, $replacement, $name);
 		//populate the $new_filelist array
 		if ($filelist[$key]['url'] !== $url || $filelist[$key]['name'] !== $name) {
 			if ($filelist[$key]['url'] !== $url) {
