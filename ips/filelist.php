@@ -153,7 +153,7 @@ if((ADMIN_STATUS)){
 		// with "María Jónsdóttir - Grettisrímur frá 15, 17 og 19 öld"
 		// in name
 		$pattern = '/MarÃ­a JÃ³nsdÃ³ttir - GrettisrÃ­mur frÃ¡ 15, 17 og 19 Ã¶ld/';
-		$replacement 'María Jónsdóttir - Grettisrímur frá 15, 17 og 19 öld';
+		$replacement = 'María Jónsdóttir - Grettisrímur frá 15, 17 og 19 öld';
 		$name = preg_replace($pattern, $replacement, $name);
 		//populate the $new_filelist array
 		if ($filelist[$key]['url'] !== $url || $filelist[$key]['name'] !== $name) {
