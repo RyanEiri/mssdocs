@@ -241,7 +241,7 @@ if((ADMIN_STATUS)){
 		<?php
 		}
 		} else {
-			echo "Table failed to load!";
+			echo "No entry errors detected.";
 		}
 	?>
 		</table>
