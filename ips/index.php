@@ -79,6 +79,12 @@ if($login_cookie->CheckIt()) {
 				<p><a class="btn btn-secondary" href="<?php echo PROGRAM_WEB_BASE ?>xml/" role="button">Edit &raquo;</a></p>
 			</div>
 			<div class="col-md-4">
+				<h2>Backups</h2>
+				<p class="lead">Index of backups</p>
+				<p>Index of the ips/backups directory</p>
+				<p><a class="btn btn-secondary" href="<?php echo PROGRAM_WEB_BASE ?>backups/" role="button">Backups &raquo;</a>    </p>
+			</div>
+			<div class="col-md-4">
 				<h2>Contact Database</h2>
 				<p class="lead">Coming soon!</p>
 				<p>Share contact information about public and private collections of manuscripts.</p>
