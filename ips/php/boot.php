@@ -17,6 +17,7 @@ define("JS_BASE", 'js');
 define("JSON_BASE", 'json');
 
 // Define hard program configuration constants.
+// altered to use getcwd() function
 define("CURRENT_WORKING_DIR", getcwd().'/');
 define("ROOT_DIR", preg_replace('/\/' . INSTALL_DIR . '.*/', '', CURRENT_WORKING_DIR));
 //define("ROOT_DIR", $_SERVER['DOCUMENT_ROOT']);
