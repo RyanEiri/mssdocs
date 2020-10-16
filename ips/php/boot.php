@@ -7,8 +7,26 @@ error_reporting(E_ALL);
 // Per-implementation constants
 // following line is no longer used per get_full_url() change !*CHANGE01*!
 //define("PROGRAM_WEB_BASE_PROTOCOL", "HTTPS");
+// define installation specific directories
+// these are the only install specific items that should change in this file
 define("INSTALL_DIR", 'ips');
-define("BASE_URL", preg_replace('/\/'.INSTALL_DIR.'.*/', '', FULL_URL));
+define("PUBLIC_DIRS", array(
+	'gallery'
+));
+
+// test for subdirectories and remove them to set BASE_URL
+if (preg_match('/\/'.INSTALL_DIR.'.*/', FULL_URL)){
+	define("BASE_URL", preg_replace('/\/'.INSTALL_DIR.'.*/', '', FULL_URL));
+} else {
+	foreach (PUBLIC_DIRS as $value){
+		if (preg_match('/\/'.$value.'.*/', FULL_URL)){
+			define("BASE_URL", preg_replace('/\/'.$value.'.*/', '', FULL_URL));
+		}
+	}
+	if (!defined(BASE_URL)){
+		define("BASE_URL", FULL_URL);
+	}
+}
 
 // Program Directories
 define("HTML_TEMPLATES_BASE", 'html');

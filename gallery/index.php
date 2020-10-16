@@ -1,3 +1,10 @@
+<?php
+session_start();
+chdir('..');
+include getcwd().'/ips/php/boot.php';
+echo BASE_URL.'<br />';
+echo FULL_URL;
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -51,7 +58,7 @@
         <div class="inner">
           <h3 class="masthead-brand">Í fótspor Árna Magnússonar í Vesturheimi</h3>
           <nav class="nav nav-masthead justify-content-center">
-            <a class="nav-link" href="../index.php">Home</a>
+	  <a class="nav-link" href="<?php echo BASE_URL ?>">Home</a>
 						<a class="nav-link active" href="<?php echo $_SERVER['PHP_SELF'] ?>">Gallery</a>
             <a class="nav-link" href="../ips">Proofing</a>
           </nav>

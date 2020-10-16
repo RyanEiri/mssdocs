@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'ips/php/boot.php';
+include getcwd().'/ips/php/boot.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -49,9 +49,9 @@ include 'ips/php/boot.php';
         <div class="inner">
           <h3 class="masthead-brand">Í fótspor Árna Magnússonar í Vesturheimi</h3>
           <nav class="nav nav-masthead justify-content-center">
-	  <a class="nav-link active" href="<?php echo $full_url ?>">Home</a>
-	  <a class="nav-link" href="<?php echo $full_url ?>/gallery">Gallery</a>
-            <a class="nav-link" href="/ips">Proofing</a>
+	  <a class="nav-link active" href="<?php echo BASE_URL?>">Home</a>
+	  <a class="nav-link" href="<?php echo BASE_URL ?>/gallery">Gallery</a>
+	  <a class="nav-link" href="<?php echo BASE_URL ?>/ips">Proofing</a>
           </nav>
         </div>
       </header>
