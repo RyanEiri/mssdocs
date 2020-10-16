@@ -1,3 +1,7 @@
+<?php
+session_start();
+include 'ips/php/boot.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -38,13 +42,15 @@
 
 <body class="text-center">
 
+<?php
+?>
     <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
       <header class="masthead mb-auto">
         <div class="inner">
           <h3 class="masthead-brand">Í fótspor Árna Magnússonar í Vesturheimi</h3>
           <nav class="nav nav-masthead justify-content-center">
-            <a class="nav-link active" href="index.php">Home</a>
-						<a class="nav-link" href="/gallery">Gallery</a>
+	  <a class="nav-link active" href="<?php echo $full_url ?>">Home</a>
+	  <a class="nav-link" href="<?php echo $full_url ?>/gallery">Gallery</a>
             <a class="nav-link" href="/ips">Proofing</a>
           </nav>
         </div>

@@ -1,5 +1,5 @@
 <?php
-include 'php/boot.php';
+include getcwd().'/php/boot.php';
 session_start();
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$userval = new UserGrab($_REQUEST['username']);
