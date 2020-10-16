@@ -2,8 +2,6 @@
 session_start();
 chdir('..');
 include getcwd().'/ips/php/boot.php';
-echo BASE_URL.'<br />';
-echo FULL_URL;
 ?>
 <!DOCTYPE html>
 <html lang="en">
