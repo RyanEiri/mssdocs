@@ -23,7 +23,7 @@ if (preg_match('/\/'.INSTALL_DIR.'.*/', FULL_URL)){
 			define("BASE_URL", preg_replace('/\/'.$value.'.*/', '', FULL_URL));
 		}
 	}
-	if (!defined(BASE_URL)){
+	if (!defined('BASE_URL')){
 		define("BASE_URL", FULL_URL);
 	}
 }
