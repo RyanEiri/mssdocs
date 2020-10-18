@@ -19,7 +19,7 @@ class UserGrab {
 			$this->grabUser();
 	}
 
-	function grabUser(){
+	private function grabUser(){
 		global $db;
 		$sql = "SELECT password, admin, secretword FROM users WHERE username='" . $this->username . "' LIMIT 1";
 		$this->result = $db->query($sql);
@@ -73,8 +73,8 @@ class UserCookie {
 		$this->username = $user;
 		$this->SecretWord();
 		if ($this->secretword==$secret) {
-			setcookie('login',$user.','.hash("sha512", $user.$this->secretword), 0, '/ips', '', true, true);
-			setcookie('zsYjZ5RdavKHU43Xi6DbWKuAu','lhE8IXrx1Ks90w7glk0VUlqTe', 0, '/ips', '', true, true);
+			setcookie('login',$user.','.hash("sha512", $user.$this->secretword), 0, '', $_SERVER['SERVER_NAME'], true, true);
+			setcookie('zsYjZ5RdavKHU43Xi6DbWKuAu','lhE8IXrx1Ks90w7glk0VUlqTe', 0, '', $_SERVER['SERVER_NAME'], true, true);
 			header('Location: ./index.php');
 		} else {
 			header('Location: ./login.php?1');
@@ -97,7 +97,7 @@ class UserCookie {
 		}
 	}
 
-	function SecretWord(){
+	private function SecretWord(){
 		global $db;
 		$sql = "SELECT secretword FROM users WHERE username='" . $this->username . "' LIMIT 1";
 		$this->result = $db->query($sql);
