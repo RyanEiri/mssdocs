@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if($secretword) {
 		$login_cookie = new UserCookie();
 		$login_cookie->CreateIt($_REQUEST['username'],$secretword);
-		$_SESSION['login_cookie'] = $login_cookie;
+//		$_SESSION['login_cookie'] = $login_cookie;
 	} else {
 		header('Location: ./login.php?1');
 	}
