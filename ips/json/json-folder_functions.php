@@ -1,17 +1,13 @@
 <?php
-ini_set('max_execution_time', '2800');
-$dir_base = 'ips';
-$config_base = $_SERVER['DOCUMENT_ROOT'];
-$config_base = $config_base.'/'.$dir_base.'/';
-//require_once ($config_base.'functions/functions.php');
-require_once ($config_base.'classes/classes.php');
-require_once ($config_base.'config/config.php');
 session_start();
-if($_SESSION['login_cookie']) {
-	$login_cookie = $_SESSION['login_cookie'];
-} else {
+//ini_set('max_execution_time', '2800');
+chdir('..');
+include getcwd().'/php/boot.php';
+//if($_SESSION['login_cookie']) {
+//	$login_cookie = $_SESSION['login_cookie'];
+//} else {
 	$login_cookie = new UserCookie();
-}
+//}
 $login_cookie->DeleteIt();
 if($login_cookie->CheckIt()) {
 	// Grab the current user's info.

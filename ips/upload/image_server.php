@@ -1,6 +1,6 @@
 <?php
-include $_SERVER['DOCUMENT_ROOT'].'/ips/php/boot.php';
 session_start();
+include getcwd().'/php/boot.php';
 
 // Initialize constants
 define("BASE_IMAGE_PATH", 'files/');

@@ -1,7 +1,8 @@
 <?php
 // This file is called by browser_assets/js/script.js
-include $_SERVER['DOCUMENT_ROOT'].'/ips/php/boot.php';
 session_start();
+chdir('..');
+include getcwd().'/php/boot.php';
 $login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
 if($login_cookie->CheckIt()) {

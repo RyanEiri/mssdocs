@@ -1,11 +1,7 @@
 <?php
-$dir_base = 'ips';
-$config_base = $_SERVER['DOCUMENT_ROOT'];
-$config_base = $config_base.'/'.$dir_base.'/';
-//require_once ($config_base.'functions/functions.php');
-require_once ($config_base.'classes/classes.php');
-require_once ($config_base.'config/config.php');
 session_start();
+chdir('..');
+include getcwd().'/php/boot.php';
 if($_SESSION['login_cookie']) {
 	$login_cookie = $_SESSION['login_cookie'];
 } else {
