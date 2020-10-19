@@ -11,7 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	} else {
 		header('Location: ./login.php?1');
 	}
-} else {
+} elseif ($_SERVER['REQUEST_METHOD'] == 'GET') {
+	$attempt = $_SERVER['QUERY_STRING'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,15 +23,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <title>Fragile Heritage Project::Internal Proofing System</title>
 <meta name="author" content="Ryan Eric Johnson" >
 <meta name="date" content="2019-05-18" >
-<meta name="copyright" content="Fragile Heritage Project 2016-2019" >
+<meta name="copyright" content="Fragile Heritage Project 2016-2020" >
 <meta name="keywords" content="manuscript, manuscripts, description, proofing" >
 <meta name="description" content="The Fragile Heritage Project aims to create a digital collection of Icelandic language manuscripts held in public and private collections in Canada and the U.S.A." >
 <meta http-equiv="expires" content="0" >
 
 <!-- Bootstrap for CSS -->
-<link rel="stylesheet" href="<?php echo PROGRAM_WEB_BASE.'css/bootstrap/bootstrap.min.css' ?>">
+<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE.'bootstrap/bootstrap.min.css' ?>">
 <!-- IE10 CSS Viewport Workaround -->
-<link rel="stylesheet" href="<?php echo PROGRAM_WEB_BASE.'css/ie10-viewport-bug-workaround.css' ?>">
+<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE.'ie10-viewport-bug-workaround.css' ?>">
 <!-- Custom styles for signin -->
 <link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE.'bootstrap/signin.css' ?>">
 
@@ -43,14 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 
 <body class="text-center">
-<?php
-if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-	$attempt = $_SERVER['QUERY_STRING'];
 
-	if($attempt==1) {
-		printf ("Incorrect Username/Password. Please try again.<br />");
-	}
-?>
 <form class="form-signin" method="POST" action="<?php echo $_SERVER['PHP_SELF'] ?>">
 	<img class="mb-4" src="<?php echo PROGRAM_WEB_BASE."img/fhp_logo-blue.png" ?>" alt="" width="72" height="72">
 	<h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
@@ -59,15 +53,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 	<label for="inputPassword" class="sr-only">Password</label>
 	<input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required autocomplete="current-password">
 	<div class="checkbox">
-	<label>
-		<input type="checkbox" value="remember-me"> Remember me
+	<label id="failure">
+<?php
+        if($attempt==1) {
+		printf ("Incorrect Username/Password. Please try again.<br />");
+        }   
+?>	
 	</label>
 	<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
 </form>
 
-<?php
-}
-?>
 <center>&copy; 2016-2019 Fragile Heritage Project</center>
 
 <!-- jQuery for javascript -->
