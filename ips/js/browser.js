@@ -13,6 +13,7 @@ $(function(){
 		var response = [data],
 			currentPath = '',
 			breadcrumbsUrls = [];
+		console.log(response);
 
 		var folders = [],
 			files = [];

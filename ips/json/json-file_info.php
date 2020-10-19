@@ -19,7 +19,7 @@ if($login_cookie->CheckIt()) {
 	if(!empty($_GET['dir'])){
 		$dir = $_GET['dir'];
 	} else {
-		$dir = "../upload/files";
+		$dir = USER_FILES_BASE."files";
 	}
 
 	// This function scans the files folder recursively, and builds a large array
