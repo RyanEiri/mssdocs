@@ -13,7 +13,6 @@ $(function(){
 		var response = [data],
 			currentPath = '',
 			breadcrumbsUrls = [];
-		console.log(response);
 
 		var folders = [],
 			files = [];
@@ -581,12 +580,13 @@ $(function(){
 		// Grab filesystem and database information for a single file
 
 		function singleFileGrabDB(grabfile) {
-			console.log(grabfile);
+			//console.log(grabfile);
 			var dbData = {};
 			var dirNameContext = grabfile.match(/(.*)[\/\\]/)[1]||'';
 			//console.log(grabfile);
 			//console.log(dirNameContext);
-			var fsDirNameContext = dirNameContext.replace(/^..\//, '');
+//			var fsDirNameContext = dirNameContext.replace(/^..\//, '');
+			var fsDirNameContext = dirNameContext.replace(/.*ips\//, '');
 			var fileNameContext = grabfile.replace(/^.*[\\\/]/, '');
 			var thumbnailContext = fsDirNameContext + '/thumbnail/' + fileNameContext;
 			dbData.context = 'file';
@@ -595,7 +595,8 @@ $(function(){
 			var dbDirName = dirNameContext.match(/files.*$/i);
 			dbDirName = dbDirName[0];
 			dbData.dbDirName = dbDirName;
-			console.log(dbData);
+			//console.log(dbData);
+			//console.log(fsDirNameContext);
 
 			$.ajax({
 			  type:"post",
@@ -605,7 +606,7 @@ $(function(){
 			})
 //			  success: function(data) {
 			  .done(function(data) {
-				  console.log(data);
+//				  console.log(data);
 			    if ( ! data.success) {
 						if (data.errors.database) {
 						  $('#fileFunctionsBody').addClass('has-error');
