@@ -513,7 +513,8 @@ $(function(){
 					fileType = fileType[fileType.length-1];
 					fileType = fileType.toLowerCase();
 
-					icon = '<span class="icon file f-'+fileType+'">.'+fileType+'</span>';
+					//icon = '<span class="icon file f-'+fileType+'">.'+fileType+'</span>';
+					icon = '<span class="icon file file-icon file-icon-lg" data-type="'+fileType+'"></span>';
 
 					var file = $('<li class="files"><input type="checkbox" class="fileCheckbox" value="'+f.path+'"><a href="'+ f.path+'" title="'+ f.path +'" class="files">'+icon+'<span class="name">'+ name +'</span> <span class="details">'+fileSize+'</span></a></li>');
 					file.appendTo(fileList);
@@ -606,7 +607,7 @@ $(function(){
 			})
 //			  success: function(data) {
 			  .done(function(data) {
-//				  console.log(data);
+			  //console.log(data);
 			    if ( ! data.success) {
 						if (data.errors.database) {
 						  $('#fileFunctionsBody').addClass('has-error');

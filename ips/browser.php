@@ -27,6 +27,9 @@ if($login_cookie->CheckIt()) {
 	<!-- Custom styles for this page -->
 	<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>bootstrap/sticky-footer-navbar.css">
 
+	<!-- File icons -->
+        <link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>fileicon.css/fileicon.css">
+
 </head>
 <body class="d-flex flex-column h-100">
 
