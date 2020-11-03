@@ -33,7 +33,7 @@ if(ADMIN_STATUS){
   }
   if (isset($files)){
     foreach($files as $key => $file) {
-	$entry = $file['dirname'].'/'.$file['filename'];
+	$entry = USER_FILES_BASE.$file['dirname'].'/'.$file['filename'];
 	if (!is_readable($entry)) {
 	  if (isset($errors['files'])) {
 	    $errors['files'] .= '<br />Invalid file:&nbsp;'.$entry;
@@ -45,6 +45,7 @@ if(ADMIN_STATUS){
   }
   if (isset($folders)){
     foreach($folders as $key => $folder) {
+	    		$folder = USER_FILES_BASE.$folder;
 			if (!is_readable($folder)) {
 			  if (isset($errors['files'])) {
 			    $errors['files'] .= '<br />Invalid folder:&nbsp;'.$folder;
@@ -88,13 +89,18 @@ if(ADMIN_STATUS){
 	// (LOGIN, SAVE, UPDATE, WHATEVER)
 	if(isset($files)){
 	  foreach ($files as $key => $file) {
-		unlink($file['dirname'].'/'.$file['filename']);
-		if (($file['dirname'] === 'files') && ($file['dirname'] =! 'thumbnail')) {
+		unlink(USER_FILES_BASE.$file['dirname'].'/'.$file['filename']);
+		if(is_readable(USER_FILES_BASE.$file['dirname'].'/thumbnail/'.$file['filename'])){
+			unlink(USER_FILES_BASE.$file['dirname'].'/thumbnail/'.$file['filename']);
+		}
+		if (($file['dirname'] === 'files') && ($file['dirname'] !== 'thumbnail')) {
 		  $show_file = $file['filename'];
 		} else {
-		  $dirname = basename($file['dirname']);
+		  //$dirname = basename($file['dirname']);
+		  $dirname = preg_replace('/^.*files\/?/', '', $file['dirname'], 1);
 		  $show_file = $dirname.'/'.$file['filename'];
 		}
+		$data['message'] = 'show_file: ' . $show_file . '<br />';
 		$fileval = new FileGrab($show_file);
 		$file_id = $fileval->id;
 		$remove_object = new ActOnSingleFile();
@@ -103,17 +109,21 @@ if(ADMIN_STATUS){
 	}
 	if(isset($folders)){
 	  foreach ($folders as $key => $folder) {
+	    $folder = USER_FILES_BASE.$folder;
+	    $data['message'] .= 'folder: ' . $folder . '<br />';
 	    $scanned_dir = scandir($folder);
-	    if (count($scanned_dir) != 2) {
+	    $data['message'] .= 'scanned_dir: ' . $scanned_dir[2] . '<br />';
+	    if (count($scanned_dir) !== 2) {
 		if ($scanned_dir[2] === 'thumbnail') {
 		  rmdir($folder.'/thumbnail');
 		}
 	    }
 	    rmdir($folder);
+//	    $db_folder_pattern = '/^.*files\/?/';
+//	    $db_folder_replacement = '';
+	    $db_folder = preg_replace('/^.*files\/?/', '', $folder);
+	    $data['message'] .= 'db_folder: ' . $db_folder . '<br />'; // ##DBUG##
 	    $db_create = FALSE;
-	    $db_folder_pattern = '/files\//';
-	    $db_folder_replacement = '';
-	    $db_folder = preg_replace($db_folder_pattern, $db_folder_replacement, $folder);
 	    $db_folderval = new FolderGrab($db_folder, $db_create);
 	    $db_folderval->removeFolder();
 	  }
@@ -122,7 +132,7 @@ if(ADMIN_STATUS){
 	// show a message of success and provide a true
 	// success variable
 	$data['success'] = true;
-	$data['message'] = 'Success!';
+	$data['message'] .= 'Success!';
   }
 
   // complete our ajax handling with our json output

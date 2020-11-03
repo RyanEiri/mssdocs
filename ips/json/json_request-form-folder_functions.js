@@ -1,4 +1,11 @@
 $(document).ready(function() {
+  $.ajax({
+    type: 'POST',
+    url: 'json/json-session_id.php',
+    success: function(session) {
+      var sessionID = session.session_id;
+      var timer;
+
   // turn tooltips on
   $(function () {
     $('[data-toggle="tooltip"]').tooltip()
@@ -50,6 +57,9 @@ $(document).ready(function() {
 		$.ajax({
 		  type:"post",
 		  url:"json/json-file_info.php",
+		  data: {
+	            "recursive":  "1"
+	          },
 		  dataType: 'json',
 		  success:function(data){
 		    obj = [data];
@@ -94,13 +104,15 @@ $(document).ready(function() {
 		    });
 
 	// Pass the created dataObject to the php zip process in json-folder_functions
-		    ajaxCall2(dataObj);
+			//console.log(dataObj);
+		    zipFolder(dataObj);
+        	    timer = window.setInterval(refreshProgress, 250);
 		  } /* End of success handling */
 		}); /* End of file heirarchy processing */
 
 
 		// process the zip form through json-folder_functions
-	function ajaxCall2(dObj){
+	function zipFolder(dObj){
 		$.ajax({
 		  type		: 'POST', //define the type of HTTP connection we want to use
 		  url		: 'json/json-folder_functions.php', //the url where we want to POST
@@ -111,11 +123,21 @@ $(document).ready(function() {
 			//using the done promise callback
 			.done(function(data) {
 
-				// log data to the console so we can see
+				// log data to the console for debugging
 				//console.log(data);
 
 				// here we will handle errors and validation messages
 				if ( ! data.success) {
+
+				  // handle errors for zip archive file -------
+				  if (data.errors.archiveFile) {
+					 $('#folderFunctionsForm').addClass(
+					   'has-error'
+					 ); // add the error class to show red input
+					 $('#folderFunctionsForm').append(
+					   '<div class="help-block">' + data.errors.archiveFile + '</div>'
+					 ); // add the actual error message under our input
+				  }
 
 				  // handle errors for selected files and folders -------
 				  if (data.errors.folderToZip) {
@@ -167,7 +189,10 @@ $(document).ready(function() {
 				} else {
 
 					// ALL GOOD! Show success and alter form as needed.
-					$('#folderFunctionsForm').prepend(
+					//$('#folderFunctionsForm').prepend(
+					//  '<div class="alert alert-success">' + data.message + '</div>'
+					//);
+					$("#zip_message").html(
 					  '<div class="alert alert-success">' + data.message + '</div>'
 					);
 					$('#zipname').html(
@@ -185,6 +210,32 @@ $(document).ready(function() {
 			});
 	}
 
+  function refreshProgress(){
+    //console.log("hit");
+    $.ajax({
+      type: 'POST',
+      url: 'json/json-progress.php',
+      data: {
+        "session_id": sessionID
+      },
+      success: function(data) {
+//        $("#zip_progress").html('<div class="bar" style="width:' + data.percent + '%"></div>');
+	$("#zip_progress").css('width', data.percent + '%');
+	$("#zip_progress").attr('aria-valuenow', data.percent + '%');
+        $("#zip_message").html('Adding files... ' + data.percent + '%');
+        if(data.percent === 100) {
+          $("#zip_message").empty();
+          window.clearInterval(timer);
+          timer = window.setInterval(completed, 250);
+        }
+      }
+    });
+  }
+
+  function completed() {
+    $("#zip_message").html('All files added to archive. Saving file. Please wait... <img src=img/loading.gif height="18">');
+    window.clearInterval(timer);
+  }
 
 		// stop the form from submitting the normal way and refreshing the page
 		event.preventDefault();
@@ -309,5 +360,6 @@ $(document).ready(function() {
 		event.preventDefault();
 
 	});
-
+  }
+  })
 });

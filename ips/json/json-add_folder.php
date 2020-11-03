@@ -3,7 +3,7 @@ session_start();
 chdir('..');
 include getcwd().'/php/boot.php';
 if($_SESSION['login_cookie']) {
-	$login_cookie = $_SESSION['login_cookie'];
+	$login_cookie = unserialize($_SESSION['login_cookie']);
 } else {
 	$login_cookie = new UserCookie();
 }
@@ -35,7 +35,8 @@ if($login_cookie->CheckIt()) {
   if (empty($_POST['path'])){
 	$errors['path'] = 'Path value has not been supplied!';
   } elseif(isset($_POST['path'])){
-	$path	= $_POST['path'];
+	$path = $_POST['path'];
+	$dir = USER_FILES_BASE.$path;
   }
 
   if (!empty($_POST['thumbnail'])) {
@@ -64,8 +65,8 @@ if($login_cookie->CheckIt()) {
 	// DO ALL YOUR FORM PROCESSING HERE
 	// THIS CAN BE WHATEVER YOU WANT TO DO 
 	// (LOGIN, SAVE, UPDATE, WHATEVER)
-	mkdir($path.'/'.$folder, 0755);
-	mkdir($path.'/'.$folder.'/thumbnail', 0755);
+	mkdir($dir.'/'.$folder, 0755);
+	mkdir($dir.'/'.$folder.'/thumbnail', 0755);
 	// add folder to folders table
 	$path_pattern = '/files\//';
 	$path_replacement = '';

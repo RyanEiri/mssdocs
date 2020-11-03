@@ -11,10 +11,13 @@ $(document).ready(function(){
 		$.ajax({
 			type:"post",
 			url:"json/json-file_info.php",
+			data: {
+			  "recursive":	"1"
+			},
 			dataType: 'json',
 			success:function(data){
 			  var obj = [data];
-
+			  console.log(obj);
 				// Collect the selected files and display them for confirmation
 			  var moveFileValues = [];
 			  $('.fileList').remove();
@@ -31,6 +34,7 @@ $(document).ready(function(){
 			  else {
 			    $('#fileList-group').append('<li class="list-group-item fileList"><div>No File Selected</div></li>');
 			  }
+			  console.log(moveFileValues);
 
 				// Collect the selected folders and display them for confirmation
 			  var moveFolderValues = [];
@@ -55,13 +59,13 @@ $(document).ready(function(){
 			    object.forEach(function(d){
 						if(d.type === 'folder') {
 					  	if(d.name !== 'thumbnail'){
-								let reg = /(.*)(files)(.*)/i;
+/*								let reg = /(.*)(files)(.*)/i;
 						    let selFSDirName = d.path.match(reg);
 						    let serverPath = selFSDirName[1];
 						    let masterDir = selFSDirName[2];
 						    let dbPath = selFSDirName[3];
-						    let dbDirName = masterDir + dbPath;
-								$('select#folderListSelect').append('<option value="'+d.path+'">'+dbDirName+'</option>');
+						    let dbDirName = masterDir + dbPath; */
+								$('select#folderListSelect').append('<option value="'+d.path+'">'+d.path+'</option>');
 								if(d.items) {
 									collectFolders(d.items);
 								}
@@ -72,12 +76,12 @@ $(document).ready(function(){
 				hash = location.href.substr(location.href.indexOf('#'))
 				hash = decodeURIComponent(hash).slice(1).split('=');
 				hash = hash[0];
-				let reg = /(.*)(files)(.*)/i;
+				/*let reg = /(.*)(files)(.*)/i;
 				let selFSDirName = hash.match(reg);
 				let serverPath = selFSDirName[1];
 				let masterDir = selFSDirName[2];
 				let dbPath = selFSDirName[3];
-				let dbDirName = masterDir + dbPath;
+				let dbDirName = masterDir + dbPath; */
 				//console.log(dbDirName);
 				//console.log(hash);
 				$('#folderListSelect').val(hash);

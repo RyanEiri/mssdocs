@@ -3,14 +3,13 @@ session_start();
 //ini_set('max_execution_time', '2800');
 chdir('..');
 include getcwd().'/php/boot.php';
-//if($_SESSION['login_cookie']) {
-//	$login_cookie = $_SESSION['login_cookie'];
-//} else {
+if($_SESSION['login_cookie']) {
+	$login_cookie = unserialize($_SESSION['login_cookie']);
+} else {
 	$login_cookie = new UserCookie();
-//}
+}
 $login_cookie->DeleteIt();
 if($login_cookie->CheckIt()) {
-	// Grab the current user's info.
 	$username = $login_cookie->username;
 	$userval = new UserGrab($username);
 	$admin = $userval->admin;
@@ -21,9 +20,10 @@ if($login_cookie->CheckIt()) {
   // initialize our ajax arrays
   $errors	= array();	// array to hold validation errors
   $data		= array();	// array to pass back data
+  $zip_progress = array();	// array for progress bar callback
 
   // validate the variables ========================================
-  // If any of these variables don't exist, add an error to our 
+  // If any of these variables don't exist, add an error to our
   // $errors array. If they do exist add them to a variable value.
   // If the folder value is the same as the current path, invalidate
   // and pass error.
@@ -33,13 +33,11 @@ if($login_cookie->CheckIt()) {
   // archive based on a single folder selection. This will be broadened
   // to create archives based on multiple files and folders selections.
   if (!empty($_POST['folderToZip'])){
-	$zip_folder = $_POST['folderToZip'];
-	$zip_folder_basename = basename($zip_folder);
-	// create zip2_folder variable for archive
-	$zip2_folder_pattern = '/files\//';
-	$zip2_folder_replacement = '';
-	$zip2_folder = preg_replace($zip2_folder_pattern, $zip2_folder_replacement, $zip_folder);	
-	$zip_filename = $zip2_folder;	
+	$zip_folder = USER_FILES_BASE.$_POST['folderToZip'];
+	//$zip_folder_basename = basename($zip_folder);
+	// create zip_db_folder variable for archive
+	$zip_db_folder = preg_replace('/^.*files\//', '', $zip_folder);
+	$zip_filename = $zip_db_folder;
 	// replace spaces with underscores
 	$zip_filename = preg_replace('/\ /', '_', $zip_filename);
 	// replace slashes with dashes
@@ -48,18 +46,19 @@ if($login_cookie->CheckIt()) {
 	$zip_filename = preg_replace('/[^A-Za-z0-9\_\-]/', '', $zip_filename);
 	// add .zip at the end
 	$zip_filename = $zip_filename.'.zip';
-	$zip_path_filename = 'archives/'.$zip_filename;
+	$zip_path_filename = USER_FILES_BASE.'archives/'.$zip_filename;
 	$data['zipFilename'] = $zip_filename;
-	if ($zip->open($zip_path_filename, ZipArchive::CREATE)!==TRUE) {
-	  exit("cannot open <$zip_path_filename>\n");
+	if (!$zip->open($zip_path_filename, ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
+	  $errors['archiveFile'] = "<br />Cannot open or create " . $zip_path_filename . "<br />";
 	}
   } else {
 	$errors['folderToZip'] = 'No folder provided for zipping!';
   }
 
-  // The file structure is passed from json_request-form-folder_functions 
-  if (!empty($_POST['zipFiles'])) {
+  // The file structure is passed from json_request-form-folder_functions
+  if (!empty($_POST['zipFiles']) && isset($zip_folder)) {
 	$zip_files = $_POST['zipFiles'];
+	$data['zip_files'] = $zip_files;
 	// remove the files root folder from the file entries
 	// the archive should not include that folder
 	foreach ($zip_files as $key => $value) {
@@ -117,26 +116,26 @@ if($login_cookie->CheckIt()) {
 
 // return a response =============================================
 
-	// if there are any errors in our errors array, 
+	// if there are any errors in our errors array,
 	// return a success boolean of false
   if ( ! empty($errors)) {
 
-	// if there are items in our errors array, 
+	// if there are items in our errors array,
 	// return those errors
 	$data['success'] = false;
 	$data['errors'] = $errors;
   } else {
 
-	// if there are no errors process our form, 
+	// if there are no errors process our form,
 	// then return a message
 
 	// DO ALL YOUR FORM PROCESSING HERE
-	// THIS CAN BE WHATEVER YOU WANT TO DO 
+	// THIS CAN BE WHATEVER YOU WANT TO DO
 	// (LOGIN, SAVE, UPDATE, WHATEVER)
 
 	// This part of the script puts checkbox file selections into
 	// the zip archive. This will not be utilized immediately,
-	// and requires rewriting.  
+	// and requires rewriting.
 //	if(isset($selected_files)){
 //	  foreach ($selected_files as $key => $value) {
 //		$zip_file = $value;
@@ -162,7 +161,7 @@ if($login_cookie->CheckIt()) {
 //		  $zip->close();
 //		  $info['zip_file'] = 'File added to zip: '.$zipped_file;
 //		} else {
-//		  $info['zip_file'] = 'Unable to open zip file!';	
+//		  $info['zip_file'] = 'Unable to open zip file!';
 //		}
 //		$thumbnail = $value['dirname'].'/thumbnail/'.$value['filename'];
 //		if(is_readable($thumbnail)){
@@ -175,8 +174,8 @@ if($login_cookie->CheckIt()) {
 //		    }
 //		    $zip->close();
 //		  } else {
-//			$info['zip_filename'] = 'Unable to open zip file'; 
-//		  } 
+//			$info['zip_filename'] = 'Unable to open zip file';
+//		  }
 //		}
 //	  }
 //	  $data['info'] = $info;
@@ -184,60 +183,60 @@ if($login_cookie->CheckIt()) {
 
 
 	// A single folder selection will provide the basis for an archive
-	// of the images with thumbnails beneath it. 
-
-  //deal with the filesystem
+	// of the images with thumbnails beneath it.
+	function zipCount($zipFiles, $zip_count = 0){
+		foreach ($zipFiles as $name => $zip2_file) {
+			if(!$zip2_file->isDir()) {
+				$zip_count++;
+			}
+		}
+		return $zip_count;
+	}
+	$zip_count = zipCount($zip2_files);
 	if(isset($zip_folder)){
-//	  $data['info']['zipFiles'] = $zip_files;
-//	  $data['info']['zipFolders'] = $zip_folders;
-//	    foreach ($zip2_folders as $key => $zip2_folder_value) {
-//		$data['info']['addzipfolder'][$key] = $zip2_folder_value;
-//		if($zip->addEmptyDir($zip2_folder_value)) {
-//		  $data['info']['zip_file'][$key] = 'Folder added to zip: '.$zip2_folder_value;
-//		} else {
-//		  $data['info']['zip_file'][$key] = 'Unable to create folder!';
-//	    	}
-//	    }
+	$i = 1;
+	while($i <= $zip_count) {
 	    foreach ($zip2_files as $name => $zip2_file) {
 		// Skip directories (they would be added automatically)
-		if (!$zip2_files->isDir())
-		{ 
+		if (!$zip2_file->isDir())
+		{
 		  // Get real and relative path for current file
 		  $filePath = $zip2_file->getRealPath();
-		  $filePathArray = explode("/", $filePath);
-		  unset($filePathArray[0]);
-		  unset($filePathArray[1]);
-		  unset($filePathArray[2]);
-		  unset($filePathArray[3]);
-		  unset($filePathArray[4]);
-		  unset($filePathArray[5]);
-		  unset($filePathArray[6]);
-		  unset($filePathArray[7]);
-		  unset($filePathArray[8]);
-		  unset($filePathArray[9]);
-		  $relativeFilePath = implode("/", $filePathArray); 
-//		  $fileDirName = dirname($filePath);
-//		  $fileDirName = basename($fileDirName); 
-//		  $newFileName = basename($filePath);
+		  // let's change the zip's path relative to files directory
+		  preg_match('/(.*)(files.*)$/i', $filePath, $relativeFilePath);
+		  $relativeFilePath = $relativeFilePath[2];
 
+		  // get the percentage of files now complete
+		  // and add that percentage to tmp file
+		  $percent = intval($i/$zip_count * 100);
+		  $zip_progress['percent'] = $percent;
+//		  $_SESSION['zip_progress'] = json_encode($zip_progress);
+		  file_put_contents(USER_FILES_BASE . "tmp/" . session_id() . ".txt", json_encode($zip_progress));
 		  // Add current file to archive
 		  $zip->addFile($filePath, $relativeFilePath);
+		  usleep(12500);
+		  $i++;
 		}
 	    }
 //	  set_time_limit(600);
-	  $zip->close();
+//	  $zip->registerProgressCallback(0.05, function ($r) {
+//	    $zip_progress['percent'] = $r * 100;
+//	    file_put_contents(USER_FILES_BASE."tmp/" . session_id() . ".txt", json_encode($zip_progress));
+//	  });
+	}
+	$zip->close();
 
-  // deal with the database: correlate archive with 
-  // the folder so user can view it from folder_functions form
+  	  // deal with the database: correlate archive with
+  	  // the folder so user can view it from folder_functions form
 	  $folder_create = FALSE; // no need to create the folder
-	  $zip_db = New FolderGrab($zip2_folder, $folder_create);
-	  $zip_url = $zip_db->get_full_url().'/archives/'.$zip_filename;
+	  $zip_db = New FolderGrab($zip_db_folder, $folder_create);
+	  $zip_url = USER_FILES_URL.'archives/'.$zip_filename;
 	  $data['zipURL'] = $zip_url;
 	  $zip_db->addZip($zip_filename, $zip_url);
 	}
 
 
-	// show a message of success and provide a true 
+	// show a message of success and provide a true
 	// success variable
 	$data['success'] = true;
 	$data['message'] = 'Success!';

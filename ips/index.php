@@ -4,7 +4,7 @@ include getcwd().'/php/boot.php';
 $login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
 if($login_cookie->CheckIt()) {
-
+	$_SESSION['login_cookie'] = serialize($login_cookie);
 	define("USERNAME", $login_cookie->username);
 
 	$userval = new UserGrab(USERNAME);

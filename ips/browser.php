@@ -4,6 +4,7 @@ include getcwd().'/php/boot.php';
 $login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
 if($login_cookie->CheckIt()) {
+	$_SESSION['login_cookie'] = serialize($login_cookie);
 	define("USERNAME", $login_cookie->username);
 	$userval = new UserGrab(USERNAME);
 	define("ADMIN_STATUS", $userval->admin);
@@ -186,7 +187,11 @@ if($login_cookie->CheckIt()) {
 		<div class="col-sm-12">
 		<input class="form-check-input" type="radio" placeholder="No Folder" id="folderNameRadio" name="folderNameRadio" checked>
 		<span id="folderNameText"></span>
-		<div id="zipname"><br /><h5>Current zip file:</h5></div>
+		<div class="progress progress-style">
+			<div id="zip_progress" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+		</div>
+		<div id="zip_message" class="mt-3"></div>
+		<div id="zipname" class="mt-3"><h5>Current zip file:</h5></div>
 		</div>
 		</label>
 	    </div>
@@ -403,9 +408,9 @@ if($login_cookie->CheckIt()) {
 
 	<div class="filemanager m-0 p-0">
 
-		<div class="search m-0 p-0">
-			<input type="search" placeholder="Find a file.." />
-		</div><br />
+		<!--<div class="search m-0 p-0">
+			<input type="search" placeholder="Find a file..." />
+		</div><br />-->
 
 		<div class="breadcrumbs m-0 p-0"></div>
 

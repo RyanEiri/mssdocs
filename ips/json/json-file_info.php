@@ -11,27 +11,29 @@ if($login_cookie->CheckIt()) {
 	$userval = new UserGrab(USERNAME);
 	define("ADMIN_STATUS", $userval->admin);
 
-	if(!empty($_GET['recursive'])){
-		$recursive = $_GET['recursive'];
+	if(!empty($_POST['recursive'])){
+		$recursive = $_POST['recursive'];
 	} else {
 		$recursive = '0';
 	}
-	if(!empty($_GET['dir'])){
-		$dir = $_GET['dir'];
+	if(!empty($_POST['dir'])){
+		$dir = $_POST['dir'];
 	} else {
 		$dir = USER_FILES_BASE."files";
+	}
+	if(isset($dir)){
+		$path = preg_replace('/.*ips\/upload\/?/', '', $dir);
 	}
 
 	// This function scans the files folder recursively, and builds a large array
 
-	function scan($dir,$recursive){
+	function scan($dir,$recursive,$path){
 
 		$files = array();
 
 		// Is there actually such a folder/file?
 
 		if(file_exists($dir)){
-
 			foreach(scandir($dir) as $f) {
 
 				if(!$f || $f[0] == '.') {
@@ -48,8 +50,8 @@ if($login_cookie->CheckIt()) {
 						$files[] = array(
 							"name" => $f,
 							"type" => "folder",
-							"path" => $dir . '/' . $f,
-							"items" => scan($dir . '/' . $f, $recursive) // Recursively get the contents of the folder
+							"path" => $path . '/' . $f,
+							"items" => scan($dir . '/' . $f, $recursive,$path . '/' . $f) // Recursively get the contents of the folder
 						);
 
 					}
@@ -62,7 +64,7 @@ if($login_cookie->CheckIt()) {
 						$files[] = array(
 							"name" => $f,
 							"type" => "folder",
-							"path" => $dir . '/' . $f
+							"path" => $path . '/' . $f
 						);
 
 					}
@@ -76,7 +78,7 @@ if($login_cookie->CheckIt()) {
 					$files[] = array(
 						"name" => $f,
 						"type" => "file",
-						"path" => $dir . '/' . $f,
+						"path" => $path . '/' . $f,
 						"size" => filesize($dir . '/' . $f) // Gets the size of this file
 					);
 				}
@@ -89,7 +91,7 @@ if($login_cookie->CheckIt()) {
 
 	// Run the recursive function
 
-	$response = scan($dir,$recursive);
+	$response = scan($dir,$recursive,$path);
 
 	// Output the directory listing as JSON
 
@@ -98,7 +100,7 @@ if($login_cookie->CheckIt()) {
 	echo json_encode(array(
 		"name" => "files",
 		"type" => "folder",
-		"path" => $dir,
+		"path" => $path,
 		"items" => $response,
 		"recursive" => $recursive
 	));

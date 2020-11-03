@@ -38,7 +38,7 @@ if($login_cookie->CheckIt()) {
   if (empty($_POST['moveToFolder'])) {
 		$errors['moveToFolder'] = 'No folders available!';
   } else {
-		$move_folder = $_POST['moveToFolder'];
+		$move_folder = USER_FILES_BASE.$_POST['moveToFolder'];
   }
 
 	if (empty($_POST['dbMoveToFolder'])) {
@@ -65,7 +65,8 @@ if($login_cookie->CheckIt()) {
 		    $errors['moveToFolder'] = 'Folder to be moved to cannot be the same as the folder being moved! Please choose a different folder.';
 		    break;
 		  }
-		  $parent_dir = dirname($value);
+		  $dir = USER_FILES_BASE.$value;
+		  $parent_dir = dirname($dir);
 		  if($parent_dir === $move_folder) {
 		    $errors['moveToFolder'] = 'Folder cannot be moved to the same folder it is currently in! Please choose a different folder.';
 		    break;
@@ -88,9 +89,7 @@ if($login_cookie->CheckIt()) {
 	// if there are no errors process our form,
 	// then return a message
 
-	// DO ALL YOUR FORM PROCESSING HERE
-	// THIS CAN BE WHATEVER YOU WANT TO DO
-	// (LOGIN, SAVE, UPDATE, WHATEVER)
+	// FORM PROCESSING 
 	if(isset($files)){
 
 		if ($db_move_folder !== 'files') {
@@ -109,30 +108,34 @@ if($login_cookie->CheckIt()) {
 		//$data['message'] .= 'folder id is: ' . $folder_id . '<br />'; // ##DBUG##
 
 	  foreach ($files as $key => $value) {
-			rename($value['dirname'].'/'.$value['filename'], $move_folder.'/'.$value['filename']);
+		  	$dirname = USER_FILES_BASE.$value['dirname'];
+			$filename = $value['filename'];
+			rename($dirname.'/'.$filename, $move_folder.'/'.$filename);
 
 			if(isset($db_move_folder) && $db_move_folder !== 'files') {
-				$change_file = $db_move_folder.'/'.$value['filename'];
+				$db_change_file = $db_move_folder.'/'.$filename;
 			} else {
-				$change_file = $value['filename'];
+				$db_change_file = $filename;
 			}
-			//$data['message'] .= 'change file is: ' . $change_file . '<br />'; // ##DBUG##
+			//$data['message'] .= 'db change file is: ' . $db_change_file . '<br />'; // ##DBUG##
 
-			$show_file = preg_replace('/.*files/', '', $value['dirname']);
-			$show_file = preg_replace('/^\//', '', $show_file);
+			$show_file = preg_replace('/^.*files\/?/', '', $dirname);
+//			$show_file = preg_replace('/^\//', '', $show_file);
 
 			if ($show_file) {
-			  $show_file = $show_file.'/'.$value['filename'];
+			  $show_file = $show_file.'/'.$filename;
 			} else {
-			  $show_file = $value['filename'];
+			  $show_file = $filename;
 			}
+			//$data['message'] .= 'dirname: ' . $dirname . '<br />'; // ##DBUG##
 			//$data['message'] .= 'show file is: ' . $show_file . '<br />'; // ##DBUG##
 			$fileval = new FileGrab($show_file);
 			$file_id = $fileval->id;
 			$change_object = new ActOnSingleFile();
 			//$data['message'] .= 'file id is: ' . $file_id . '<br />'; // ##DBUG##
 
-			$file_url = $change_object->get_full_url().'/'.$move_folder.'/'.$value['filename'];
+			//$file_url = $change_object->get_full_url().'/'.$move_folder.'/'.$value['filename'];
+			$file_url = USER_FILES_URL.$db_move_folder.'/'.$filename;
 			/* The location of the JSON request js script
 			 * dictates the filesystem location provided.
 			 */
@@ -143,30 +146,38 @@ if($login_cookie->CheckIt()) {
 			}
 			//$data['message'] .= 'file url is: ' . $file_url . '<br />'; // ##DBUG##
 
-			$change_object->changeFileSystemDB($file_id, $change_file, $file_url, $folder_id);
+			$change_object->changeFileSystemDB($file_id, $db_change_file, $file_url, $folder_id);
 
 			// Check for the thumbnail and move it along with.
 			// Create thumbnail dir if it does not exist.
-			$thumbnail = $value['dirname'].'/thumbnail/'.$value['filename'];
+			$thumbnail = $dirname.'/thumbnail/'.$filename;
 			if(is_readable($thumbnail)){
 			  if(!file_exists($move_folder.'/thumbnail/') && !is_dir($move_folder.'/thumbnail/')){
 			    mkdir($move_folder.'/thumbnail/', 0755);
 			  }
-			  rename($thumbnail, $move_folder.'/thumbnail/'.$value['filename']);
+			  rename($thumbnail, $move_folder.'/thumbnail/'.$filename);
 			}
 	  }
 	}
 
 	if(isset($folders)){
-	  $db_move_folder = preg_replace('/files/', '', $move_folder);
-	  $db_move_folder = preg_replace('/^\//', '', $db_move_folder);
+	  $db_move_folder = preg_replace('/^.*files\/?/', '', $move_folder, 1);
+//	  $db_move_folder = preg_replace('/^\//', '', $db_move_folder);
 	  foreach ($folders as $key => $value) {
 			$base_folder = basename($value);
+			//$data['message'] .= 'base_folder: ' . $base_folder . '<br />'; // ##DBUG##
 			$new_file_folder = $move_folder.'/'.$base_folder;
-			$new_db_folder = $db_move_folder.'/'.$base_folder;
-			rename($value, $new_file_folder);
+			//$data['message'] .= 'new_file_folder: ' . $new_file_folder . '<br />'; // ##DBUG##
+			if(!empty($db_move_folder)){
+				$new_db_folder = $db_move_folder.'/'.$base_folder;
+			} else {
+				$new_db_folder = $base_folder;
+			}
+			//$data['message'] .= 'new_db_folder: ' . $new_db_folder . '<br />'; // ##DBUG##
+			rename(USER_FILES_BASE.$value, USER_FILES_BASE.$new_file_folder);
 			$db_value = preg_replace('/files/', '', $value);
 			$db_value = preg_replace('/^\//', '', $db_value);
+			//$data['message'] .= 'db_value: ' . $db_value . '<br />'; // ##DBUG##
 	  	$folder_create = FALSE;
 	  	$folderval = new FolderGrab($db_value, $folder_create);
 			$folderval->updateFolder($new_db_folder);
@@ -176,7 +187,7 @@ if($login_cookie->CheckIt()) {
 	// show a message of success and provide a true
 	// success variable
 	$data['success'] = true;
-	$data['message'] .= 'Success!';
+	$data['message'] = 'Success!';
   }
 
   // complete our ajax handling with our json output

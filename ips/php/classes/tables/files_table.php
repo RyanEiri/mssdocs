@@ -155,7 +155,8 @@ class FolderGrab {
 		foreach ($this->files as $key => $value) {
 			$file_name = basename($value['name']);
 			$file_name = $update_folder.'/'.$file_name;
-			$file_url = $this->get_full_url().'/files/'.$file_name;
+//			$file_url = $this->get_full_url().'/files/'.$file_name;
+			$file_url = USER_FILES_URL.'files/'.$file_name;
 			$file_id = $value['id'];
 			$update_files_sql = "UPDATE files
 				SET `name` =
@@ -263,17 +264,20 @@ class FolderGrab {
 			}
 			$this->zip_url = $zip_url;
 			$this->date = date("Y-m-d H:i:s");
-			$this->addzip_sql = "INSERT INTO ziparchives
+			$this->addzip_sql = "
+				      INSERT INTO ziparchives
 				      (folder_id, zip_name, zip_url)
 				      VALUES (
 					'$this->folder_id',
 					'$this->zip_name',
 					'$this->zip_url'
 				      )";
-			$this->updatezip_sql = "UPDATE ziparchives
-					SET `zip_date` =
-					'$this->date' WHERE
-					`folder_id`='$this->duplicateZipFolderID'
+			$this->updatezip_sql = "
+					UPDATE ziparchives SET 
+					`zip_date` = '$this->date',
+				        `zip_url` = '$this->zip_url',
+					`zip_name` = '$this->zip_name'	
+					WHERE `folder_id`='$this->duplicateZipFolderID'
 					";
 			if($this->zip_name === $this->duplicateZipname){
 			  $this->updatezip_result = $db->query($this->updatezip_sql)

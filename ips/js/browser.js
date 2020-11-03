@@ -8,8 +8,7 @@ $(function(){
 
 	// Start by fetching the file data from scan.php with an AJAX request
 
-	$.get('json/json-file_info.php', { recursive: '1' }, function(data) {
-
+	$.post('json/json-file_info.php', { recursive: '1' }, function(data) {
 		var response = [data],
 			currentPath = '',
 			breadcrumbsUrls = [];
@@ -587,9 +586,9 @@ $(function(){
 			//console.log(grabfile);
 			//console.log(dirNameContext);
 //			var fsDirNameContext = dirNameContext.replace(/^..\//, '');
-			var fsDirNameContext = dirNameContext.replace(/.*ips\//, '');
+//			var fsDirNameContext = dirNameContext.replace(/.*ips\//, '');
 			var fileNameContext = grabfile.replace(/^.*[\\\/]/, '');
-			var thumbnailContext = fsDirNameContext + '/thumbnail/' + fileNameContext;
+			var thumbnailContext = 'upload/' + dirNameContext + '/thumbnail/' + fileNameContext;
 			dbData.context = 'file';
 			dbData.fileName = fileNameContext;
 			var fsDirName = dirNameContext;
