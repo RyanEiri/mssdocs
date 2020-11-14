@@ -1,6 +1,7 @@
 <?php
 session_start();
 ini_set('max_execution_time', '3600');
+ini_set('memory_limit', '1000M');
 chdir('..');
 include getcwd().'/php/boot.php';
 if($_SESSION['login_cookie']) {
