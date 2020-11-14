@@ -1,7 +1,9 @@
 ips/upload/files/*
 ips/upload/archives/*
+ips/upload/tmp/*
 ips/backups/*
 !ips/upload/files/.gitkeep
 !ips/upload/archives/.gitkeep
+!ips/upload/tmp/.gitkeep
 !ips/backups/.gitkeep
 
