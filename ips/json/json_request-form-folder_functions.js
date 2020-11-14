@@ -19,7 +19,8 @@ $(document).ready(function() {
 		$('.alert-success').remove();
 
 		// get the form data
-		// there are many ways to get this data using jQuery (you can use the class or id also)
+
+    // initialize object to send selection info
 		var dataObj = {};
 
 		// add the selected files to the dataObject
@@ -54,7 +55,7 @@ $(document).ready(function() {
 
 		// Create a new ajax filesystem scan so that json-folder_functions can
 		// get the file heirarchy for selected folder to be zipped
-		$.ajax({
+		/*$.ajax({
 		  type:"post",
 		  url:"json/json-file_info.php",
 		  data: {
@@ -107,8 +108,11 @@ $(document).ready(function() {
 			//console.log(dataObj);
 		    zipFolder(dataObj);
         	    timer = window.setInterval(refreshProgress, 250);
-		  } /* End of success handling */
-		}); /* End of file heirarchy processing */
+		  } // End of success handling
+		}); // End of file heirarchy processing  */
+
+    zipFolder(dataObj);
+      timer = window.setInterval(refreshProgress, 250);
 
 
 		// process the zip form through json-folder_functions
@@ -137,7 +141,7 @@ $(document).ready(function() {
 					 $('#folderFunctionsForm').append(
 					   '<div class="help-block">' + data.errors.archiveFile + '</div>'
 					 ); // add the actual error message under our input
-				  }
+         }
 
 				  // handle errors for selected files and folders -------
 				  if (data.errors.folderToZip) {
@@ -150,7 +154,7 @@ $(document).ready(function() {
 				  }
 
 				  // handle errors for move to folder ------
-				  if (data.errors.zipFiles) {
+				  /*if (data.errors.zipFiles) {
 					$('#folderFunctionsForm').addClass(
 					  'has-error'
 					); // add the error class to show red input
@@ -184,7 +188,7 @@ $(document).ready(function() {
 					$('#folderFunctionsForm').append(
 					  '<div class="help-block">' + data.errors.selectedFolders + '</div>'
 					); // add the actual error message under our input
-				  }
+        }*/
 
 				} else {
 

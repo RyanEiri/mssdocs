@@ -56,7 +56,7 @@ if($login_cookie->CheckIt()) {
   }
 
   // The file structure is passed from json_request-form-folder_functions
-  if (!empty($_POST['zipFiles']) && isset($zip_folder)) {
+  /*if (!empty($_POST['zipFiles']) && isset($zip_folder)) {
 	$zip_files = $_POST['zipFiles'];
 	$data['zip_files'] = $zip_files;
 	// remove the files root folder from the file entries
@@ -73,9 +73,14 @@ if($login_cookie->CheckIt()) {
 	);
 // debug
 //	$data['info']['zip2_files'] = $zip2_files;
-  }
+}*/
 
-  if (!empty($_POST['zipFolders'])) {
+	$zip_files = new RecursiveIteratorIterator(
+	  new RecursiveDirectoryIterator($zip_folder),
+	  RecursiveIteratorIterator::LEAVES_ONLY
+	);
+
+  /*if (!empty($_POST['zipFolders'])) {
 	$zip_folders = $_POST['zipFolders'];
 	$zip2_folders = $zip_folders;
 	foreach ($zip2_folders as $key => $value) {
@@ -100,7 +105,7 @@ if($login_cookie->CheckIt()) {
 	  $zip2_folders[$key] = preg_replace($zip2_folders_pattern3, $zip2_folders_replacement, $value);
 	}
 //	$data['info']['zip2_folders'] = $zip2_folders;
-  }
+}*/
 
   // Checkbox selection passed from json_request
   // !! Turning these off for now so that the code for individual
@@ -192,16 +197,16 @@ if($login_cookie->CheckIt()) {
 		}
 		return $zip_count;
 	}
-	$zip_count = zipCount($zip2_files);
+	$zip_count = zipCount($zip_files);
 	if(isset($zip_folder)){
 	$i = 1;
 	while($i <= $zip_count) {
-	    foreach ($zip2_files as $name => $zip2_file) {
+	    foreach ($zip_files as $name => $zip_file) {
 		// Skip directories (they would be added automatically)
-		if (!$zip2_file->isDir())
+		if (!$zip_file->isDir())
 		{
 		  // Get real and relative path for current file
-		  $filePath = $zip2_file->getRealPath();
+		  $filePath = $zip_file->getRealPath();
 		  // let's change the zip's path relative to files directory
 		  preg_match('/(.*)(files.*)$/i', $filePath, $relativeFilePath);
 		  $relativeFilePath = $relativeFilePath[2];
