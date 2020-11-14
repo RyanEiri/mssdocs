@@ -9,6 +9,7 @@ $(function(){
 	// Start by fetching the file data from scan.php with an AJAX request
 
 	$.post('json/json-file_info.php', { recursive: '1' }, function(data) {
+		//console.log(data);
 		var response = [data],
 			currentPath = '',
 			breadcrumbsUrls = [];
