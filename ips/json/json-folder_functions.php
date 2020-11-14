@@ -1,6 +1,6 @@
 <?php
 session_start();
-//ini_set('max_execution_time', '2800');
+ini_set('max_execution_time', '3600');
 chdir('..');
 include getcwd().'/php/boot.php';
 if($_SESSION['login_cookie']) {
