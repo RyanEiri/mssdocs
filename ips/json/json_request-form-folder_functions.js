@@ -112,7 +112,7 @@ $(document).ready(function() {
 		}); // End of file heirarchy processing  */
 
     zipFolder(dataObj);
-      timer = window.setInterval(refreshProgress, 250);
+      timer = window.setInterval(refreshProgress, 500);
 
 
 		// process the zip form through json-folder_functions
@@ -230,7 +230,7 @@ $(document).ready(function() {
         if(data.percent === 100) {
           $("#zip_message").empty();
           window.clearInterval(timer);
-          timer = window.setInterval(completed, 250);
+          timer = window.setInterval(completed, 500);
         }
       }
     });

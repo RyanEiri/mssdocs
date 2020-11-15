@@ -1,7 +1,7 @@
 <?php
-session_start();
 ini_set('max_execution_time', '3600');
-ini_set('memory_limit', '1000M');
+ini_set('max_input_time', '3600');
+session_start();
 chdir('..');
 include getcwd().'/php/boot.php';
 if($_SESSION['login_cookie']) {
@@ -132,6 +132,9 @@ if($login_cookie->CheckIt()) {
 	$data['errors'] = $errors;
   } else {
 
+  header('HTTP/1.1 200 OK');
+  header('Content-Type: application/json');
+
 	// if there are no errors process our form,
 	// then return a message
 
@@ -220,7 +223,7 @@ if($login_cookie->CheckIt()) {
 		  file_put_contents(USER_FILES_BASE . "tmp/" . session_id() . ".txt", json_encode($zip_progress));
 		  // Add current file to archive
 		  $zip->addFile($filePath, $relativeFilePath);
-		  usleep(12500);
+		  //usleep(12500);
 		  $i++;
 		}
 	    }
@@ -251,8 +254,6 @@ if($login_cookie->CheckIt()) {
   // complete our ajax handling with our json output
   // return all our data to an AJAX call
 
-  header('HTTP/1.1 200 OK');
-  header('Content-Type: application/json');
   echo json_encode($data);
 }
 ?>

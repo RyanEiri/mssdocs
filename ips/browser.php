@@ -1,4 +1,5 @@
 <?php
+ini_set('max_execution_time', '3600');
 session_start();
 include getcwd().'/php/boot.php';
 $login_cookie = new UserCookie();
