@@ -1,14 +1,7 @@
 <?php
-// session_start() will have to deal with a lock on output
-// so session is removed for this script to get real-time data from file
-//session_start();
 chdir('..');
-include getcwd().'/php/boot.php';
-//if(isset($_SESSION['login_cookie'])) {
-//	$login_cookie = unserialize($_SESSION['login_cookie']);
-//} else {
-	$login_cookie = new UserCookie();
-//}
+require_once(getcwd().'/php/boot.php');
+$login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
 if($login_cookie->CheckIt()) {
 	$username = $login_cookie->username;

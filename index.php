@@ -1,5 +1,4 @@
 <?php
-session_start();
 include getcwd().'/ips/php/boot.php';
 ?>
 <!DOCTYPE html>

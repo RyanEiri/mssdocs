@@ -5,11 +5,9 @@
 ini_set('max_execution_time', '3600');
 ini_set('max_input_time', '3600');
 
-// Start our session.
-session_start();
-
 // Perform application bootstrap.
 chdir('..');
+require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
 
 // User authentication.

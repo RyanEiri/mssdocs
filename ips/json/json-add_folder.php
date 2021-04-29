@@ -1,6 +1,6 @@
 <?php
-session_start();
 chdir('..');
+require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
 if($_SESSION['login_cookie']) {
 	$login_cookie = unserialize($_SESSION['login_cookie']);

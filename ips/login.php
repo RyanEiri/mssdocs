@@ -1,6 +1,6 @@
 <?php
+require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
-session_start();
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$userval = new UserGrab($_REQUEST['username']);
 	$secretword = $userval->validateUser($_REQUEST['username'],$_REQUEST['password']);
