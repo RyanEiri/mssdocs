@@ -36,24 +36,24 @@ if($login_cookie->CheckIt()) {
   // If any of these variables don't exist, add an error to our
   // $errors array. If they do exist add them to a variable value.
   if (!empty($_POST['folderToZip'])){
-	$zip_folder = USER_FILES_BASE.$_POST['folderToZip'];
-	$zip_db_folder = preg_replace('/^.*files\//', '', $zip_folder);
-	$zip_filename = $zip_db_folder;
-	// replace spaces with underscores
-	$zip_filename = preg_replace('/\ /', '_', $zip_filename);
-	// replace slashes with dashes
-	$zip_filename = preg_replace('/\//', '-', $zip_filename);
-	// remove all other special characters
-	$zip_filename = preg_replace('/[^A-Za-z0-9\_\-]/', 'o', $zip_filename);
-	// add .zip at the end
-	$zip_filename = $zip_filename.'.zip';
-	$zip_path_filename = USER_FILES_BASE.'archives/'.$zip_filename;
-	$data['zipFilename'] = $zip_filename;
-	if (!$zip->open($zip_path_filename, ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
-	  $errors['archiveFile'] = "Cannot open or create: " . $zip_path_filename;
-	}
+		$zip_folder = USER_FILES_BASE.$_POST['folderToZip'];
+		$zip_db_folder = preg_replace('/^.*files\//', '', $zip_folder);
+		$zip_filename = $zip_db_folder;
+		// replace spaces with underscores
+		$zip_filename = preg_replace('/\ /', '_', $zip_filename);
+		// replace slashes with dashes
+		$zip_filename = preg_replace('/\//', '-', $zip_filename);
+		// remove all other special characters
+		$zip_filename = preg_replace('/[^A-Za-z0-9\_\-]/', 'o', $zip_filename);
+		// add .zip at the end
+		$zip_filename = $zip_filename.'.zip';
+		$zip_path_filename = USER_FILES_BASE.'archives/'.$zip_filename;
+		$data['zipFilename'] = $zip_filename;
+		if (!$zip->open($zip_path_filename, ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
+		  $errors['archiveFile'] = "Cannot open or create: " . $zip_path_filename;
+		}
   } else {
-	$errors['folderToZip'] = 'No folder provided for zipping!';
+		$errors['folderToZip'] = 'No folder provided for zipping!';
   }
 
 	$zip_files = new RecursiveIteratorIterator(
@@ -70,7 +70,6 @@ if($login_cookie->CheckIt()) {
 	$data['success'] = false;
 	$data['errors'] = $errors;
   } else {
-
 
 	// FORM PROCESSING HERE
 	// If there are no errors, process our form, then return a success message upon completion.
