@@ -2,10 +2,13 @@
 ini_set('max_execution_time', '3600');
 require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
+
+// Initialize authentication control cookie
 $login_cookie = new UserCookie();
+// Check for sign out signal
 $login_cookie->DeleteIt();
+
 if($login_cookie->CheckIt()) {
-	$_SESSION['login_cookie'] = serialize($login_cookie);
 	define("USERNAME", $login_cookie->username);
 	$userval = new UserGrab(USERNAME);
 	define("ADMIN_STATUS", $userval->admin);

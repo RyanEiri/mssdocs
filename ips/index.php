@@ -1,11 +1,10 @@
 <?php
-//session_start();
 require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
 $login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
 if($login_cookie->CheckIt()) {
-	$_SESSION['login_cookie'] = serialize($login_cookie);
+	$_SESSION['login_cookie'] = $login_cookie;
 	define("USERNAME", $login_cookie->username);
 
 	$userval = new UserGrab(USERNAME);

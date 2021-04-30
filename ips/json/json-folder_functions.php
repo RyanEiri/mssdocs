@@ -7,16 +7,11 @@ ini_set('max_input_time', '3600');
 
 // Perform application bootstrap.
 chdir('..');
-require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
 
 // User authentication.
-if($_SESSION['login_cookie']) {
-	$login_cookie = unserialize($_SESSION['login_cookie']);
-} else {
-	$login_cookie = new UserCookie();
-}
-$login_cookie->DeleteIt();
+$login_cookie = new UserCookie();
+//$login_cookie->DeleteIt();
 
 // Everything between this if statement assumes an authenticated user.
 if($login_cookie->CheckIt()) {
@@ -119,6 +114,7 @@ if($login_cookie->CheckIt()) {
 		}
 
 	// Save the zip file.
+	session_write_close();
 	$zip->close();
 
   // Update database.

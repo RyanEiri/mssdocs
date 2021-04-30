@@ -1,10 +1,15 @@
 <?php
-// This file is called by browser_assets/js/script.js
+// Database info
+// File format: JSON
+// This file is called by ./js/browser.js
+
+// Load the initialiazation files.
 chdir('..');
-require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
+
 $login_cookie = new UserCookie();
-$login_cookie->DeleteIt();
+//$login_cookie->DeleteIt();
+
 if($login_cookie->CheckIt()) {
 
 	define("USERNAME", $login_cookie->username);
@@ -183,65 +188,49 @@ if(isset($context) && $context === 'file') {
   }
  }
 
-// return a response =============================================
+// Return a response: =============================================
 
-	// if there are any errors in our errors array,
-	// return a success boolean of false
+	// If there are any errors in our errors array, return a success boolean of false
   if ( ! empty($errors)) {
-
-	// if there are items in our errors array,
-	// return those errors
-	$data['success'] = false;
-	$data['errors'] = $errors;
+		$data['success'] = false;
+		$data['errors'] = $errors;
   } else {
 
-	// if there are no errors process our form,
-	// then return a message
-
-	// DO ALL YOUR FORM PROCESSING HERE
-	// THIS CAN BE WHATEVER YOU WANT TO DO
-	// (LOGIN, SAVE, UPDATE, WHATEVER)
-
-	// Table lookup done in error correction to allow for
-	// database error to be thrown through error validation.
-	// $fileval = new FileGrab($file); // this line does the lookup
-
-
-	// show a message of success and provide a true
-	// success variable
+	// If there are no errors proceed to collect all data.
+	// Show a message of success and provide a true success variable.
 	$data['success'] = true;
- if(isset($context) && $context === 'file') {
-	$data['fileId'] = $file_id;
-	$data['fileName'] = $file_name;
-	$data['fileSize'] = $file_size;
-	$data['fileType'] = $file_type;
-	$data['fileUrl'] = $file_url;
-	$data['fileTitle'] = $file_title;
-	$data['fileDescription'] = $file_description;
-	$data['fileDate'] = $file_date;
-	$data['message'] = "Success grabbing info for file: $file_name with file ID: $file_id";
- } elseif(isset($context) && $context === 'folder') {
-	$data['folderId'] = $folder_id;
-	$data['folderName'] = $folder_name;
-	if(isset($zip_name)){
-	  $data['zipname'] = $zip_name;
-	  $data['zipfullpath'] = 'archives/'.$zip_name;
-	  if(isset($zip_url)){
-	    $data['zipURL'] = $zip_url;
-	  }
-	  if(isset($zip_date)){
-	    $data['zipDate'] = $zip_date;
-	  }
-	}
-	if(isset($folder_files)){
-	  $data['files'] = $folder_files;
-	}
-	$data['message'] = "Success grabbing info for folder: $folder with folder ID: $folder_id";
- }
+		if(isset($context) && $context === 'file') {
+		$data['fileId'] = $file_id;
+		$data['fileName'] = $file_name;
+		$data['fileSize'] = $file_size;
+		$data['fileType'] = $file_type;
+		$data['fileUrl'] = $file_url;
+		$data['fileTitle'] = $file_title;
+		$data['fileDescription'] = $file_description;
+		$data['fileDate'] = $file_date;
+		$data['message'] = "Success grabbing info for file: $file_name with file ID: $file_id";
+		} elseif(isset($context) && $context === 'folder') {
+		$data['folderId'] = $folder_id;
+		$data['folderName'] = $folder_name;
+		if(isset($zip_name)){
+		  $data['zipname'] = $zip_name;
+		  $data['zipfullpath'] = 'archives/'.$zip_name;
+		  if(isset($zip_url)){
+		    $data['zipURL'] = $zip_url;
+		  }
+		  if(isset($zip_date)){
+		    $data['zipDate'] = $zip_date;
+		  }
+		}
+		if(isset($folder_files)){
+		  $data['files'] = $folder_files;
+		}
+		$data['message'] = "Success grabbing info for folder: $folder with folder ID: $folder_id";
+		}
   }
   // complete our ajax handling with our json output
   // return all our data to an AJAX call
-
+	header('HTTP/1.1 200 OK');
   header('Content-Type: application/json');
   echo json_encode($data);
 }

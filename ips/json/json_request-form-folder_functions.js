@@ -118,9 +118,9 @@ $(document).ready(function() {
 		// process the zip form through json-folder_functions
 	function zipFolder(dObj){
 		$.ajax({
-		  type		: 'POST', //define the type of HTTP connection we want to use
-		  url		: 'json/json-folder_functions.php', //the url where we want to POST
-		  data		: dObj, // our data object
+		  type      : 'POST', //define the type of HTTP connection we want to use
+		  url       : 'json/json-folder_functions.php', //the url where we want to POST
+		  data		  : dObj, // our data object
 		  dataType	: 'json', // what type of data do we expect back from the server
 		  encode		: true
 		})

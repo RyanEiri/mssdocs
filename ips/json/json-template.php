@@ -1,17 +1,11 @@
 <?php
-$dir_base = 'ips';
-$config_base = $_SERVER['DOCUMENT_ROOT'];
-$config_base = $config_base.'/'.$dir_base.'/';
-//require_once ($config_base.'functions/functions.php');
-require_once ($config_base.'classes/classes.php');
-require_once ($config_base.'config/config.php');
-session_start();
-if($_SESSION['login_cookie']) {
-	$login_cookie = $_SESSION['login_cookie'];
-} else {
-	$login_cookie = new UserCookie();
-}
-$login_cookie->DeleteIt();
+// Load the initialiazation files.
+chdir('..');
+include getcwd().'/php/boot.php';
+
+// Initialize authentication control cookie
+$login_cookie = new UserCookie();
+
 if($login_cookie->CheckIt()) {
 	// Grab the current user's info.
 	$username = $login_cookie->username;
@@ -23,7 +17,7 @@ if($login_cookie->CheckIt()) {
   $data		= array();	// array to pass back data
 
   // validate the variables ========================================
-  // If any of these variables don't exist, add an error to our 
+  // If any of these variables don't exist, add an error to our
   // $errors array. If they do exist add them to a variable value.
   // If the folder value is the same as the current path, invalidate
   // and pass error.
@@ -35,15 +29,15 @@ if($login_cookie->CheckIt()) {
   }
   if (!$admin) {
 	$errors['admin'] = 'Administrator access is required for these changes.';
-  } 
+  }
 
 // return a response =============================================
 
-	// if there are any errors in our errors array, 
+	// if there are any errors in our errors array,
 	// return a success boolean of false
   if ( ! empty($errors)) {
 
-	// if there are items in our errors array, 
+	// if there are items in our errors array,
 	// return those errors
 	$data['success'] = false;
 	$data['errors'] = $errors;
@@ -52,17 +46,17 @@ if($login_cookie->CheckIt()) {
 	}
   } else {
 
-	// if there are no errors process our form, 
+	// if there are no errors process our form,
 	// then return a message
 
 	// DO ALL YOUR FORM PROCESSING HERE
-	// THIS CAN BE WHATEVER YOU WANT TO DO 
+	// THIS CAN BE WHATEVER YOU WANT TO DO
 	// (LOGIN, SAVE, UPDATE, WHATEVER)
 
 
 
-	// show a message of success and provide a boolean 
-	// success variable set to true. 
+	// show a message of success and provide a boolean
+	// success variable set to true.
 	$data['success'] = true;
 	if(isset($warnings)) {
 	  $data['warnings'] = $warnings;

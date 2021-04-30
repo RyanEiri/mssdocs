@@ -13,6 +13,7 @@ if($login_cookie->CheckIt()) {
 
   // begin our ajax handling
   $errors	= array();	// array to hold validation errors
+	$warnings = array(); // array to hold warnings
   $data		= array();	// array to pass back data
 
   // validate the variables ========================================
@@ -74,10 +75,11 @@ if($login_cookie->CheckIt()) {
   	}
 		if (empty($errors)) {
 		  // Find the file in the database and check our file id
+
 		  // the files root directory does not appear in the db
 		  // need to strip that from the file info before querying
 		  $show_file = preg_replace('/.*files\//', '', $previous_file_folder);
-		  //$show_file = preg_replace('/^\//', '', $show_file);
+
 		  if($show_file){
 		    $show_file = $show_file.'/'.$file_name;
 		  } else {
@@ -111,19 +113,18 @@ if($login_cookie->CheckIt()) {
 	// if there are any errors in our errors array,
 	// return a success boolean of false
   if ( ! empty($errors)) {
-
-	// if there are items in our errors array,
-	// return those errors
-	$data['success'] = false;
-	$data['errors'] = $errors;
-	$data['warnings'] = $warnings;
-
+		// If there are items in our errors array, return those errors.
+		$data['success'] = false;
+		$data['errors'] = $errors;
+		$data['warnings'] = $warnings;
   } else {
 
 		/* If there are no errors, create DB object and
 		 * send variables to DB for processing.
-		 */
+		*/
 
+		// Collect DB errors.
+		$db_errors	= array();	// array to hold DB errors
 		$change_object = new ActOnSingleFile();
 		$file_url = $change_object->get_full_url().'/'.$fs_dir_name.'/'.$file_name;
 
@@ -168,7 +169,8 @@ if($login_cookie->CheckIt()) {
 
 		  if ($change_object->changeFileSystemDB($file_id, $change_file, $file_url, $folder_id) !== FALSE) {
 
-				if (rename($previous_file_folder.'/'.$previous_file_name, $fs_dir_name.'/'.$file_name)) {
+				if (!rename($previous_file_folder.'/'.$previous_file_name, $fs_dir_name.'/'.$file_name)) {
+					$db_errors['rename'] .= 'Rename operation failed.';
 //					$data['message'] .= '<br />success executing rename file';
 				} else {
 //					$data['message'] .= '<br />failed executing rename file';
@@ -218,17 +220,19 @@ if($login_cookie->CheckIt()) {
 		  }
 		}
 
-		// show a message of success and provide a boolean
-		// success variable set to true.
+		// Show a message of success and provide a boolean success variable set to true.
 		$data['success'] = true;
+		if(isset($db_errors)) {
+			$data['db_errors'] = $db_errors;
+		}
 		if(isset($warnings)) {
 		  $data['warnings'] = $warnings;
 		}
 
   }
 
-  // complete our ajax handling with our json output
-  // return all our data to an AJAX call
+  // JSON Output
+	header('HTTP/1.1 200 OK');
   header('Content-Type: application/json');
   echo json_encode($data);
 }
