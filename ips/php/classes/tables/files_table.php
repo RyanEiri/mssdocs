@@ -155,7 +155,6 @@ class FolderGrab {
 		foreach ($this->files as $key => $value) {
 			$file_name = basename($value['name']);
 			$file_name = $update_folder.'/'.$file_name;
-//			$file_url = $this->get_full_url().'/files/'.$file_name;
 			$file_url = USER_FILES_URL.'files/'.$file_name;
 			$file_id = $value['id'];
 			$update_files_sql = "UPDATE files
@@ -273,10 +272,10 @@ class FolderGrab {
 					'$this->zip_url'
 				      )";
 			$this->updatezip_sql = "
-					UPDATE ziparchives SET 
+					UPDATE ziparchives SET
 					`zip_date` = '$this->date',
 				        `zip_url` = '$this->zip_url',
-					`zip_name` = '$this->zip_name'	
+					`zip_name` = '$this->zip_name'
 					WHERE `folder_id`='$this->duplicateZipFolderID'
 					";
 			if($this->zip_name === $this->duplicateZipname){
@@ -369,8 +368,7 @@ class ActOnSingleFile {
 		;
 
 	function __construct(
-	                ) {
-
+	  ) {
 	}
 
 	function addFile(){

@@ -103,13 +103,6 @@ class SQL {
 		$this->dbUser, $this->dbPass, $this->dbName)) {
 			trigger_error('Could not connect to server');
 			$this->connectError = true;
-		// Select database
-		// Deprecated with change to mysqli interface
-	  // Database is now selected upon connection
-	  // See fourth variable in connection
-//		} else if (!@mysql_select_db($this->dbName,$this->dbConn)) {
-//			trigger_error('Could not select database');
-//			$this->connectError = true;
 		} else {
 			@mysqli_set_charset($this->dbConn, 'utf8');
 		}
@@ -148,10 +141,10 @@ class SQL {
 	* Returns an instance of MySQLResult to fetch rows with
 	*/
 	/*
-	* The $param is to pass in an array of parameters to bind to the sql statement  - The two array values are
-	*
-	* 'type' and 'value'  The array should look like
-	*
+	* The $param is to pass in an array of parameters to bind to the sql statement.
+  * The two array values are:
+	* 'type' and 'value'
+	* The array should look like
 	* $params[] = Array( 'type' => 's', 'value' => 'my value' );
 	*
 	* Currently this addition was only made for INSERT statements
@@ -159,7 +152,6 @@ class SQL {
 	*/
 	public function query($statement, $params = NULL){ // default for $params set to NULL
 		// Check for parameters to form a prepared statement
-
 
 			// prepare statement
 			$conn = $this->dbConn;
@@ -170,6 +162,7 @@ class SQL {
 			}
 
 			if(is_array($params)) {
+
 			//initialize param variables
 			$a_params = array();
 			$param_type = '';
@@ -190,6 +183,7 @@ class SQL {
 			//use call_user_func_array, as $stmt->bind_param('s', $param); does not accept params array
 			call_user_func_array(array($stmt, 'bind_param'), $a_params);
 			}
+
 			//execute statement
 			if (!$exec = $stmt->execute()) {
 				trigger_error('Query failed: ' . mysqli_error($conn)
@@ -204,21 +198,7 @@ class SQL {
 					return new MySQLResult($this, $exec);
 				}
 			}
-
-		/*} else {
-			if (!$queryResource = mysqli_query($this->dbConn, $statement)) {
-						trigger_error('Query failed: ' . mysqli_error($this->dbConn)
-												. ' SQL: ' . $statement);
-						$this->queryError = true;
-						$this->previousStatement = $statement;
-						return new MySQLResult($this, $queryResource);
-			} else {
-						return new MySQLResult($this, $queryResource);
-			}
-		}*/
-
 	}
-
 }
 
 ?>
