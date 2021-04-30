@@ -1,6 +1,5 @@
 <?php
 chdir('..');
-require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
 if($_SESSION['login_cookie']) {
 	$login_cookie = $_SESSION['login_cookie'];
@@ -20,7 +19,7 @@ if($login_cookie->CheckIt()) {
   $data		= array();	// array to pass back data
 
   // validate the variables ========================================
-  // If any of these variables don't exist, add an error to our 
+  // If any of these variables don't exist, add an error to our
   // $errors array. If they do exist add them to a variable value.
   // If the folder value is the same as the current path, invalidate
   // and pass error.
@@ -45,7 +44,7 @@ if($login_cookie->CheckIt()) {
 	  if(!$errors){
 	    $errors = 'No folder id found! Aborting operation.';
 	  } else {
-	    $errors .= 'No folder id found!'; 
+	    $errors .= 'No folder id found!';
 	  }
   } else {
 	  $folder_id = $_POST['folderId'];
@@ -74,7 +73,7 @@ if($login_cookie->CheckIt()) {
 
   if (!$admin) {
 	$errors = 'Administrator access is required for these changes.';
-  } 
+  }
 
   // pull a fresh file listing from the database to compare
   // so that we will not be updating mysql with duplicate entries
@@ -101,8 +100,8 @@ if($login_cookie->CheckIt()) {
   // correspondence: https://stackoverflow.com/questions/3876435/recursive-array-diff.
   // The function that was used produces a result when the same value appears
   // in different keys. Another answer suggests this is inappropriate for diff
-  // usage, though based on admittedly quirky behaviour of php's diff utility. 
-  // Standard diff output is not the desired result here. And so, 
+  // usage, though based on admittedly quirky behaviour of php's diff utility.
+  // Standard diff output is not the desired result here. And so,
   // this suggestion was ignored, though the same comment also suggested to use non-
   // obscure names for arrays and variables, and this suggestion was taken into account
   // for the following function.
@@ -129,8 +128,8 @@ if($login_cookie->CheckIt()) {
 
   // remove entries with no information remaining other than the id
   foreach ($files_from_js as $key => $array) {
-	  if(!array_key_exists('name', $array) 
-		  AND !array_key_exists('title', $array) 
+	  if(!array_key_exists('name', $array)
+		  AND !array_key_exists('title', $array)
 		  AND !array_key_exists('description', $array)
 	  ) {
 	    unset($files_from_js[$key]);
@@ -143,11 +142,11 @@ if($login_cookie->CheckIt()) {
 
 // return a response =============================================
 
-	// if there are any errors in our errors array, 
+	// if there are any errors in our errors array,
 	// return a success boolean of false
   if ( ! empty($errors)) {
 
-	// if there are items in our errors array, 
+	// if there are items in our errors array,
 	// return those errors
 	$data['success'] = false;
 	$data['errors'] = $errors;
@@ -156,10 +155,10 @@ if($login_cookie->CheckIt()) {
 	}
   } else {
 
-	// if there are no errors process our form, 
+	// if there are no errors process our form,
 	// then return a message
 
-	// Database processing 
+	// Database processing
 	$folderval->updateFolderFiles($files_from_js);
 	// Filesystem processing
 	foreach ($files_from_js as $key => $array) {
@@ -176,8 +175,8 @@ if($login_cookie->CheckIt()) {
 	  }
 	}
 
-	// show a message of success and provide a boolean 
-	// success variable set to true. 
+	// show a message of success and provide a boolean
+	// success variable set to true.
 	$data['success'] = true;
 	if(!empty($warnings)) {
 	  $data['warnings'] = $warnings;

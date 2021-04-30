@@ -1,6 +1,5 @@
 <?php
 chdir('..');
-require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
 $login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
@@ -89,7 +88,7 @@ if($login_cookie->CheckIt()) {
 	// if there are no errors process our form,
 	// then return a message
 
-	// FORM PROCESSING 
+	// FORM PROCESSING
 	if(isset($files)){
 
 		if ($db_move_folder !== 'files') {

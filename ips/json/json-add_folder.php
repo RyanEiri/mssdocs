@@ -1,6 +1,5 @@
 <?php
 chdir('..');
-require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
 if($_SESSION['login_cookie']) {
 	$login_cookie = unserialize($_SESSION['login_cookie']);
@@ -18,7 +17,7 @@ if($login_cookie->CheckIt()) {
   $data		= array();	// array to pass back data
 
   // validate the variables ========================================
-  // If any of these variables don't exist, add an error to our 
+  // If any of these variables don't exist, add an error to our
   // $errors array. If they do exist add them to a variable value.
 
   if (empty($_POST['folder'])){
@@ -49,21 +48,21 @@ if($login_cookie->CheckIt()) {
 
 // return a response =============================================
 
-  // if there are any errors in our errors array, 
+  // if there are any errors in our errors array,
   // return a success boolean of false
   if (!empty($errors)) {
 
-	// if there are items in our errors array, 
+	// if there are items in our errors array,
 	// return those errors
 	$data['success'] = false;
 	$data['errors'] = $errors;
   } else {
 
-	// if there are no errors process our form, 
+	// if there are no errors process our form,
 	// then return a message
 
 	// DO ALL YOUR FORM PROCESSING HERE
-	// THIS CAN BE WHATEVER YOU WANT TO DO 
+	// THIS CAN BE WHATEVER YOU WANT TO DO
 	// (LOGIN, SAVE, UPDATE, WHATEVER)
 	mkdir($dir.'/'.$folder, 0755);
 	mkdir($dir.'/'.$folder.'/thumbnail', 0755);
@@ -75,7 +74,7 @@ if($login_cookie->CheckIt()) {
 	$folder_create = TRUE; // this is where the folder is created in db
 	$folderval = new FolderGrab($db_folder, $folder_create);
 
-	// show a message of success and provide a true 
+	// show a message of success and provide a true
 	// success variable
 	$data['success'] = true;
 	$data['message'] = 'Success!';

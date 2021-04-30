@@ -1,16 +1,15 @@
 <?php
 chdir('..');
-require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
 $login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
 if($login_cookie->CheckIt()) {
-	
+
 	define("USERNAME", $login_cookie->username);
-	
+
 	$userval = new UserGrab(USERNAME);
 	define("ADMIN_STATUS", $userval->admin);
-	
+
 if(ADMIN_STATUS){
   // instantiate an ActOnSingleUser object
   if(!isset($user_object)) {
@@ -23,26 +22,26 @@ if(ADMIN_STATUS){
 
 // return a response =============================================
 
-	// if there are any errors in our errors array, 
+	// if there are any errors in our errors array,
 	// return a success boolean of false
   if ( ! empty($errors)) {
 
-	// if there are items in our errors array, 
+	// if there are items in our errors array,
 	// return those errors
 	$data['success'] = false;
 	$data['errors'] = $errors;
 	$data['value'] = $value;
   } else {
 
-	// if there are no errors process our form, 
+	// if there are no errors process our form,
 	// then return a message
 
 	// DO ALL YOUR FORM PROCESSING HERE
-	// THIS CAN BE WHATEVER YOU WANT TO DO 
+	// THIS CAN BE WHATEVER YOU WANT TO DO
 	// (LOGIN, SAVE, UPDATE, WHATEVER)
 	if($user_object->removeUser() !== FALSE){
 
-  	  // show a message of success and provide a true 
+  	  // show a message of success and provide a true
 	  // success variable
 	  $data['success'] = true;
 	  $data['message'] = 'Success!';
