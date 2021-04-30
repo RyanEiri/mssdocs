@@ -1,6 +1,6 @@
 <?php
-session_start();
-include $_SERVER['DOCUMENT_ROOT'].'/ips/php/boot.php';
+require_once(getcwd().'/php/start_sess.php');
+include getcwd().'/php/boot.php';
 $login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
 if($login_cookie->CheckIt()) {

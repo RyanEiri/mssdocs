@@ -1,5 +1,6 @@
 <?php
-session_start();
+//session_start();
+require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
 $login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
@@ -25,8 +26,8 @@ if($login_cookie->CheckIt()) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fragile Heritage Project::Internal Proofing System</title>
 <meta name="author" content="Ryan Eric Johnson" >
-<meta name="date" content="2018-06-02" >
-<meta name="copyright" content="Fragile Heritage Project 2016-2019" >
+<meta name="date" content="2020-12-20" >
+<meta name="copyright" content="Fragile Heritage Project 2016-2020" >
 <meta http-equiv="expires" content="0" >
 
 <!-- Bootstrap for CSS -->
