@@ -233,6 +233,7 @@ if($login_cookie->CheckIt()) {
 //	    file_put_contents(USER_FILES_BASE."tmp/" . session_id() . ".txt", json_encode($zip_progress));
 //	  });
 	}
+	session_write_close();
 	$zip->close();
 
   	  // deal with the database: correlate archive with
