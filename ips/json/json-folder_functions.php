@@ -81,43 +81,40 @@ if($login_cookie->CheckIt()) {
 	}
 	$zip_count = zipCount($zip_files);
 	if(isset($zip_folder)){
-	$i = 1;
+		$i = 1;
 		while($i <= $zip_count) {
-		    foreach ($zip_files as $name => $zip_file) {
-					// Skip directories (they will be added automatically)
-					if (!$zip_file->isDir())
-					{
-					  // Get real and relative path for current file
-					  $filePath = $zip_file->getRealPath();
-					  // let's change the zip's path relative to files directory
-					  preg_match('/(.*)(files.*)$/i', $filePath, $relativeFilePath);
-					  $relativeFilePath = $relativeFilePath[2];
+	    foreach ($zip_files as $name => $zip_file) {
+				// Skip directories (they will be added automatically)
+				if (!$zip_file->isDir())
+				{
+				  // Get real and relative path for current file
+				  $filePath = $zip_file->getRealPath();
+				  // let's change the zip's path relative to files directory
+				  preg_match('/(.*)(files.*)$/i', $filePath, $relativeFilePath);
+				  $relativeFilePath = $relativeFilePath[2];
 
-					  // Get the percentage of files now complete and add that percentage to a user unique
-						// tmp file.
-					  $percent = intval($i/$zip_count * 100);
-					  $zip_progress['percent'] = $percent;
-					  file_put_contents(USER_FILES_BASE . "tmp/" . session_id() . ".txt",
-							json_encode($zip_progress));
+				  // Get the percentage of files now complete and add that percentage to a user unique
+					// tmp file.
+				  $percent = intval($i/$zip_count * 100);
+				  $zip_progress['percent'] = $percent;
+				  file_put_contents(USER_FILES_BASE . "tmp/" . session_id() . ".txt",
+						json_encode($zip_progress));
 
-					  // Add current file to archive
-					  $zip->addFile($filePath, $relativeFilePath);
+				  // Add current file to archive
+				  $zip->addFile($filePath, $relativeFilePath);
 
-						// Pad time for progress update.
-					  //usleep(12500);
+					// Pad time for progress update.
+				  //usleep(12500);
 
-						// Increase the while statement counter.
-					  $i++;
-					}
-		    }
-
-		}
+					// Increase the while statement counter.
+				  $i++;
+				}
 	    }
+		}
 	}
   	// Unlock the session for large archives
 	session_write_close();
 	// Save the zip file.
-	session_write_close();
 	$zip->close();
 
   // Update database.
@@ -126,8 +123,6 @@ if($login_cookie->CheckIt()) {
   $zip_url = USER_FILES_URL.'archives/'.$zip_filename;
   $data['zipURL'] = $zip_url;
   $zip_db->addZip($zip_filename, $zip_url);
-	}
-
 
 	// show a message of success and provide a true success variable
 	$data['success'] = true;
