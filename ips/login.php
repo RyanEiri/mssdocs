@@ -1,5 +1,4 @@
 <?php
-require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$userval = new UserGrab($_REQUEST['username']);
