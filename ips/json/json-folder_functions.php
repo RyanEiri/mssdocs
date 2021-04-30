@@ -112,7 +112,10 @@ if($login_cookie->CheckIt()) {
 		    }
 
 		}
-
+	    }
+	}
+  	// Unlock the session for large archives
+	session_write_close();
 	// Save the zip file.
 	session_write_close();
 	$zip->close();
