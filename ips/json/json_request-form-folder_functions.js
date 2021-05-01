@@ -53,43 +53,18 @@ $(document).ready(function() {
 		// add the single folder selection to the dataObject
 		dataObj['folderToZip'] = $('#folderNameRadio').val();
 
-    zipFolder(dataObj)
-      .then((data) => {
-        console.log(data);
-        startTimer();
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-
-    function zipFolder(dObj) {
-      return new Promise((resolve, reject) => {
-        $.ajax({
-          type      : 'POST', //define the type of HTTP connection we want to use
-          url       : 'json/json-folder_functions.php', //the url where we want to POST
-          data		  : dObj, // our data object
-          //dataType	: 'json', // what type of data do we expect back from the server
-          //encode		: true,
-          success: function (data) {
-            resolve(data);
-          },
-          error: function (error) {
-            reject (error);
-          }
-        })
-      })
-    }
-
-    // process the zip form through json-folder_functions
-  	function startTimer(){
+    zipFolder(dataObj);
       timer = window.setInterval(refreshProgress, 500);
-      /* $.ajax({
+
+		// process the zip form through json-folder_functions
+  	function zipFolder(dObj){
+  		$.ajax({
   		  type      : 'POST', //define the type of HTTP connection we want to use
   		  url       : 'json/json-folder_functions.php', //the url where we want to POST
   		  data		  : dObj, // our data object
-  		  dataType	: 'json', // what type of data do we expect back from the server
-  		  encode		: true
-  		}) */
+  		  //dataType	: 'json', // what type of data do we expect back from the server
+  		  //encode		: true
+  		})
   			/* //using the done promise callback
   			.done(function(data) {
 
@@ -181,7 +156,8 @@ $(document).ready(function() {
   					  '<div class="alert alert-success">' + data.message + '</div>'
   					);
   					$('#zipname').html(
-  					  '<br /><h5>Newly created zip file:</h5><a type="application/zip" href="' + data.zipURL + '">' + data.zipFilename + '</a>'
+  					  '<br /><h5>Newly created zip file:</h5><a type="application/zip" href="'
+              + data.zipURL + '">' + data.zipFilename + '</a>'
   					);
           } else if(data.success === false) {
             // handle errors for zip archive file -------
