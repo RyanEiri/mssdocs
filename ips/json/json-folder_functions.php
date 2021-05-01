@@ -127,13 +127,14 @@ if($login_cookie->CheckIt()) {
 		// Save the zip file.
 		$zip->close();
 
+		// Put together Zip URL for db update.
+		$zip_url = USER_FILES_URL.'archives/'.$zip_filename;
 	  // Update database.
 	  $folder_create = FALSE; // no need to create the folder
 	  $zip_db = New FolderGrab($zip_db_folder, $folder_create);
 	  $zip_db->addZip($zip_filename, $zip_url);
 
 		// Provide Zip URL in data.
-		$zip_url = USER_FILES_URL.'archives/'.$zip_filename;
 		$data['zipURL'] = $zip_url;
 		// Provide success value of true in data.
 		$data['success'] = true;

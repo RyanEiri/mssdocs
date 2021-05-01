@@ -53,18 +53,43 @@ $(document).ready(function() {
 		// add the single folder selection to the dataObject
 		dataObj['folderToZip'] = $('#folderNameRadio').val();
 
-    zipFolder(dataObj);
-      timer = window.setInterval(refreshProgress, 500);
+    zipFolder(dataObj)
+      .then((data) => {
+        console.log(data);
+        startTimer();
+      })
+      .catch((error) => {
+        console.log(error);
+      })
 
-		// process the zip form through json-folder_functions
-  	function zipFolder(dObj){
-  		$.ajax({
+    function zipFolder(dObj) {
+      return new Promise((resolve, reject) => {
+        $.ajax({
+          type      : 'POST', //define the type of HTTP connection we want to use
+          url       : 'json/json-folder_functions.php', //the url where we want to POST
+          data		  : dObj, // our data object
+          //dataType	: 'json', // what type of data do we expect back from the server
+          //encode		: true,
+          success: function (data) {
+            resolve(data);
+          },
+          error: function (error) {
+            reject (error);
+          }
+        })
+      })
+    }
+
+    // process the zip form through json-folder_functions
+  	function startTimer(){
+      timer = window.setInterval(refreshProgress, 500);
+      /* $.ajax({
   		  type      : 'POST', //define the type of HTTP connection we want to use
   		  url       : 'json/json-folder_functions.php', //the url where we want to POST
   		  data		  : dObj, // our data object
   		  dataType	: 'json', // what type of data do we expect back from the server
   		  encode		: true
-  		})
+  		}) */
   			/* //using the done promise callback
   			.done(function(data) {
 
