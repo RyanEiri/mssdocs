@@ -190,6 +190,9 @@ if($login_cookie->CheckIt()) {
 
 						<input class="form-check-input" type="radio" placeholder="No Folder" id="folderNameRadio" name="folderNameRadio" checked>
 						<span id="folderNameText"></span>
+						<div class="progress progress-style">
+							<div id="zip_progress" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+						</div>
 						<div id="zip_message" class="mt-3"></div>
 						<div id="zip_name" class="mt-3"><h5>Current zip file:</h5></div>
 
