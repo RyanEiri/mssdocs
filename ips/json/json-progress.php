@@ -22,19 +22,7 @@ if($login_cookie->CheckIt()) {
 			unlink($file);
 		}
 	} else {
-		echo json_encode(array("percent" => null));
+		echo json_encode(array("percent" => 0));
 	}
-
-	/*if(isset($_SESSION['zip_progress'])) {
-		$zip_progress = $_SESSION['zip_progress'];
-		echo $zip_progress;
-
-		$obj = json_decode($zip_progress);
-		if ($obj->percent == 100) {
-			unset($_SESSION['zip_progress']);
-		}
-	} else {
-		echo json_encode(array("percent" => null));
-	}*/
 }
 ?>

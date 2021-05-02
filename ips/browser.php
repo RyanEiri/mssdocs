@@ -1,3 +1,8 @@
+<!--
+	File browser based on Cute File Browser
+	Cute File Browser with jQuery, AJAX and PHP
+	http://tutorialzine.com/2014/09/cute-file-browser-jquery-ajax-php/</a>
+-->
 <?php
 ini_set('max_execution_time', '3600');
 require_once(getcwd().'/php/start_sess.php');
@@ -33,8 +38,17 @@ if($login_cookie->CheckIt()) {
 	<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>bootstrap/sticky-footer-navbar.css">
 
 	<!-- File icons -->
-        <link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>fileicon.css/fileicon.css">
+  <link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>fileicon.css/fileicon.css">
 
+	<!-- Internet Explorer Tweaks -->
+	<!-- IE10 CSS Viewport Workaround -->
+	<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>ie10-viewport-bug-workaround.css">
+	    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	    <!--[if lt IE 9]>
+	      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+	      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	    <![endif]-->
 </head>
 <body class="d-flex flex-column h-100">
 
@@ -103,14 +117,12 @@ if($login_cookie->CheckIt()) {
 	    <label for="fileSize" class="col-sm-4 col-form-label">File Size</label>
 	    <div class="col-sm-8">
 		<span id="fileSize"></span>
-<!--		<input class="form-control form-control-sm" type="text" placeholder="No size" id="fileSize" disabled> -->
 	    </div>
 	  </div>
 	  <div class="form-group row">
 	    <label for="fileType" class="col-sm-4 col-form-label">File Type</label>
 	    <div class="col-sm-8">
 		<span id="fileType"></span>
-<!--		<input class="form-control form-control-sm" type="text" placeholder="No Type" id="fileType"> -->
 	    </div>
 	  </div>
 	  <div class="form-group row">
@@ -119,7 +131,6 @@ if($login_cookie->CheckIt()) {
 		<a href="" class="fileUrl" data-toggle="tooltip" data-html="true" title="<em>Tooltip</em>: <b>Click this link to download the full size image.</b>" data-placement="top">
 		<span id="fileUrl" style="word-break: break-all;"></span>
 		</a>
-<!--		<input class="form-control form-control-sm" type="url" placeholder="No URL" id="fileUrl"> -->
 	    </div>
 	  </div>
 	  <div class="form-group row">
@@ -144,7 +155,6 @@ if($login_cookie->CheckIt()) {
 	    <label for="fileDate" class="col-sm-4 col-form-label">Date and Time Modified (PST or PDT)</label>
 	    <div class="col-sm-8">
 		<span id="fileDate"></span>
-<!--		<input class="form-control form-control-sm" type="text" placeholder="No Date" id="fileDate"> -->
 	    </div>
 	  </div>
 	  </li>
@@ -396,20 +406,12 @@ if($login_cookie->CheckIt()) {
 		</button>
 		</div>
 		<div class="input-group align-items-center" role="group">
-		<!-- <p class="col m-0 p-0"><label class="btn btn-sm m-0">
-		<input type="checkbox" name="selectAllFiles" id="selectAllFileList" />
-			<span>All Files</span>
-		</label></p> -->
 		<div class="col-auto my-1">
 			<div class="custom-control custom-switch mr-sm-2">
 			  <input type="checkbox" class="custom-control-input" name="selectAllFiles" id="selectAllFileList" aria-label="Checkbox to select all files">
 			  <label class="custom-control-label" for="selectAllFileList">All files</label>
 			</div>
 		</div>
-		<!-- <p class="col m-0 p-0"><label class="btn btn-sm m-0">
-		<input type="checkbox" name="selectAllFolders" id="selectAllFolderList" />
-			<span>All Folders</span>
-		</label></p> -->
 		<div class="col-auto my-1">
 			<div class="custom-control custom-switch mr-sm-2">
 			  <input type="checkbox" class="custom-control-input" name="selectAllFolders" id="selectAllFolderList" aria-label="Checkbox to select all folders">
@@ -424,9 +426,12 @@ if($login_cookie->CheckIt()) {
 
 	<div class="filemanager m-0 p-0">
 
-		<!--<div class="search m-0 p-0">
+		<!--
+		File search - disabled
+		<div class="search m-0 p-0">
 			<input type="search" placeholder="Find a file..." />
-		</div><br />-->
+		</div><br />
+		-->
 
 		<div class="breadcrumbs m-0 p-0"></div>
 
@@ -440,13 +445,6 @@ if($login_cookie->CheckIt()) {
 	</div>
 </div>
 </main>
-<!--
-	<footer>
-        <a class="tz" href="http://tutorialzine.com/2014/09/cute-file-browser-jquery-ajax-php/">Cute File Browser with jQuery, AJAX and PHP</a>
-        <div id="tzine-actions"></div>
-        <span class="close"></span>
-    </footer>
--->
 
 	<!-- jQuery for javascript -->
 	<script src="<?php echo PROGRAM_JS_BASE ?>jquery.min.js"></script>

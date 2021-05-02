@@ -9,7 +9,7 @@
 	<!-- Collect the nav links, forms, and other content for toggling -->
 	<div class="collapse navbar-collapse" id="fhp-navbar-collapse-1">
 		<ul class="navbar-nav mr-auto">
-			<li class="nav-item active"><a class="nav-link" href="<?php echo PROGRAM_WEB_BASE ?>index.php">Home <span class="sr-only">(current)</span></a></li>
+			<li class="nav-item active"><a class="nav-link" href="<?php echo PROGRAM_WEB_BASE ?>">Home <span class="sr-only">(current)</span></a></li>
 			<li class="nav-item"><a class="nav-link" href="<?php echo PROGRAM_WEB_BASE ?>index.php?header=cookieDel">Sign Out</a></li>
 <?php if(ADMIN_STATUS){ ?>
 			<li class="nav-item dropdown">

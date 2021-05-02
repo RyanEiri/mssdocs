@@ -48,7 +48,10 @@ if($login_cookie->CheckIt()) {
 
 <body>
 
+<header>
+<!-- Fixed Navbar -->
 <?php include(HTML_TEMPLATES.'navbar.php'); ?>
+</header>
 
 <main role="main">
 <!-- Info Panel about FHP -->
