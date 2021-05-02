@@ -181,7 +181,7 @@ if($login_cookie->CheckIt()) {
 			</button>
 	  </div>
 		<div class="row justify-content-center mt-3">
-		  <div class="card border-dark mb-3 w-90" id="folderFunctionsZip">
+		  <div class="card border-dark mb-3" style="width: 90%;" id="folderFunctionsZip">
 				<h5 class="card-header">Zip Folder</h5>
 			  <div class="card-body">
 			  <form class="form-horizontal" id="folderFunctionsForm" class="form-error" method="POST" action="json-folder_functions.php" accept-charset="utf-8">
@@ -205,7 +205,7 @@ if($login_cookie->CheckIt()) {
 			  </form>
 			  </div>
 			</div>
-			<div class="card border-dark mb-3" id="folderFunctionsFiles">
+			<div class="card border-dark mb-3" style="width: 90%;" id="folderFunctionsFiles">
 				<h5 class="card-header">Files in Folder</h5>
 			  <div class="card-body p-0" id="files">
 				  <form "form-inline" id="filesInFolderForm" class="form-error" method="POST"
