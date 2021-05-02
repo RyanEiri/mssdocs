@@ -685,9 +685,9 @@ $(function(){
 						  $('#folder_name').val(data.folderName);
 						}
 						if (data.zipname) {
-						  $('#zipname').append('<a type="application/zip" href=' + data.zipURL + ' download>' + data.zipname + '</a> created at ' + data.zipDate + ' (PST or PDT)');
+						  $('#zip_name').append('<a type="application/zip" href=' + data.zipURL + ' download>' + data.zipname + '</a> created at ' + data.zipDate + ' (PST or PDT)');
 						} else {
-						  $('#zipname').append('No zip archive created yet.');
+						  $('#zip_name').append('No zip archive created yet.');
 						}
 						var filesObj = {};
 						filesObj = data.files;
@@ -698,31 +698,31 @@ $(function(){
 						  var fileDescription = val.description;
 						  fileName = fileName.replace(/^.*[\\\/]/, '');
 						  $('#filetable').append(
-							  '<tr>' +
-							  '<div class="form-group"><td class="col-sm-1 col-lg-1">' +
+							  '<tbody><tr>' +
+							  '<div class="form-row"><div class="form-group"><th scope="row">' +
 							    '<p class="form-control-static input-sm">' +
 							    fileId +
 							    '</p>' +
 							    '<input class="form-control" name="file_id[]" id="file_id-' + i +
 							    '" type="hidden" value="' + fileId +
 							    '">' +
-							  '</td></div>' +
-							  '<div class="form-group"><td class="col-sm-3 col-lg-3">' +
+							  '</th></div>' +
+							  '<div class="form-group"><td>' +
 							    '<input class="form-control input-sm" name="file_name[]" id="file_name-' + i +
 							    '" type="text" ' + 'value="' + fileName +
 							    '">' +
 							  '</td></div>' +
-							  '<div class="form-group"><td class="col-sm-4 col-lg-4">' +
+							  '<div class="form-group"><td>' +
 							    '<input class="form-control input-sm" name="file_title[]" id="file_title-' + i +
 							    '" type="text" ' + 'value="' + fileTitle +
 							    '">' +
 							  '</td></div>' +
-							  '<div class="form-group"><td class="col-sm-4 col-lg-4">' +
+							  '<div class="form-group"><td>' +
 							    '<input class="form-control input-sm" name="file_description[]" id="file_description-' + i +
 							    '" type="text" ' + 'value="' + fileDescription +
 							    '">' +
 							  '</td></div>' +
-							  '</tr>'
+							  '</tr></div></tbody>'
 							  );
 						});
 			    }

@@ -152,11 +152,13 @@ $(document).ready(function() {
         success: function(data) {
           if(data.success === true) {
             // ALL GOOD! Show success and alter form as needed.
-  					$("#zip_message").html(
+            $("#zip_message").empty();
+            $("#zip_message").append(
   					  '<div class="alert alert-success">' + data.message + '</div>'
   					);
-  					$('#zipname').html(
-  					  '<br /><h5>Newly created zip file:</h5><a type="application/zip" href="'
+            $('#zip_name').empty();
+  					$('#zip_name').append(
+  					  '<h5>Newly created zip file:</h5><a type="application/zip" href="'
               + data.zipURL + '">' + data.zipFilename + '</a>'
   					);
           } else if(data.success === false) {

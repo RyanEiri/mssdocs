@@ -1,8 +1,9 @@
 <?php
-include $_SERVER['DOCUMENT_ROOT'].'/ips/php/boot.php';
-session_start();
+chdir('..');
+include getcwd().'/php/boot.php';
 $login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
+require_once(getcwd().'/php/start_sess.php');
 if($login_cookie->CheckIt()) {
 
 	define("USERNAME", $login_cookie->username);
@@ -125,5 +126,4 @@ if($login_cookie->CheckIt()) {
 </html>
 <?php
 }
-session_unset();
 ?>

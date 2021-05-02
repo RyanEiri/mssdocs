@@ -169,61 +169,70 @@ if($login_cookie->CheckIt()) {
 <!-- end of FileFunctions Modal Form -->
 
 <!-- FolderFunctions Modal Form -->
-<div class="modal fade col-xs-12" id="folderFunctions" tabindex="-1" role="dialog" aria-labelledby="folderFunctionsLabel">
+<div class="modal fade" id="folderFunctions" tabindex="-1"
+	role="dialog" aria-labelledby="folderFunctionsLabel">
 	<div class="modal-dialog modal-lg" role="document">
-	  <div class="modal-content">
+	  <div class="modal-content" id="folderFunctionsBody">
 	  <div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="window.location.reload();"><span aria-hidden="true">&times;</span></button>
-		<h4 class="modal-title" id="folderFunctionsLabel">Folder Functions</h4>
+			<h5 class="modal-title" id="folderFunctionsLabel">Folder Functions</h5>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close"
+			onclick="window.location.reload();">
+				<span aria-hidden="true">&times;</span>
+			</button>
 	  </div>
-	  <div class="modal-body container col-xs-12" id="folderFunctionsBody">
-	  <ul class="list-group" id="folderFunctions-group">
-	  <li class="list-group-item active">Folder Functions</li>
-	  <li class="list-group-item">
-<br />
-	  <div class="row">
-	  <form class="form-horizontal" id="folderFunctionsForm" class="form-error" method="POST" action="json-folder_functions.php" accept-charset="utf-8">
-	    <legend class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">Zip Folder
-	    <button type="submit" class="btn btn-primary col-xs-offset-6 col-lg-offset-6" data-toggle="tooltip" data-html="true" title="<em>Tooltip</em>: <b>Click me and wait for the success message!</b>">Zip this folder now!</button>
-	    </legend>
-	    <div class="form-group form-check col-xs-9 col-sm-12">
-		<label class="form-check-label">
-		<div class="col-sm-12">
-		<input class="form-check-input" type="radio" placeholder="No Folder" id="folderNameRadio" name="folderNameRadio" checked>
-		<span id="folderNameText"></span>
-		<div class="progress progress-style">
-			<div id="zip_progress" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+		<div class="row justify-content-center mt-3">
+		  <div class="card border-dark mb-3 w-90" id="folderFunctionsZip">
+				<h5 class="card-header">Zip Folder</h5>
+			  <div class="card-body">
+			  <form class="form-horizontal" id="folderFunctionsForm" class="form-error" method="POST" action="json-folder_functions.php" accept-charset="utf-8">
+			    <div class="form-group form-check">
+						<label class="form-check-label">
+
+						<input class="form-check-input" type="radio" placeholder="No Folder" id="folderNameRadio" name="folderNameRadio" checked>
+						<span id="folderNameText"></span>
+						<div id="zip_message" class="mt-3"></div>
+						<div id="zip_name" class="mt-3"><h5>Current zip file:</h5></div>
+
+						</label>
+			    </div>
+					<legend>
+						Zip
+						<button type="submit" class="btn btn-primary" data-toggle="tooltip" data-html="true"
+						title="<b>Click and wait for the success message!</b>">
+							<span data-feather="archive"></span>
+						</button>
+					</legend>
+			  </form>
+			  </div>
+			</div>
+			<div class="card border-dark mb-3" id="folderFunctionsFiles">
+				<h5 class="card-header">Files in Folder</h5>
+			  <div class="card-body p-0" id="files">
+				  <form "form-inline" id="filesInFolderForm" class="form-error" method="POST"
+					action="json-folder_files.php" accept-charset="utf-8">
+				    <legend><span data-feather="layers" class="m-3"></span>&nbsp;Files</legend>
+				    <input type="hidden" id="folder_id" name="folder_id">
+				    <input type="hidden" id="folder_name" name="folder_name">
+						<table id="filetable" class="table table-sm table-striped table-hover">
+							<thead class="thead-light">
+							  <tr>
+							    <div class="form-group">
+						    		<th scope="col">ID</th>
+										<th scope="col">Name</th>
+										<th scope="col">Title</th>
+										<th scope="col">Description</th>
+							    </div>
+							  </tr>
+							</thead>
+						</table>
+			  </div>
+		  </div>
 		</div>
-		<div id="zip_message" class="mt-3"></div>
-		<div id="zipname" class="mt-3"><h5>Current zip file:</h5></div>
-		</div>
-		</label>
-	    </div>
-	  </form>
-	  </div>
-<br /><br />
-	  <div id="files" class="row">
-	  <form "form-inline" id="filesInFolderForm" class="form-error" method="POST" action="json-folder_files.php" accept-charset="utf-8">
-	    <legend class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">Files in Folder</legend>
-	    <input type="hidden" id="folder_id" name="folder_id">
-	    <input type="hidden" id="folder_name" name="folder_name">
-		<table id="filetable" class="table table-striped table-hover table-condensed">
-		  <tr>
-		    <div class="form-group">
-	    		<label for="file_id"><th>File ID</th></label>
-			<label for="file_name"><th>File Name</th></label>
-			<label for="file_title"><th>File Title</th></label>
-			<label for="file_description"><th>File Description</th></label>
-		    </div>
-		  </tr>
-		</table>
-	  </div>
-	  </div>
 	  <div class="modal-footer">
 		<button type="button" class="btn btn-default" data-dismiss="modal" onclick="window.location.reload();">Close</button>
 		<button type="submit" class="btn btn-primary">Save Changes</button>
 	  </div>
-  	  </form>
+  	  		</form>
 	  </div>
 	</div>
 </div>
@@ -453,6 +462,12 @@ if($login_cookie->CheckIt()) {
 	<script src="<?php echo PROGRAM_JSON_BASE ?>json_request-form-remove_file.js"></script>
 	<script src="<?php echo PROGRAM_JSON_BASE ?>json_request-form-file_functions.js"></script>
 	<script src="<?php echo PROGRAM_JSON_BASE ?>json_request-form-folder_functions.js"></script>
+
+	<!-- Icons -->
+  <script src="<?php echo PROGRAM_JS_BASE ?>icons/feather.min.js"></script>
+  <script>
+    feather.replace()
+  </script>
 
 </body>
 </html>

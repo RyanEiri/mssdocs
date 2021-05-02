@@ -1,6 +1,6 @@
 <?php
-include $_SERVER['DOCUMENT_ROOT'].'/ips/php/boot.php';
-session_start();
+chdir('..');
+include getcwd().'/php/boot.php';
 $login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
 if($login_cookie->CheckIt()) {
@@ -34,9 +34,9 @@ function scan($dir,$recursive,$search_ext){
 	// Is there actually such a folder/file?
 
 	if(file_exists($dir)){
-	
+
 		foreach(scandir($dir) as $f) {
-		
+
 			if(!$f || $f[0] == '.') {
 				continue; // Ignore hidden files
 			}
@@ -44,7 +44,7 @@ function scan($dir,$recursive,$search_ext){
 			if(is_dir($dir . '/' . $f)) {
 
 				// The path is a folder and request is for
-				// recursive lookup. 
+				// recursive lookup.
 				if(strcmp($recursive, $compare) !== 0){
 					$files[] = array(
 						"name" => $f,
@@ -53,20 +53,20 @@ function scan($dir,$recursive,$search_ext){
 						"items" => scan($dir . '/' . $f,$recursive,$search_ext) // Recursively get the contents of the folder
 					);
 				} else {
-					
+
 					// The path is a folder and request is not
-					// for recursive lookup. 
-					
+					// for recursive lookup.
+
 					$files[] = array(
 						"name" => $f,
 						"type" => "folder",
 						"path" => $dir . '/' . $f
 					);
-					
+
 				}
-				
+
 			}
-			
+
 			else {
 
 				// It is a file
@@ -95,9 +95,9 @@ function scan($dir,$recursive,$search_ext){
 	return $files;
 }
 
-// Run the scan function 
+// Run the scan function
 $response = scan($dir,$recursive,$search_ext);
-	
+
 // Output the directory listing as JSON
 header('Content-type: application/json');
 
