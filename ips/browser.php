@@ -198,7 +198,7 @@ if($login_cookie->CheckIt()) {
 					<legend>
 						Zip
 						<button type="submit" class="btn btn-primary" data-toggle="tooltip" data-html="true"
-						title="<b>Click and wait for the success message!</b>">
+						title="<b>Click and wait for the success message.</b>">
 							<span data-feather="archive"></span>
 						</button>
 					</legend>
@@ -214,7 +214,7 @@ if($login_cookie->CheckIt()) {
 				    <input type="hidden" id="folder_id" name="folder_id">
 				    <input type="hidden" id="folder_name" name="folder_name">
 						<table id="filetable" class="table table-sm table-striped table-hover">
-							<thead class="thead-light">
+							<thead class="thead-dark">
 							  <tr>
 							    <div class="form-group">
 						    		<th scope="col">ID</th>
