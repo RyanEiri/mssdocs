@@ -1,13 +1,16 @@
 <?php
+// Change to the _ips_ directory for our base.
 chdir('..');
 include getcwd().'/php/boot.php';
-if($_SESSION['login_cookie']) {
+if(isset($_SESSION['login_cookie'])) {
 	$login_cookie = $_SESSION['login_cookie'];
 } else {
 	$login_cookie = new UserCookie();
 }
 $login_cookie->DeleteIt();
 if($login_cookie->CheckIt()) {
+	// Change to the _upload_ directory for file manipulation.
+	chdir('upload');
 	// Grab the current user's info.
 	$username = $login_cookie->username;
 	$userval = new UserGrab($username);
@@ -25,9 +28,9 @@ if($login_cookie->CheckIt()) {
   // and pass error.
 
   if (empty($_POST['filesInFolder'])) {
-	$errors['filesInFolder'] = 'No files array found! Aborting operation.';
+		$errors['filesInFolder'] = 'No files array found! Aborting operation.';
   } else {
-	$files_from_js = $_POST['filesInFolder'];
+		$files_from_js = $_POST['filesInFolder'];
   }
   if (empty($_POST['folderName'])) {
 	  if(!$errors){
@@ -52,7 +55,7 @@ if($login_cookie->CheckIt()) {
 
   foreach ($files_from_js as $key => $array) {
 	if (isset($array['name'])){
-  		if (strpbrk($array['name'], "\\/?%*:|\"<>") === FALSE) {
+  	if (strpbrk($array['name'], "\\/?%*:|\"<>") === FALSE) {
 		} else {
 		  $flag = 'File name "' . $array['name'] . '" contains illegal characters.';
 		  if(!$errors){
@@ -81,8 +84,8 @@ if($login_cookie->CheckIt()) {
   $folderval = new FolderGrab($folder_name, $folder_create);
   $files_from_db = $folderval->files;
 
-  // remove keys from db query not provided as a $_POST value from JS
-  $exclude_keys = array('size', 'type', 'url', 'date', 'folder_name', 'folder_id');
+  // remove unneeded keys from db query not provided as a $_POST value from JS
+  $exclude_keys = array('size', 'type', 'date', 'folder_name', 'folder_id');
   function array_exclude($multi_array, Array $exclude_keys) {
     foreach($multi_array as $key => $array){
     	foreach($exclude_keys as $exclude_key){
@@ -110,25 +113,27 @@ if($login_cookie->CheckIt()) {
 
     foreach ($arr1 as $key => $value) {
     	if (array_key_exists($key, $arr2)) {
-	  if (is_array($value)) {
-	    $recursive_diff = array_recursive_diff($value, $arr2[$key]);
-	    if (count($recursive_diff)) { $output[$key] = $recursive_diff; }
-	  } else {
-	    if ($value != $arr2[$key]) {
-		$output[$key] = $value;
-	    }
-	  }
-	} else {
-	  $output[$key] = $value;
-	}
+			  if (is_array($value)) {
+			    $recursive_diff = array_recursive_diff($value, $arr2[$key]);
+			    if (count($recursive_diff)) { $output[$key] = $recursive_diff; }
+			  } else {
+			    if ($value != $arr2[$key]) {
+						$output[$key] = $value;
+			    }
+			  }
+			} else {
+	  		$output[$key] = $value;
+			}
     }
     return $output;
   }
   $files_from_js = array_recursive_diff($files_from_js, $files_from_db);
 
-  // remove entries with no information remaining other than the id
+  // Remove entries with no information remaining other than the id
+	// and change name and url for db formatting.
   foreach ($files_from_js as $key => $array) {
 	  if(!array_key_exists('name', $array)
+			AND !array_key_exists('url', $array)
 		  AND !array_key_exists('title', $array)
 		  AND !array_key_exists('description', $array)
 	  ) {

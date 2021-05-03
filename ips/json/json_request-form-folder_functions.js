@@ -32,10 +32,10 @@ $(document).ready(function() {
 		dataObj['selectedFiles'] = {};
 		$.each(fileArr, function(i, val){
 		  var dirname = val.match(/(.*)[\/\\]/)[1]||'';
-                  var filename = val.replace(/^.*[\\\/]/, '');
-                  dataObj['selectedFiles'][i] = {};
-                  dataObj['selectedFiles'][i]['filename'] = filename;
-                  dataObj['selectedFiles'][i]['dirname'] = dirname;
+      var filename = val.replace(/^.*[\\\/]/, '');
+      dataObj['selectedFiles'][i] = {};
+      dataObj['selectedFiles'][i]['filename'] = filename;
+      dataObj['selectedFiles'][i]['dirname'] = dirname;
 		});
 
 
@@ -211,6 +211,8 @@ $(document).ready(function() {
 		// pull the table fields into separate arrays
 		var fileId = $("input[name='file_id\\[\\]']")
 				.map(function(){return $(this).val();}).get();
+    var fileURL = $("input[name='file_url\\[\\]']")
+        .map(function(){return $(this).val();}).get();
 		var fileName = $("input[name='file_name\\[\\]']")
 				.map(function(){return $(this).val();}).get();
 		var fileTitle = $("input[name='file_title\\[\\]']")
@@ -225,6 +227,11 @@ $(document).ready(function() {
 		  folderFilesObj[i] = {};
 		  folderFilesObj[i]['id'] = id;
 		});
+    $.each(fileURL, function(i, val){
+      var url = val.match(/(.*[\/\\])/)[1]||'';
+      url = url + fileName[i];
+      folderFilesObj[i]['url'] = url;
+    });
 		$.each(fileName, function(i, val){
 		  var name = val;
 		  folderFilesObj[i]['name'] = name;
@@ -276,15 +283,15 @@ $(document).ready(function() {
 
 			    // handle errors and add error message to form
 			    if (data.errors) {
-				$('#filesInFolderForm').addClass(
-				  'has-error'
-				); // add the error class to show red input
-				$('#filesInFolderForm').prepend(
-				  '<div class="help-block">' + data.errors + '</div>'
-				);
-				$('#filesInFolderForm').append(
-				  '<div class="help-block">' + data.errors + '</div>'
-  				); // add the actual error message
+    				$('#filesInFolderForm').addClass(
+    				  'has-error'
+    				); // add the error class to show red input
+    				$('#filesInFolderForm').prepend(
+    				  '<div class="help-block">' + data.errors + '</div>'
+    				);
+    				$('#filesInFolderForm').append(
+    				  '<div class="help-block">' + data.errors + '</div>'
+    				); // add the actual error message
 			    }
 
 			  } else {
@@ -295,8 +302,8 @@ $(document).ready(function() {
 			    $('#filesInFolderForm').append(
 			  	'<div class="alert alert-success">' + data.message + '</div>'
 			    );
-
 			  }
+
 			})
 
 			// fail callback for uncompleted calls

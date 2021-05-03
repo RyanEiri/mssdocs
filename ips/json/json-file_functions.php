@@ -1,10 +1,12 @@
 <?php
+// Change to the _ips_ directory for our base.
 chdir('..');
 include getcwd().'/php/boot.php';
 $login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
 if($login_cookie->CheckIt()) {
-
+	// Change to the _upload_ directory for file manipulation.
+	chdir('upload');
 	define("USERNAME", $login_cookie->username);
 
 	$userval = new UserGrab(USERNAME);
@@ -50,6 +52,11 @@ if($login_cookie->CheckIt()) {
   	} else {
 	  	$file_name = $_POST['fileName'];
   	}
+		if (empty($_POST['fileUrl'])) {
+			$errors['fileUrl'] = 'No File URL found.';
+		} else {
+			$file_url = $_POST['fileUrl'];
+		}
 		if (empty($_POST['previousFileTitle'])) {
 		  $previous_file_title = NULL;
 		} else {
@@ -125,16 +132,18 @@ if($login_cookie->CheckIt()) {
 		// Collect DB errors.
 		$db_errors	= array();	// array to hold DB errors
 		$change_object = new ActOnSingleFile();
-		$file_url = $change_object->get_full_url().'/'.$fs_dir_name.'/'.$file_name;
+		//$file_url = $change_object->get_full_url().'/'.$fs_dir_name.'/'.$file_name;
+		//$file_url = preg_replace("/.*[\/\\]/", '', $file_url);
+		$file_url = $file_url.$file_name;
 
 		/* The location of the JSON request js script
 		 * dictates the filesystem location provided.
 		 */
-		if (preg_match("/ips\/\.\.\//", $file_url)) {
+		/*if (preg_match("/ips\/\.\.\//", $file_url)) {
  			$file_url = preg_replace("/ips\/\.\.\//", 'ips/', $file_url);
  		} elseif (preg_match("/\w+\/\.\.\//", $file_url)) {
  			$file_url = preg_replace("/ips\/\w+\/\.\.\//", 'ips/', $file_url);
- 		}
+ 		} */
 //		$data['message'] .= 'file url is ' . $file_url;
 
 		if(($previous_file_folder !== $fs_dir_name) || $rename_file === TRUE){

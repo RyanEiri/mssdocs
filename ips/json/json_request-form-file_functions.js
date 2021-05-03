@@ -38,9 +38,14 @@ $(document).ready(function() {
     let reg = /(.*)(files)(.*)/i;
     let selFSDirName = fsDirName.match(reg);
     let serverPath = selFSDirName[1];
-    //let masterDir = selFSDirName[2];
-    //let dbPath = selFSDirName[3];
-    let newFSDirName = serverPath + dbDirName;
+    var newFSDirName = serverPath + dbDirName;
+
+    let fileName = $('#fileName').val();
+    var newFileName = fileName;
+
+    let fileUrl = $('#fileUrl').val();
+    let folderUrl = fileUrl.match(/(.*[\/\\])/)[1]||'';
+    var newFileUrl = folderUrl+newFileName;
 
 // place the information into the data object
 	  dataObj['fileId'] = $('#contextFileId').val();
@@ -50,8 +55,8 @@ $(document).ready(function() {
     var newFSFileFolder = dataObj['fsDirName'];
 	  dataObj['previousFileFolder'] = $('#previousFileFolder').val();
 	  dataObj['previousFileName'] = $('#previousFileName').val();
-	  dataObj['fileName'] = $('#fileName').val();
-	  var newFileName = dataObj['fileName'];
+	  dataObj['fileName'] = fileName;
+    dataObj['fileUrl'] = folderUrl;
 	  dataObj['previousFileTitle'] = $('#previousFileTitle').val();
 	  dataObj['fileTitle'] = $('#fileTitle').val();
 	  dataObj['previousFileDescription'] = $('#previousFileDescription').val();
@@ -67,7 +72,7 @@ $(document).ready(function() {
 		})
 		//using the done promise callback
 		.done(function(data) {
-
+      //console.log(data);
 			// log data to the console so we can see
 			//console.log(data);
 			// here we will handle errors and validation messages
@@ -110,6 +115,11 @@ $(document).ready(function() {
   				  '<div class="alert alert-danger" role="alert">' + data.errors.fileName + '</div>'
   				);
   			  }
+          if (typeof data.errors.fileUrl !== 'undefined') {
+            $('#database-error').append(
+              '<div class="alert alert-danger" role"alert">' + data.errors.fileUrl + '</div>'
+            );
+          }
         }
 
         if (typeof data.warnings !== 'undefined') {
@@ -154,9 +164,12 @@ $(document).ready(function() {
           }
         }
 
-				// ALL GOOD! just show the success message!
+				// ALL GOOD! Adjust the form and show the success message!
 				$('#previousFileName').attr('value', newFileName);
 				$('#previousFileFolder').attr('value', newFSFileFolder);
+        $('#fileUrl').val(newFileUrl);
+        $('.fileUrl').attr('href', newFileUrl);
+        $('#fileUrlLink').html('<a href="' + newFileUrl +'">' + newFileUrl + '</a>');
         //console.log(data);
         if (typeof data.message !== 'undefined') {
   				$('#fileFunctionsBody').append(

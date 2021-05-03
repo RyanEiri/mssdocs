@@ -177,7 +177,7 @@ class FolderGrab {
 				LEFT JOIN folders ON
 				folders.folder_id = files.folder_id
 				WHERE files.folder_id='" . $this->folder_id . "'
-				";
+				ORDER BY files.name";
 		$result = $db->query($sql)
 		  or die ('Select statement failed for grabbing folder files!');
 		$query = $result->fetchArray();
@@ -189,37 +189,47 @@ class FolderGrab {
 		){
 		global $db;
 		$id = "";
+		$url = "";
 		$name = "";
 		$title = "";
 		$description = "";
 		if(is_array($files_array)) {
 		  foreach($files_array as $key => $value) {
 		    $id = $value['id'];
+				if(isset($value['url'])){
+					$url = $value['url'];
+					$sql_url = "UPDATE files
+					SET `url` = '$url'
+					WHERE id='" . $id . "'
+					";
+					$db->query($sql_url)
+				or die ('Update url failed.');
+				}
 		    if(isset($value['name'])){
 		    	$name = $value['name'];
-			$sql_name = "UPDATE files
+					$sql_name = "UPDATE files
 			    SET `name` = '$name'
 			    WHERE id='" . $id . "'
 			    ";
-			$db->query($sql_name)
+					$db->query($sql_name)
 			  or die ('Update name failed.');
 		    }
 		    if(isset($value['title'])){
 		    	$title = $value['title'];
-			$sql_title = "UPDATE files
+					$sql_title = "UPDATE files
 			    SET `title` = '$title'
 			    WHERE id='" . $id . "'
 			    ";
-			$db->query($sql_title)
+					$db->query($sql_title)
 			  or die ('Update title failed.');
 		    }
 		    if(isset($value['description'])){
 		    	$description = $value['description'];
-			$sql_description = "UPDATE files
+					$sql_description = "UPDATE files
 			    SET `description` = '$description'
 			    WHERE id='" . $id . "'
 			    ";
-			$db->query($sql_description)
+					$db->query($sql_description)
 			  or die ('Update description failed.');
 		    }
 		  }

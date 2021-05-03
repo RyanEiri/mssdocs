@@ -629,6 +629,8 @@ $(function(){
 								}
 							});
 						}
+						var fileURL = data.fileUrl;
+						//console.log(fileURL);
 						// Fill in the select box for the available folders
 						$('#dirName').find('option').remove();
 						$.each(availableFolders, function(i,val){
@@ -643,7 +645,8 @@ $(function(){
 						$('#previousFileName').attr('value', fileNameContext);
 						$('#fileSize').text(data.fileSize);
 						$('#fileType').text(data.fileType);
-						$('#fileUrl').html('<a href="' + data.fileUrl +'">' + data.fileUrl + '</a>');
+						$('#fileUrl').val(fileURL);
+						$('#fileUrlLink').html('<a href="' + data.fileUrl +'">' + data.fileUrl + '</a>');
 						$('.fileUrl').attr('href', data.fileUrl);
 						$('#fileTitle').attr('value', data.fileTitle);
 						$('#previousFileTitle').attr('value', data.fileTitle);
@@ -694,6 +697,7 @@ $(function(){
 						$.each(filesObj, function(i, val){
 						  var fileId = val.id;
 						  var fileName = val.name;
+							var fileURL = val.url;
 						  var fileTitle = val.title;
 						  var fileDescription = val.description;
 						  fileName = fileName.replace(/^.*[\\\/]/, '');
@@ -706,6 +710,9 @@ $(function(){
 							    '<input class="form-control" name="file_id[]" id="file_id-' + i +
 							    '" type="hidden" value="' + fileId +
 							    '">' +
+									'<input name="file_url[]" id="file_url-' + i +
+									'" type="hidden" value="' + fileURL +
+									'">' +
 							  '</th></div>' +
 							  '<div class="form-group"><td>' +
 							    '<input class="form-control input-sm" name="file_name[]" id="file_name-' + i +

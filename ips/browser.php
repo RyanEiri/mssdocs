@@ -1,5 +1,5 @@
 <!--
-	File browser based on Cute File Browser
+	File browser based on
 	Cute File Browser with jQuery, AJAX and PHP
 	http://tutorialzine.com/2014/09/cute-file-browser-jquery-ajax-php/</a>
 -->
@@ -28,7 +28,7 @@ if($login_cookie->CheckIt()) {
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-	<title>FHP::File browser</title>
+	<title>FHP File browser</title>
 
 	<!-- Bootstrap for CSS -->
 	<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>bootstrap/bootstrap.min.css">
@@ -128,9 +128,10 @@ if($login_cookie->CheckIt()) {
 	  <div class="form-group row">
 	    <label for="fileUrl" class="col-sm-4 col-form-label">File URL</label>
 	    <div class="col-sm-8">
-		<a href="" class="fileUrl" data-toggle="tooltip" data-html="true" title="<em>Tooltip</em>: <b>Click this link to download the full size image.</b>" data-placement="top">
-		<span id="fileUrl" style="word-break: break-all;"></span>
-		</a>
+				<input type="hidden" id="fileUrl" name="fileUrl">
+				<a href="" class="fileUrl" data-toggle="tooltip" data-html="true" title="<em>Tooltip</em>: <b>Click this link to download the full size image.</b>" data-placement="top">
+				<span id="fileUrlLink" style="word-break: break-all;"></span>
+				</a>
 	    </div>
 	  </div>
 	  <div class="form-group row">
