@@ -73,8 +73,8 @@ class UserCookie {
 		$this->username = $user;
 		$this->SecretWord();
 		if ($this->secretword==$secret) {
-			setcookie('login', $user.','.hash("sha512", $user.$this->secretword), time()+86400, true, true);
-			setcookie('zsYjZ5RdavKHU43Xi6DbWKuAu','lhE8IXrx1Ks90w7glk0VUlqTe', time()+86400, true, true);
+			setcookie('login', $user.','.hash("sha512", $user.$this->secretword), time()+86400, '', true, true);
+			setcookie('zsYjZ5RdavKHU43Xi6DbWKuAu','lhE8IXrx1Ks90w7glk0VUlqTe', time()+86400, '', true, true);
 			header('Location: ./index.php');
 		} else {
 			header('Location: ./login.php?1');
