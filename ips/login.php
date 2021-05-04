@@ -1,4 +1,5 @@
 <?php
+require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$userval = new UserGrab($_REQUEST['username']);
@@ -56,8 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <?php
         if($attempt==1) {
 		printf ("Incorrect Username/Password. Please try again.<br />");
-        }   
-?>	
+        }
+?>
 	</label>
 	<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
 </form>
