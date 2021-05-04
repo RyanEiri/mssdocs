@@ -58,8 +58,8 @@ class UserCookie {
 	function DeleteIt(){
 		if(isset($_GET['header'])){
 			if ($_GET['header']==='cookieDel') {
-		    setcookie("login", "", time() - 3600);
-				setcookie("zsYjZ5RdavKHU43Xi6DbWKuAu", "", time() - 3600);
+		    setcookie('login','',time()-86400, '', $_SERVER['SERVER_NAME'], true, true);
+				setcookie('zsYjZ5RdavKHU43Xi6DbWKuAu','',time()-86400, '', $_SERVER['SERVER_NAME'], true, true);
 				session_destroy();
 			  header('Location: ./login.php');
 			}
@@ -73,8 +73,8 @@ class UserCookie {
 		$this->username = $user;
 		$this->SecretWord();
 		if ($this->secretword==$secret) {
-			setcookie('login', $user.','.hash("sha512", $user.$this->secretword), time()+86400);
-			setcookie('zsYjZ5RdavKHU43Xi6DbWKuAu','lhE8IXrx1Ks90w7glk0VUlqTe', time()+86400);
+			setcookie('login',$user.','.hash("sha512", $user.$this->secretword), 0, '', $_SERVER['SERVER_NAME'], true, true);
+			setcookie('zsYjZ5RdavKHU43Xi6DbWKuAu','lhE8IXrx1Ks90w7glk0VUlqTe', 0, '', $_SERVER['SERVER_NAME'], true, true);
 			header('Location: ./index.php');
 		} else {
 			header('Location: ./login.php?1');
