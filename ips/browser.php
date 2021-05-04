@@ -475,5 +475,5 @@ if($login_cookie->CheckIt()) {
 </html>
 <?php
 }
-session_destroy();
+
 ?>
