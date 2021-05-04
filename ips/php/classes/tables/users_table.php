@@ -58,8 +58,8 @@ class UserCookie {
 	function DeleteIt(){
 		if(isset($_GET['header'])){
 			if ($_GET['header']==='cookieDel') {
-		    setcookie('login', '', time() - 3600);
-				setcookie('zsYjZ5RdavKHU43Xi6DbWKuAu', '', time() - 3600);
+		    setcookie("login", "", time() - 3600);
+				setcookie("zsYjZ5RdavKHU43Xi6DbWKuAu", "", time() - 3600);
 				session_destroy();
 			  header('Location: ./login.php');
 			}
