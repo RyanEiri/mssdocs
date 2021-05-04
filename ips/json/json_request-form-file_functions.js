@@ -20,15 +20,9 @@ $(document).ready(function() {
     // create the main data object to be submitted
 	  var dataObj = {};
 
-    // Set the newly selected folder based on the
-    // selected db folder. This requires some
-    // regular expression trickery in order to
-    // satisfy the filesystem requirements.
-    // The main concern being that the leading path
-    // until after the master 'files' folder needs
-    // to be removed for the database. The 'files'
-    // folder should be set as a program option in
-    // the future.
+    /* Set the newly selected folder based on the selected db folder.
+     * The leading 'files/' needs to be stripped for the DB.
+    */
     let dbDirName = $('#dbDirName').val();
     let fsDirName = $('#fsDirName').val();
     let reg = /(.*)(files)(.*)/i;
@@ -47,8 +41,6 @@ $(document).ready(function() {
 	  dataObj['fileId'] = $('#contextFileId').val();
 	  dataObj['dbDirName'] = $('#dbDirName').val();
     dataObj['fsDirName'] = newFSDirName;
-	  var newDBFileFolder = dataObj['dbDirName'];
-    var newFSFileFolder = dataObj['fsDirName'];
 	  dataObj['previousFileFolder'] = $('#previousFileFolder').val();
 	  dataObj['previousFileName'] = $('#previousFileName').val();
 	  dataObj['fileName'] = fileName;
@@ -58,6 +50,12 @@ $(document).ready(function() {
 	  dataObj['fileTitle'] = $('#fileTitle').val();
 	  dataObj['previousFileDescription'] = $('#previousFileDescription').val();
 	  dataObj['fileDescription'] = $('#fileDescription').val();
+
+    // set up our new data to pass back to the form for subsequent submissions
+    var newDBFileFolder = dataObj['dbDirName'];
+    var newFSFileFolder = dataObj['fsDirName'];
+    var newFileTitle = dataObj['fileTitle'];
+    var newFileDescription = dataObj['fileDescription'];
 
     // process the form
 		$.ajax({
@@ -104,9 +102,12 @@ $(document).ready(function() {
           }
         }
       } else {
+
 				// ALL GOOD! Adjust the form and show the success message!
 				$('#previousFileName').attr('value', newFileName);
 				$('#previousFileFolder').attr('value', newFSFileFolder);
+        $('#previousFileTitle').attr('value', newFileTitle);
+        $('#previousFileDescription').attr('value', newFileDescription);
         $('#fileUrl').val(newFileUrl);
         $('.fileUrl').attr('href', newFileUrl);
         $('#fileUrlLink').html('<a href="' + newFileUrl +'">' + newFileUrl + '</a>');
@@ -121,10 +122,12 @@ $(document).ready(function() {
 
 		})
 
-		// using the fail promise callback
+    /*
+		// fail promise for debug data
 		.fail(function(data) {
-
+      console.log(data);
 		});
+    */
 
 	});
 
