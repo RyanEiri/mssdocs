@@ -122,8 +122,8 @@ $(document).ready(function() {
             );
           }
         }
-
-/*        if (typeof data.warnings !== 'undefined') {
+/*
+        if (typeof data.warnings !== 'undefined') {
           // handle warnings for fileTitle -------------
           if (typeof data.warnings.fileTitle !== 'undefined') {
             $('#file_title-warning').append( // add the actual warning message under our input
@@ -137,9 +137,9 @@ $(document).ready(function() {
             );
           }
         }
-
+*/
       } else {
-
+/*
         if (typeof data.warnings !== 'undefined') {
           if (typeof data.warnings.nameEntries !== 'undefined') {
             $('#filesystem-error').append( // add the actual warning message under our input
