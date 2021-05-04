@@ -3,8 +3,6 @@ include getcwd().'/php/boot.php';
 ini_set('max_execution_time', '3600');
 // Initialize authentication control cookie
 $login_cookie = new UserCookie();
-// Check for sign out signal
-$login_cookie->DeleteIt();
 
 if($login_cookie->CheckIt()) {
 	define("USERNAME", $login_cookie->username);
