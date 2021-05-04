@@ -123,24 +123,18 @@ $(document).ready(function() {
           }
         }
 
-        if (typeof data.warnings !== 'undefined') {
+/*        if (typeof data.warnings !== 'undefined') {
           // handle warnings for fileTitle -------------
           if (typeof data.warnings.fileTitle !== 'undefined') {
-          /*$('#fileDatabaseList-group').addClass( // add the warning class to show amber input
-            'has-warning'
-          );*/
-          $('#file_title-warning').append( // add the actual warning message under our input
-            '<div class="alert alert-secondary" role="alert">' + data.warnings.fileTitle + '</div>'
-          );
+            $('#file_title-warning').append( // add the actual warning message under our input
+              '<div class="alert alert-secondary" role="alert">' + data.warnings.fileTitle + '</div>'
+            );
           }
           // handle errors for fileDescription --------
           if(typeof data.warnings.fileDescription !== 'undefined') {
-          /*$('#fileDatabaseList-group').addClass( // add the warning class to show amber input
-            'has-warning'
-          );*/
-          $('#file_description-warning').append( // add the actual warning message under our input
-            '<div class="alert alert-secondary" role="alert">' + data.warnings.fileDescription + '</div>'
-          );
+            $('#file_description-warning').append( // add the actual warning message under our input
+              '<div class="alert alert-secondary" role="alert">' + data.warnings.fileDescription + '</div>'
+            );
           }
         }
 
@@ -148,23 +142,17 @@ $(document).ready(function() {
 
         if (typeof data.warnings !== 'undefined') {
           if (typeof data.warnings.nameEntries !== 'undefined') {
-            /*$('#fileFilesystemList-group').addClass( // add the warning class to show amber input
-              'has-warning'
-            );*/
             $('#filesystem-error').append( // add the actual warning message under our input
               '<div class="alert alert-secondary" role="alert">' + data.warnings.nameEntries + '</div>'
             );
           }
           if(typeof data.warnings.database !== 'undefined') {
-            /*$('#fileDatabaseList-group').addClass( // add the warning class to show amber input
-              'has-warning'
-            );*/
             $('#database-error').append( // add the actual warning message under out input
               '<div class="alert alert-secondary" role="alert">' + data.warnings.database + '</div>'
             );
           }
         }
-
+*/
 				// ALL GOOD! Adjust the form and show the success message!
 				$('#previousFileName').attr('value', newFileName);
 				$('#previousFileFolder').attr('value', newFSFileFolder);
