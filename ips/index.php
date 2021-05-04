@@ -1,5 +1,5 @@
 <?php
-//require_once(getcwd().'/php/start_sess.php');
+require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
 $login_cookie = new UserCookie();
 // Check for sign out signal
