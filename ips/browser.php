@@ -4,8 +4,8 @@
 	http://tutorialzine.com/2014/09/cute-file-browser-jquery-ajax-php/</a>
 -->
 <?php
-ini_set('max_execution_time', '3600');
 include getcwd().'/php/boot.php';
+ini_set('max_execution_time', '3600');
 session_start();
 
 // Initialize authentication control cookie
