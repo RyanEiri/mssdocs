@@ -61,7 +61,7 @@ if($login_cookie->CheckIt()) {
 <div class="container">
 	<h1 class="display-4">Í fótspor Árna Magnússonar í Vesturheimi</h3>
 	<p class="lead">The internal proofing system...</p>
-	<p>Welcome to our internal proofing system web application. The goal of this application is to ease the ability to collaborate with interested parties across the North American continent, in collecting manuscript images and organizing information about them and the people and institutions that possess them.</p> <?php echo $_SERVER['SERVER_NAME']; ?>
+	<p>Welcome to our internal proofing system web application. The goal of this application is to ease the ability to collaborate with interested parties across the North American continent, in collecting manuscript images and organizing information about them and the people and institutions that possess them.</p>
 </div>
 </div>
 
