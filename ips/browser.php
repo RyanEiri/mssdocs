@@ -473,5 +473,4 @@ if($login_cookie->CheckIt()) {
 </html>
 <?php
 }
-
 ?>
