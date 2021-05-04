@@ -1,7 +1,16 @@
 <?php
+// Set error handling
+error_reporting(E_ALL);
+// Set secure cookies
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_httponly', 1);
+ini_set('session.use_cookies', 1);
+ini_set('session.use_only_cookies', 1);
+ini_set('session.cookie_samesite', 'Strict');
+
 include 'php.php';
 // method for URL control using get_full_url() function borrowed from
-// blueimp https://github.com/blueimp 
+// blueimp https://github.com/blueimp
 define("FULL_URL", get_full_url());
 
 // Per-implementation constants
