@@ -1,6 +1,6 @@
 <?php
+require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
-session_start();
 $login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
 
@@ -120,5 +120,4 @@ if($login_cookie->CheckIt()) {
 </html>
 <?php
 }
-session_destroy();
 ?>
