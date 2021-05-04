@@ -14,7 +14,6 @@ if($login_cookie->CheckIt()) {
 
   // begin our ajax handling
   $errors	= array();	// array to hold validation errors
-	$warnings = array(); // array to hold warnings
   $data		= array();	// array to pass back data
 
   // validate the variables ========================================
@@ -57,13 +56,17 @@ if($login_cookie->CheckIt()) {
 		} else {
 			$file_url = $_POST['fileUrl'];
 		}
+		if (empty($_POST['newFileUrl'])) {
+			$errors['newFileUrl'] = 'No New File URL found.';
+		} else {
+			$new_file_url = $_POST['newFileUrl'];
+		}
 		if (empty($_POST['previousFileTitle'])) {
 		  $previous_file_title = NULL;
 		} else {
 		  $previous_file_title = $_POST['previousFileTitle'];
 		}
   	if (empty($_POST['fileTitle'])) {
-	  	$warnings['fileTitle'] = 'No File Title provided, we recommend entering one now.';
 	  	$file_title = NULL;
   	} else {
 	  	$file_title = $_POST['fileTitle'];
@@ -74,7 +77,6 @@ if($login_cookie->CheckIt()) {
 		  $previous_file_description = $_POST['previousFileDescription'];
 		}
   	if (empty($_POST['fileDescription'])) {
-	  	$warnings['fileDescription'] = 'No File Description provided, we recommend entering one now.';
 	  	$file_description = NULL;
   	} else {
 	  	$file_description = $_POST['fileDescription'];
@@ -98,19 +100,12 @@ if($login_cookie->CheckIt()) {
 		  // the file name needs to be updated
 		  $fileval = new FileGrab($show_file);
 		  $db_file_id = $fileval->id;
-//			$data['message'] = 'file to show is ' . $show_file . '<br />';
-//			$data['message'] .= 'file id is ' . $file_id . ' and it is a ' . gettype($file_id) . '<br />';
-//			$data['message'] .= 'db file id is ' . $db_file_id . ' and it is a ' . gettype($db_file_id) . '<br />';
+
 		  if($file_id !== $db_file_id) {
 		    $rename_file = TRUE;
-//				$data['message'] .= 'rename file is TRUE and it is a ' . gettype($rename_file) . '<br />';
 		  } else {
 		    $rename_file = FALSE;
-//				$data['message'] .= 'rename file is FALSE and it is a ' . gettype($rename_file) . '<br />';
 		  }
-//			$data['message'] .= 'previous file folder is ' . $previous_file_folder . '<br />';
-//			$data['message'] .= 'fs dir name is ' . $fs_dir_name . '<br />';
-//			$data['message'] .= 'db dir name is ' . $db_dir_name . '<br />';
 		}
   }
 
@@ -132,19 +127,6 @@ if($login_cookie->CheckIt()) {
 		// Collect DB errors.
 		$db_errors	= array();	// array to hold DB errors
 		$change_object = new ActOnSingleFile();
-		//$file_url = $change_object->get_full_url().'/'.$fs_dir_name.'/'.$file_name;
-		//$file_url = preg_replace("/.*[\/\\]/", '', $file_url);
-		$file_url = $file_url.$file_name;
-
-		/* The location of the JSON request js script
-		 * dictates the filesystem location provided.
-		 */
-		/*if (preg_match("/ips\/\.\.\//", $file_url)) {
- 			$file_url = preg_replace("/ips\/\.\.\//", 'ips/', $file_url);
- 		} elseif (preg_match("/\w+\/\.\.\//", $file_url)) {
- 			$file_url = preg_replace("/ips\/\w+\/\.\.\//", 'ips/', $file_url);
- 		} */
-//		$data['message'] .= 'file url is ' . $file_url;
 
 		if(($previous_file_folder !== $fs_dir_name) || $rename_file === TRUE){
 
@@ -153,7 +135,6 @@ if($login_cookie->CheckIt()) {
 			 * the query.
 			 */
 
-			//$db_move_folder = preg_replace('/^\//', '', $db_move_folder);
 			if ($db_dir_name !== 'files') {
 				$db_move_folder = preg_replace('/files\//', '', $db_dir_name);
 			} else {
@@ -175,19 +156,11 @@ if($login_cookie->CheckIt()) {
 				$change_file = $file_name;
 			}
 
-		  if ($change_object->changeFileSystemDB($file_id, $change_file, $file_url, $folder_id) !== FALSE) {
+		  if ($change_object->changeFileSystemDB($file_id, $change_file, $new_file_url, $folder_id) !== FALSE) {
 
 				if (!rename($previous_file_folder.'/'.$previous_file_name, $fs_dir_name.'/'.$file_name)) {
 					$db_errors['rename'] .= 'Rename operation failed.';
-//					$data['message'] .= '<br />success executing rename file';
-				} else {
-//					$data['message'] .= '<br />failed executing rename file';
 				}
-
-
-//				$data['message'] .= '<br />success changing file in database';
-			} else {
-//				$data['message'] .= '<br />failed changing file in database: ' . $change_object->change_file_mysql_error;
 			}
 
 		  $thumbnail = $previous_file_folder.'/thumbnail/'.$previous_file_name;
@@ -198,33 +171,19 @@ if($login_cookie->CheckIt()) {
 		    rename($thumbnail, $fs_dir_name.'/thumbnail/'.$file_name);
 		  }
 		  if(!empty($data['message'])){
-		    $data['message'] .= '<br />Filesystem changed.';
+		    $data['message'] .= '<br />Filesystem and database changed.';
 		  } else {
-		    $data['message'] = 'Filesystem changed.';
+		    $data['message'] = 'Filesystem and database changed.';
 		  }
 
-		} else {
-		  $warnings['nameEntries'] = 'Filesystem unchanged!';
-		  if(!empty($data['message'])){
-		    $data['message'] .= '<br />Filesystem unchanged.';
-		  } else {
-		    $data['message'] = 'Filesystem unchanged.';
-		  }
 		}
 
 		if(($previous_file_title != $file_title) || ($previous_file_description != $file_description)){
 		  $change_object->changeFileDB($file_id, $file_title, $file_description);
 		  if(!empty($data['message'])){
-		    $data['message'] .= '<br />Database changed.';
+		    //$data['message'] .= '<br />Database changed.';
 		  } else {
 		    $data['message'] = 'Database changed.';
-		  }
-		} else {
-		  $warnings['database'] = 'Database unchanged!';
-		  if(!empty($data['message'])){
-		    $data['message'] .= '<br />Database unchanged.';
-		  } else {
-		    $data['message'] = 'Database unchanged.';
 		  }
 		}
 
@@ -232,9 +191,6 @@ if($login_cookie->CheckIt()) {
 		$data['success'] = true;
 		if(isset($db_errors)) {
 			$data['db_errors'] = $db_errors;
-		}
-		if(isset($warnings)) {
-		  $data['warnings'] = $warnings;
 		}
 
   }

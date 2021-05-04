@@ -67,18 +67,18 @@ if($login_cookie->CheckIt()) {
 <div class="container-fluid col-xs-12">
 	  <div class="row no-gutters">
 	  <div class="container-fluid col-xs-12 col-sm-2">
-	    <img data-toggle="tooltip" data-html="true" title="<em>Tooltip</em>: <b>This is the thumbnail image saved in the thumbnail sub-folder.</b>" data-placement="right" id="fileThumbnail" class="" align="center">
+	    <img data-toggle="tooltip" data-html="true" title="Thumbnail image saved in the thumbnail sub-folder." data-placement="right" id="fileThumbnail" class="" align="center">
 	    <br /><br />
 	  </div>
 	  <div class="container-fluid col-xs-12 col-sm-10">
 	  <ul class="list-group" id="fileFilesystemList-group">
-	  <li class="list-group-item active">Filesystem Entries for this File</li>
+	  <li class="list-group-item active"><strong>Filesystem Entries for this File</strong></li>
 	  <li class="list-group-item">
 	  <div class="form-group row">
-	    <label for="dirName" class="col-sm-3 col-form-label">Folder Name</label>
+	    <label for="dirName" class="col-sm-3 col-form-label" data-toggle="tooltip" data-html="true" title="DB: files table, name field" data-placement="top"><strong>Folder Name</strong></label>
 	    <div class="col-sm-9">
 				<input type="hidden" id="contextFileId" name="contextFileId">
-				<select id="dbDirName" name="dirList" form="fileFunctionsForm" class="form-control" data-toggle="tooltip" data-html="true" title="<em>Tooltip</em>: <b>You can change the folder from here. Remember to hit the <em>Save Changes</em> button.</b>" data-placement="top" <?php if(!ADMIN_STATUS){ echo 'disabled'; } ?>>
+				<select id="dbDirName" name="dirList" form="fileFunctionsForm" class="form-control" <?php if(!ADMIN_STATUS){ echo 'disabled'; } ?>>
 				</select>
 				<input type="hidden" id="fsDirName" name="fsDirName">
 				<input type="hidden" id="previousFileFolder" name="previousFileFolder">
@@ -91,9 +91,9 @@ if($login_cookie->CheckIt()) {
 			</div>
 	  </div>
 	  <div class="form-group row">
-	    <label for="fileName" class="col-sm-3 col-form-label">File Name</label>
+	    <label for="fileName" class="col-sm-3 col-form-label" data-toggle="tooltip" data-html="true" title="DB: files table, name field" data-placement="top"><strong>File Name</strong></label>
 	    <div class="col-sm-9">
-		<input class="form-control" type="text" placeholder="No file" id="fileName" data-toggle="tooltip" data-html="true" title="<em>Tooltip</em>: <b>You can change the file name here. Remember to hit the <em>Save Changes</em> button. Hit the <em>Reset</em> button if you want to revert back to the original file name and start over.</b>" data-placement="bottom" <?php if(!ADMIN_STATUS){ echo 'disabled'; } ?>>
+		<input class="form-control" type="text" placeholder="No file" id="fileName" <?php if(!ADMIN_STATUS){ echo 'disabled'; } ?>>
 	    </div>
 			<div id="file-error" class="mt-3">
 				<!-- errors will go here -->
@@ -111,49 +111,49 @@ if($login_cookie->CheckIt()) {
 	  <div class="row no-gutters">
 	  <div class="container col-xs-12">
 	  <ul class="list-group" id="fileDatabaseList-group">
-	  <li class="list-group-item active">Database Entries for This File</li>
+	  <li class="list-group-item active"><strong>Database Entries for This File</strong></li>
 	  <li class="list-group-item">
 	  <div class="form-group row">
-	    <label for="fileSize" class="col-sm-4 col-form-label">File Size</label>
+	    <label for="fileSize" class="col-sm-4 col-form-label" data-toggle="tooltip" data-html="true" title="DB: files table, size field" data-placement="top"><strong>File Size</strong></label>
 	    <div class="col-sm-8">
 		<span id="fileSize"></span>
 	    </div>
 	  </div>
 	  <div class="form-group row">
-	    <label for="fileType" class="col-sm-4 col-form-label">File Type</label>
+	    <label for="fileType" class="col-sm-4 col-form-label" data-toggle="tooltip" data-html="true" title="DB: files table, type field" data-placement="top"><strong>File Type</strong></label>
 	    <div class="col-sm-8">
 		<span id="fileType"></span>
 	    </div>
 	  </div>
 	  <div class="form-group row">
-	    <label for="fileUrl" class="col-sm-4 col-form-label">File URL</label>
+	    <label for="fileUrl" class="col-sm-4 col-form-label" data-toggle="tooltip" data-html="true" title="DB: files table, url field" data-placement="top"><strong>File URL</strong></label>
 	    <div class="col-sm-8">
 				<input type="hidden" id="fileUrl" name="fileUrl">
-				<a href="" class="fileUrl" data-toggle="tooltip" data-html="true" title="<em>Tooltip</em>: <b>Click this link to download the full size image.</b>" data-placement="top">
+				<a href="" class="fileUrl">
 				<span id="fileUrlLink" style="word-break: break-all;"></span>
 				</a>
 	    </div>
 	  </div>
 	  <div class="form-group row">
-	    <label for="fileTitle" class="col-sm-4 col-form-label">File Title</label>
+	    <label for="fileTitle" class="col-sm-4 col-form-label" data-toggle="tooltip" data-html="true" title="DB: files table, title field" data-placement="top"><strong>File Title</strong></label>
 	    <div class="col-sm-8">
-		<input class="form-control" type="text" placeholder="No Title" id="fileTitle" data-toggle="tooltip" data-html="true" title="<em>Tooltip</em>: <b>Database entry for this file, files table, title field.</b>" data-placement="top">
+		<input class="form-control" type="text" placeholder="No Title" id="fileTitle">
 	    </div>
 			<div id="file_title-warning" class="mt-3">
 				<!-- warnings will go here -->
 			</div>
 	  </div>
 	  <div class="form-group row">
-	    <label for="fileDescription" class="col-sm-4 col-form-label">File Description</label>
+	    <label for="fileDescription" class="col-sm-4 col-form-label" data-toggle="tooltip" data-html="true" title="DB: files table, description field" data-placement="bottom"><strong>File Description</strong></label>
 	    <div class="col-sm-8">
-		<input class="form-control" type="text" placeholder="No Description" id="fileDescription" data-toggle="tooltip" data-html="true" title="<em>Tooltip</em>: <b>Database entry for this file, files table, description field.</b>" data-placement="bottom">
+		<input class="form-control" type="text" placeholder="No Description" id="fileDescription">
 	    </div>
 			<div id="file_description-warning" class="mt-3">
 				<!-- warnings will go here -->
 			</div>
 	  </div>
 	  <div class="form-group row">
-	    <label for="fileDate" class="col-sm-4 col-form-label">Date and Time Modified (PST or PDT)</label>
+	    <label for="fileDate" class="col-sm-4 col-form-label" data-toggle="tooltip" data-html="true" title="DB: files table, date field" data-placement="bottom"><strong>Date and Time Modified (PST or PDT)</strong></label>
 	    <div class="col-sm-8">
 		<span id="fileDate"></span>
 	    </div>

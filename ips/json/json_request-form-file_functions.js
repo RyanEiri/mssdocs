@@ -43,7 +43,7 @@ $(document).ready(function() {
     let fileName = $('#fileName').val();
     var newFileName = fileName;
 
-    let fileUrl = $('#fileUrl').val();
+    var fileUrl = $('#fileUrl').val();
     let folderUrl = fileUrl.match(/(.*[\/\\])/)[1]||'';
     var newFileUrl = folderUrl+newFileName;
 
@@ -56,7 +56,8 @@ $(document).ready(function() {
 	  dataObj['previousFileFolder'] = $('#previousFileFolder').val();
 	  dataObj['previousFileName'] = $('#previousFileName').val();
 	  dataObj['fileName'] = fileName;
-    dataObj['fileUrl'] = folderUrl;
+    dataObj['fileUrl'] = fileUrl;
+    dataObj['newFileUrl'] = newFileUrl;
 	  dataObj['previousFileTitle'] = $('#previousFileTitle').val();
 	  dataObj['fileTitle'] = $('#fileTitle').val();
 	  dataObj['previousFileDescription'] = $('#previousFileDescription').val();
