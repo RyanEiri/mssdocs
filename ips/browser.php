@@ -1,13 +1,7 @@
-<!--
-	File browser based on
-	Cute File Browser with jQuery, AJAX and PHP
-	http://tutorialzine.com/2014/09/cute-file-browser-jquery-ajax-php/</a>
--->
 <?php
 session_start();
 include getcwd().'/php/boot.php';
 ini_set('max_execution_time', '3600');
-
 // Initialize authentication control cookie
 $login_cookie = new UserCookie();
 // Check for sign out signal
@@ -21,6 +15,11 @@ if($login_cookie->CheckIt()) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!--
+	File browser based on
+	Cute File Browser with jQuery, AJAX and PHP
+	http://tutorialzine.com/2014/09/cute-file-browser-jquery-ajax-php/</a>
+-->
 <!-- Force latest IE rendering engine or ChromeFrame if installed -->
 <!--[if IE]>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
