@@ -1,6 +1,6 @@
 <?php
-session_start();
 include getcwd().'/php/boot.php';
+session_start();
 $login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
 
