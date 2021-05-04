@@ -1,4 +1,5 @@
 <?php
+require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
 ini_set('max_execution_time', '3600');
 // Initialize authentication control cookie
