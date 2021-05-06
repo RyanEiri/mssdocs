@@ -47,7 +47,7 @@ define("CLASSES_DIR", FUNCTIONS_DIR.'/'.CLASSES_BASE_DIR.'/');
 define("CLASSES_CONFIG_FILE", 'config.php');
 define("PROGRAM_CLASSES_CONFIG", CLASSES_DIR.CLASSES_CONFIG_FILE);
 define("PROGRAM_WEB_BASE", BASE_URL.'/'.INSTALL_DIR.'/');
-define("USER_FILES_URL", PROGRAM_WEB_BASE.'upload/');
+define("USER_FILES_URL", PROGRAM_WEB_BASE.'upload/files/');
 define("USER_FILES_BASE", PROGRAM_BASE.'upload/');
 
 // Instantiate PHP functions.

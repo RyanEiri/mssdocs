@@ -23,7 +23,7 @@ if($login_cookie->CheckIt()) {
   // and pass error.
 
   if (empty($_POST['files']) && empty($_POST['folders'])){
-		$errors['files'] = 'No files or folders selected!';
+		$errors['files'] = 'No files or folders selected.';
   }
 
   if (!empty($_POST['files'])){
@@ -41,16 +41,16 @@ if($login_cookie->CheckIt()) {
   }
 
 	if (empty($_POST['dbMoveToFolder'])) {
-		$errors['moveToFolder'] = 'No db move to folder available!';
+		$errors['moveToFolder'] = 'No db move to folder available.';
 	} else {
 		$db_move_folder = $_POST['dbMoveToFolder'];
 	}
 
-  if (!empty($_POST['files'])) {
+  if (!empty($files)) {
 		if (!empty($move_folder)) {
 		  foreach ($files as $key => $value) {
 		    if($value['dirname'] === $move_folder) {
-		      $errors['moveToFolder'] = 'Folder to be moved to cannot be the same as the current folder! Please choose a different folder.';
+		      $errors['moveToFolder'] = 'Folder to be moved to cannot be the same as the current folder. Please choose a different folder.';
 		      break;
 		    }
 		  }
@@ -61,13 +61,13 @@ if($login_cookie->CheckIt()) {
 		$move_folder	= $_POST['moveToFolder'];
 		foreach ($folders as $key => $value) {
 		  if($value === $move_folder) {
-		    $errors['moveToFolder'] = 'Folder to be moved to cannot be the same as the folder being moved! Please choose a different folder.';
+		    $errors['moveToFolder'] = 'Folder to be moved to cannot be the same as the folder being moved. Please choose a different folder. '.$move_folder;
 		    break;
 		  }
-		  $dir = USER_FILES_BASE.$value;
+		  $dir = $value;
 		  $parent_dir = dirname($dir);
 		  if($parent_dir === $move_folder) {
-		    $errors['moveToFolder'] = 'Folder cannot be moved to the same folder it is currently in! Please choose a different folder.';
+		    $errors['moveToFolder'] = 'Folder cannot be moved to the same folder it is currently in. Please choose a different folder.';
 		    break;
 		  }
 		}

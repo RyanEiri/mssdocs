@@ -6,8 +6,9 @@ $(document).ready(function() {
 		// stop the form from submitting the normal way and refreshing the page
 		event.preventDefault();
 
-		$('.form-group').removeClass('has-error'); // remove the error class from a prior submission
-		$('.help-block').remove(); // remove the error text from a prior submission
+		//$('.form-group').removeClass('has-error'); // remove the error class from a prior submission
+		//$('.help-block').remove(); // remove the error text from a prior submission
+		$('.alert-danger').remove();
 		$('.alert-success').remove();
 
 		// get the form data
@@ -16,7 +17,7 @@ $(document).ready(function() {
 		var moveFile = $('input:checkbox:checked.fileCheckbox').map(function() {
 		  return $(this).val()
 		}).get()
-		dataObj['files'] = {};
+		dataObj['files'] = [];
 		$.each(moveFile, function(i, val){
 		  var dirname = val.match(/(.*)[\/\\]/)[1]||'';
                   var filename = val.replace(/^.*[\\\/]/, '');
@@ -29,11 +30,23 @@ $(document).ready(function() {
 		var moveFolder = $('input:checkbox:checked.folderCheckbox').map(function() {
 		  return $(this).val()
 		}).get()
-		dataObj['folders'] = {};
+		dataObj['folders'] = [];
 		$.each(moveFolder, function(i, val){
 		  dataObj['folders'][i] = val;
 		});
+/*
+		$.ajax({
+			type:"post",
+			url:"json/json-file_info.php",
+			data: {
+				"recursive":	"1"
+			},
+			dataType: 'json',
+			success:function(data){
 
+			}
+		});
+*/
 		fsDirName = $('#folderListSelect').val();
 		dataObj['moveToFolder'] = fsDirName;
 
@@ -72,18 +85,22 @@ $(document).ready(function() {
 					console.log(data);
 					// handle errors for selected files and folders -------
 					if (data.errors.files) {
-						$('#moveFileFolderBody').addClass('has-error'); // add the error class to show red input
-						$('#moveFileFolderBody').append('<div class="help-block">' + data.errors.files + '</div>'); // add the actual error message under our input
+						//$('#moveFileFolderBody').addClass('has-error'); // add the error class to show red input
+						$('#moveFileFolderBody').append(
+							'<div class="alert alert-danger" role="alert">' + data.errors.files + '</div>'
+						); // add the actual error message under our input
 					}
 
 					// handle errors for move to folder ------
 					if (data.errors.moveToFolder) {
-						$('#moveFileFolderBody').addClass('has-error'); // add the error class to show red input
-						$('#moveFileFolderBody').append('<div class="help-block">' + data.errors.moveToFolder + '</div>'); // add the actual error message under our input
+						//$('#moveFileFolderBody').addClass('has-error'); // add the error class to show red input
+						$('#moveFileFolderBody').append(
+							'<div class="alert alert-danger" role="alert">' + data.errors.moveToFolder + '</div>'
+						); // add the actual error message under our input
 					}
 
 				} else {
-					console.log(data);
+					//console.log(data);
 					// ALL GOOD! just show the success message!
 					$('#moveFileFolderBody').append('<div class="alert alert-success">' + data.message + '</div>');
 

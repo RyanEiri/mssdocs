@@ -17,7 +17,7 @@ $(document).ready(function(){
 			dataType: 'json',
 			success:function(data){
 			  var obj = [data];
-			  console.log(obj);
+			  //console.log(obj);
 				// Collect the selected files and display them for confirmation
 			  var moveFileValues = [];
 			  $('.fileList').remove();
@@ -34,7 +34,7 @@ $(document).ready(function(){
 			  else {
 			    $('#fileList-group').append('<li class="list-group-item fileList"><div>No File Selected</div></li>');
 			  }
-			  console.log(moveFileValues);
+			  //console.log(moveFileValues);
 
 				// Collect the selected folders and display them for confirmation
 			  var moveFolderValues = [];

@@ -67,7 +67,11 @@ class FolderGrab {
 		$zip_name,
 		$zip_url,
 		$thumbnail,
-		$files;
+		$files,
+		$subfolders,
+		$subfolders_files,
+		$new_subfolder_base,
+		$subfolder_pattern;
 
 	function __construct(
 		$folder_name,
@@ -83,6 +87,7 @@ class FolderGrab {
 			}
 			$this->grabFolder();
 			$this->grabFolderFiles();
+			$this->grabFolderSubfolders();
 	}
 
 	function grabFolder(){
@@ -152,21 +157,77 @@ class FolderGrab {
 			";
 		$db->query($update_folder_sql)
 		  or die ('Update folder query failed!');
-		foreach ($this->files as $key => $value) {
-			$file_name = basename($value['name']);
-			$file_name = $update_folder.'/'.$file_name;
-			$file_url = USER_FILES_URL.'files/'.$file_name;
-			$file_id = $value['id'];
-			$update_files_sql = "UPDATE files
-				SET `name` =
-				'$file_name',
-				`url` =
-				'$file_url'
-				WHERE `id` =
-				'$file_id'
-				";
-			$db->query($update_files_sql)
-			  or die ('Update files query failed!');
+		if(is_array($this->files)){
+			foreach ($this->files as $key => $value) {
+				$file_name = basename($value['name']);
+				$file_name = $update_folder.'/'.$file_name;
+				$file_url = USER_FILES_URL.$file_name;
+				$file_id = $value['id'];
+				$update_files_sql = "UPDATE files
+					SET `name` =
+					'$file_name',
+					`url` =
+					'$file_url'
+					WHERE `id` =
+					'$file_id'
+					";
+				$db->query($update_files_sql)
+				  or die ('Folder file update query failed.');
+			}
+		}
+		if(is_array($this->subfolders)){
+			foreach ($this->subfolders as $key => $value) {
+				$sql = "SELECT files.id, files.name, files.size, files.type, files.url, files.title, files.description, files.date, folders.folder_id, folders.folder_name
+						FROM `files`
+						LEFT JOIN `folders` ON
+						folders.folder_id = files.folder_id
+						WHERE files.folder_id='" . $value['folder_id'] . "'
+						ORDER BY files.name";
+				$result = $db->query($sql)
+					or die ('Subfolder files SELECT statement failed.');
+				$query = $result->fetchArray();
+				if(is_array($this->subfolders_files)){
+					$this->subfolders_files = array_merge($this->subfolders_files, $query);
+				} else {
+					$this->subfolders_files = $query;
+				}
+			}
+		}
+		if(is_array($this->subfolders_files)){
+			foreach ($this->subfolders_files as $key => $value) {
+				$subfolder_pattern = '/'.preg_quote($this->folder_name, '/').'\//';
+				$new_subfolder_file_base = preg_replace($subfolder_pattern, '', $value['name']);
+				$file_name = $update_folder.'/'.$new_subfolder_file_base;
+				$update_subfolder = dirname($file_name);
+				$file_url = USER_FILES_URL.$file_name;
+				$file_id = $value['id'];
+				$update_sql = "UPDATE `files`
+					SET 	`name` 	= '$file_name',
+								`url` 	= '$file_url'
+					WHERE `id` 		= '$file_id'";
+				$db->query($update_sql)
+					or die ('Subfolder file update query failed.');
+				$old_subfolder = dirname($value['name']);
+				$subfolder_grab_id_sql = "SELECT `folder_id`, `folder_name`
+					FROM `folders`
+					WHERE `folder_name`='" . $old_subfolder . "'
+					LIMIT 1";
+				$subfolder_grab_id_result = $db->query($subfolder_grab_id_sql);
+				$subfolder_grab_id_query = $subfolder_grab_id_result->fetchArray();
+				if(is_array($subfolder_grab_id_query)) {
+					extract($subfolder_grab_id_query[0]);
+				}
+				if(isset($folder_id) && $folder_name !== $update_subfolder){
+					$subfolder_push_new_sql = "UPDATE `folders`
+						SET `folder_name` =
+						'$update_subfolder' WHERE
+						`folder_id` =
+						'$folder_id'
+						";
+					$db->query($subfolder_push_new_sql)
+						or die ('Update subfolder query failed!');
+				}
+			}
 		}
 	}
 
@@ -179,9 +240,19 @@ class FolderGrab {
 				WHERE files.folder_id='" . $this->folder_id . "'
 				ORDER BY files.name";
 		$result = $db->query($sql)
-		  or die ('Select statement failed for grabbing folder files!');
+		  or die ('Select statement failed for grabbing folder files.');
 		$query = $result->fetchArray();
 		$this->files = $query;
+	}
+
+	function grabFolderSubfolders(){
+		global $db;
+		$parent_folder_search = $this->folder_name.'/%';
+		$sql = "SELECT * FROM folders WHERE folder_name LIKE '" . $parent_folder_search . "'";
+		$result = $db->query($sql)
+			or die ('Select statement failed for grabbing folder subfolders.');
+		$query = $result->fetchArray();
+		$this->subfolders = $query;
 	}
 
 	function updateFolderFiles(
