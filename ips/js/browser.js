@@ -8,8 +8,8 @@ $(function(){
 
 	// Start by fetching the file data from scan.php with an AJAX request
 
-	$.post('json/json-file_info.php', { recursive: '1' }, function(data) {
-		//console.log(data);
+	$.post('json/json-file_info.php', { recursive: '0' }, function(data) {
+
 		var response = [data],
 			currentPath = '',
 			breadcrumbsUrls = [];
@@ -19,23 +19,16 @@ $(function(){
 
 		// This event listener monitors changes on the URL. We use it to
 		// capture back/forward navigation in the browser.
-
 		$(window).on('hashchange', function(){
 
-			//goto(window.location.hash);
-			// The following line replaces the prior because
-			// the hash is available in more browsers with the
-			// following method.
 			goto(location.href.substr(location.href.indexOf('#')));
 
-			// We are triggering the event. This will execute
-			// this function on page load, so that we show the correct folder:
-
+		// We are triggering the event. This will execute
+		// this function on page load, so that we show the correct folder:
 		}).trigger('hashchange');
 
 
 		// Hiding and showing the search box
-
 		filemanager.find('.search').click(function(){
 
 			var search = $(this);
@@ -120,21 +113,21 @@ $(function(){
 
 		// Clicking on individual folders
 
-                fileList.on('click', 'li.folders', function(e){
-                        e.preventDefault();
+    fileList.on('click', 'li.folders', function(e){
+      e.preventDefault();
 
-                        var folderBox = $(this).find('input.folderCheckbox');
+      var folderBox = $(this).find('input.folderCheckbox');
 
 			if ($('#selectAllFolderList').is(':checked')) {
 			  $('#selectAllFolderList').prop('checked', false);
 			}
 
-                        if(folderBox.is(':checked')) {
-                                $(folderBox.prop('checked', false));
-                        }
-                        else {
-                                $(folderBox.prop('checked', true));
-                        }
+        if(folderBox.is(':checked')) {
+                $(folderBox.prop('checked', false));
+        }
+        else {
+                $(folderBox.prop('checked', true));
+        }
 
 			if ($('.folderCheckbox:checked').length === $('.folderCheckbox').length) {
 			  $('#selectAllFolderList').prop('checked', true);
@@ -180,17 +173,17 @@ $(function(){
 
 		// added to select files for manipulation::FHP
 		// Clicking on selectAllFile toggle
-                $('#selectAllFileList').click(function(){
-                  if(this.checked){
-                    $(fileList).find('input.fileCheckbox').each(function() {
-                      $(this).prop('checked', true);
-                    });
-                  } else {
-                    $(fileList).find('input.fileCheckbox').each(function() {
-                      $(this).prop('checked', false);
-                    });
-                  }
-                });
+    $('#selectAllFileList').click(function(){
+      if(this.checked){
+        $(fileList).find('input.fileCheckbox').each(function() {
+          $(this).prop('checked', true);
+        });
+      } else {
+        $(fileList).find('input.fileCheckbox').each(function() {
+          $(this).prop('checked', false);
+        });
+      }
+    });
 
 		// Clicking on individual files
 		fileList.on('click', 'li.files', function(e){
@@ -220,13 +213,6 @@ $(function(){
 
 			var showFile = $(this).find('a.files').attr('href');
 			singleFileGrabDB(showFile);
-
-			// warning that the filename has changed from its default value
-/*			$('#warningCurrentFileName').text(showFile);
-			$('#fileName').keydown(function(event) {
-			  $('#warningFileName').show();
-			});
-*/
 
 			$('#fileFunctions').modal('show');
 		});
@@ -322,40 +308,43 @@ $(function(){
 				// if hash is some path
 
 				else if (hash[0].trim().length) {
+					$.post('json/json-file_info.php', { recursive: '0', dir: hash[0] }, function(data) {
 
-					rendered = searchByPath(hash[0]);
+						var response = [data];
 
-					if (rendered.length) {
+						rendered = searchByPath(hash[0], response);
 
-						currentPath = hash[0];
-						breadcrumbsUrls = generateBreadcrumbs(hash[0]);
+						if (rendered.length) {
 
-						// added to send path to add folder form::FHP
-						$('.path_value').remove(); // remove prior instance of path
-						$.each(breadcrumbsUrls, function(i){
-						  $('.path_value').remove(); // remove so we only see the final value containing the full path
-						  $('#add_folder-group').append('<input type="hidden" class="path_value" name="path_value" value="'+breadcrumbsUrls[i]+'">');
-						});
-						// end of FHP addition
+							currentPath = hash[0];
+							breadcrumbsUrls = generateBreadcrumbs(hash[0]);
 
-						render(rendered);
+							// added to send path to add folder form::FHP
+							$('.path_value').remove(); // remove prior instance of path
+							$.each(breadcrumbsUrls, function(i){
+							  $('.path_value').remove(); // remove so we only see the final value containing the full path
+							  $('#add_folder-group').append('<input type="hidden" class="path_value" name="path_value" value="'+breadcrumbsUrls[i]+'">');
+							});
+							// end of FHP addition
 
-					}
-					else {
-						currentPath = hash[0];
-						breadcrumbsUrls = generateBreadcrumbs(hash[0]);
+							render(rendered);
 
-						// added to send path to add folder form::FHP
-						$('.path_value').remove(); // remove prior instance of path
-						$.each(breadcrumbsUrls, function(i){
-						  $('.path_value').remove(); // remove so we only see the final value containing the full path
-						  $('#add_folder-group').append('<input type="hidden" class="path_value" name="path_value" value="'+breadcrumbsUrls[i]+'">');
-						});
-						// end of FHP addition
+						}
+						else {
+							currentPath = hash[0];
+							breadcrumbsUrls = generateBreadcrumbs(hash[0]);
 
-						render(rendered);
-					}
+							// added to send path to add folder form::FHP
+							$('.path_value').remove(); // remove prior instance of path
+							$.each(breadcrumbsUrls, function(i){
+							  $('.path_value').remove(); // remove so we only see the final value containing the full path
+							  $('#add_folder-group').append('<input type="hidden" class="path_value" name="path_value" value="'+breadcrumbsUrls[i]+'">');
+							});
+							// end of FHP addition
 
+							render(rendered);
+						}
+					});
 				}
 
 				// if there is no hash
@@ -388,9 +377,11 @@ $(function(){
 
 		// Locates a file by path
 
-		function searchByPath(dir) {
+		function searchByPath(dir, demo) {
+			if (demo === undefined) {
+				demo = response;
+			}
 			var path = dir.split('/'),
-				demo = response,
 				flag = 0;
 
 			for(var i=0;i<path.length;i++){
@@ -459,7 +450,6 @@ $(function(){
 
 			}
 
-
 			// Empty the old result and make the new one
 
 			fileList.empty().hide();
@@ -474,12 +464,12 @@ $(function(){
 			}
 
 			if(scannedFolders.length) {
-
 				scannedFolders.forEach(function(f) {
-
-					var itemsLength = f.items.length,
-						name = escapeHTML(f.name),
-						icon = '<span class="icon folder"></span>';
+					if(f.items){
+						var itemsLength = f.items;
+					}
+					var	name = escapeHTML(f.name),
+							icon = '<span class="icon folder"></span>';
 
 					if(itemsLength) {
 						icon = '<span class="icon folder full"></span>';
@@ -505,15 +495,14 @@ $(function(){
 
 				scannedFiles.forEach(function(f) {
 
-					var fileSize = bytesToSize(f.size),
-						name = escapeHTML(f.name),
-						fileType = name.split('.'),
-						icon = '<span class="icon file"></span>';
+					var fileSize 	= bytesToSize(f.size),
+							name 			= escapeHTML(f.name),
+							fileType 	= name.split('.'),
+							icon 			= '<span class="icon file"></span>';
 
 					fileType = fileType[fileType.length-1];
 					fileType = fileType.toLowerCase();
 
-					//icon = '<span class="icon file f-'+fileType+'">.'+fileType+'</span>';
 					icon = '<span class="icon file file-icon file-icon-lg" data-type="'+fileType+'"></span>';
 
 					var file = $('<li class="files"><input type="checkbox" class="fileCheckbox" value="'+f.path+'"><a href="'+ f.path+'" title="'+ f.path +'" class="files">'+icon+'<span class="name">'+ name +'</span> <span class="details">'+fileSize+'</span></a></li>');
@@ -581,13 +570,8 @@ $(function(){
 		// Grab filesystem and database information for a single file
 
 		function singleFileGrabDB(grabfile) {
-			//console.log(grabfile);
 			var dbData = {};
 			var dirNameContext = grabfile.match(/(.*)[\/\\]/)[1]||'';
-			//console.log(grabfile);
-			//console.log(dirNameContext);
-//			var fsDirNameContext = dirNameContext.replace(/^..\//, '');
-//			var fsDirNameContext = dirNameContext.replace(/.*ips\//, '');
 			var fileNameContext = grabfile.replace(/^.*[\\\/]/, '');
 			var thumbnailContext = 'upload/' + dirNameContext + '/thumbnail/' + fileNameContext;
 			dbData.context = 'file';
@@ -596,8 +580,6 @@ $(function(){
 			var dbDirName = dirNameContext.match(/files.*$/i);
 			dbDirName = dbDirName[0];
 			dbData.dbDirName = dbDirName;
-			//console.log(dbData);
-			//console.log(fsDirNameContext);
 
 			$.ajax({
 			  type:"post",
@@ -605,69 +587,68 @@ $(function(){
 			  dataType: 'json',
 			  data: dbData,
 			})
-//			  success: function(data) {
 			  .done(function(data) {
-			  //console.log(data);
 			    if ( ! data.success) {
 						if (data.errors.database) {
 						  $('#fileFunctionsBody').addClass('has-error');
 						  $('#fileFunctionsBody').append('<div class="help-block">' + data.errors.database + '</div>');
 						}
 			    } else {
-						//console.log(data);
-						// Grab the folders available
-						var availableFolders = [];
-						collectAvailableFolders(response);
-						function collectAvailableFolders(object) {
-							object.forEach(function(d){
-								if(d.type === 'folder') {
-									if(d.name !== 'thumbnail'){
-										var cleanedPath = d.path.match(/files.*$/i);
-										availableFolders.push(cleanedPath);
-										collectAvailableFolders(d.items);
+						$.post('json/json-file_info.php', { recursive: '1' }, function(moreData) {
+							let response = [moreData];
+							// Grab the folders available
+							var availableFolders = [];
+							collectAvailableFolders(response);
+							function collectAvailableFolders(object) {
+								object.forEach(function(d){
+									if(d.type === 'folder') {
+										if(d.name !== 'thumbnail'){
+											var cleanedPath = d.path.match(/files.*$/i);
+											availableFolders.push(cleanedPath);
+											collectAvailableFolders(d.items);
+										}
 									}
-								}
+								});
+							}
+							var fileURL = data.fileUrl;
+							// Fill in the select box for the available folders
+							$('#dirName').find('option').remove();
+							$.each(availableFolders, function(i,val){
+							  $('select#dbDirName').append('<option value="'+val+'">'+val+'</option>');
 							});
-						}
-						var fileURL = data.fileUrl;
-						//console.log(fileURL);
-						// Fill in the select box for the available folders
-						$('#dirName').find('option').remove();
-						$.each(availableFolders, function(i,val){
-						  $('select#dbDirName').append('<option value="'+val+'">'+val+'</option>');
+							// Set the values for the fields
+							$('#contextFileId').val(data.fileId);
+							$('#dbDirName option[value="'+dbDirName+'"]').attr("selected", true);
+							$('#fsDirName').attr('value', fsDirName);
+							$('#fileName').attr('value', fileNameContext);
+							$('#previousFileFolder').attr('value', dirNameContext);
+							$('#previousFileName').attr('value', fileNameContext);
+							$('#fileSize').text(data.fileSize);
+							$('#fileType').text(data.fileType);
+							$('#fileUrl').val(fileURL);
+							$('#fileUrlLink').html('<a href="' + data.fileUrl +'">' + data.fileUrl + '</a>');
+							$('.fileUrl').attr('href', data.fileUrl);
+							$('#fileTitle').attr('value', data.fileTitle);
+							$('#previousFileTitle').attr('value', data.fileTitle);
+							$('#fileDescription').attr('value', data.fileDescription);
+							$('#previousFileDescription').attr('value', data.fileDescription);
+							$('#fileDate').text(data.fileDate);
+							$('#fileThumbnail').attr('src', thumbnailContext);
 						});
-						// Set the values for the fields
-						$('#contextFileId').val(data.fileId);
-						$('#dbDirName option[value="'+dbDirName+'"]').attr("selected", true);
-						$('#fsDirName').attr('value', fsDirName);
-						$('#fileName').attr('value', fileNameContext);
-						$('#previousFileFolder').attr('value', dirNameContext);
-						$('#previousFileName').attr('value', fileNameContext);
-						$('#fileSize').text(data.fileSize);
-						$('#fileType').text(data.fileType);
-						$('#fileUrl').val(fileURL);
-						$('#fileUrlLink').html('<a href="' + data.fileUrl +'">' + data.fileUrl + '</a>');
-						$('.fileUrl').attr('href', data.fileUrl);
-						$('#fileTitle').attr('value', data.fileTitle);
-						$('#previousFileTitle').attr('value', data.fileTitle);
-						$('#fileDescription').attr('value', data.fileDescription);
-						$('#previousFileDescription').attr('value', data.fileDescription);
-						$('#fileDate').text(data.fileDate);
-						$('#fileThumbnail').attr('src', thumbnailContext);
 			    }
-			 }) /* end of .done function */
+			 })
 			 .fail(function(data) {
-			 	//console.log(data);
+
 			 });
-//			  } /* end of success function */
-//			}); /* end of ajax call */
+
 		}
 		// Grab the filesystem and database information for a single folder
 		function singleFolderGrabDB(grabfolder) {
+
 			var dbData = {};
 			dbData.context = 'folder';
 			dbData.dirName = grabfolder;
-			//console.log(dbData);
+
 			$.ajax({
 			  type:"post",
 			  url:"json/json-database_info.php",
@@ -681,7 +662,6 @@ $(function(){
 						  $('#folderFunctionsBody').append('<div class="help-block">' + data.errors.database + '</div>');
 						}
 			    } else {
-						//console.log(data);
 						// Set the values for the fields
 						if (data.folderId) {
 						  $('#folder_id').val(data.folderId);
@@ -735,10 +715,8 @@ $(function(){
 			    }
 			   })
 			   .fail(function(data) {
-					 //console.log(data);
+
 			   });
 		}
-
-
 	});
 });

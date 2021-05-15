@@ -5,10 +5,6 @@ include 'php.php';
 define("FULL_URL", get_full_url());
 
 // Per-implementation constants
-// following line is no longer used per get_full_url() change !*CHANGE01*!
-//define("PROGRAM_WEB_BASE_PROTOCOL", "HTTPS");
-// define installation specific directories
-// these are the only install specific items that should change in this file
 define("INSTALL_DIR", 'ips');
 define("PUBLIC_DIRS", array(
 	'gallery'

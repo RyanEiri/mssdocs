@@ -15,12 +15,8 @@ if($login_cookie->CheckIt()) {
 	} else {
 		$recursive = '0';
 	}
-	/*if(!empty($_POST['dir'])){
-		$dir = USER_FILES_BASE."files/".$_POST['dir'];
-	} else {
-		$dir = USER_FILES_BASE."files";
-	}*/
-	$dir = (isset($_POST['dir'])) ? USER_FILES_BASE."files/".$_POST['dir']
+
+	$dir = (isset($_POST['dir'])) ? USER_FILES_BASE.$_POST['dir']
 	 : $dir = USER_FILES_BASE."files";
 	if(isset($dir)){
 		$path = preg_replace('/.*ips\/upload\/?/', '', $dir);
@@ -65,7 +61,8 @@ if($login_cookie->CheckIt()) {
 						$files[] = array(
 							"name" => $f,
 							"type" => "folder",
-							"path" => $path . '/' . $f
+							"path" => $path . '/' . $f,
+							"items" => count(scandir($dir . '/' . $f))-2
 						);
 
 					}
