@@ -7,6 +7,7 @@ ini_set('max_input_time', '3600');
 
 // Perform application bootstrap.
 chdir('..');
+require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
 define("PROGRESS_FILE", USER_FILES_BASE . "tmp/" . session_id() . ".txt");
 
@@ -42,7 +43,7 @@ if($login_cookie->CheckIt()) {
 		// replace slashes with dashes
 		$zip_filename = preg_replace('/\//', '-', $zip_filename);
 		// remove all other special characters
-		$zip_filename = preg_replace('/[^A-Za-z0-9\_\-]/', 'o', $zip_filename);
+		$zip_filename = preg_replace('/[^\d\wðÐþÞáÁöÖúÚéÉíÍóÓ\_\-\s]/', 'o', $zip_filename);
 		// add .zip at the end
 		$zip_filename = $zip_filename.'.zip';
 		// Zip full path and filename for archive creation.

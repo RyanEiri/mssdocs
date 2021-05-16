@@ -1,8 +1,9 @@
 <?php
 chdir('..');
+require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
 $login_cookie = new UserCookie();
-//$login_cookie->DeleteIt();
+
 if($login_cookie->CheckIt()) {
 	$username = $login_cookie->username;
 	$userval = new UserGrab($username);

@@ -116,7 +116,7 @@ $(document).ready(function() {
   	}
 
     function refreshProgress(){
-      //console.log("hit");
+
       $.ajax({
         type: 'POST',
         url: 'json/json-progress.php',

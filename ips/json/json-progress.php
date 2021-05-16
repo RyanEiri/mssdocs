@@ -8,7 +8,7 @@ if($login_cookie->CheckIt()) {
 	$userval = new UserGrab($username);
 	$admin = $userval->admin;
 
-	$file = isset($_POST['session_id']) ? $_POST['session_id'] : null;
+	$file = isset($_POST['session_id']) ? $_POST['session_id'] : NULL;
 	$file = USER_FILES_BASE . "tmp/" . $file . ".txt";
 
 	header('HTTP/1.1 200 OK');
@@ -18,7 +18,7 @@ if($login_cookie->CheckIt()) {
 		echo $text;
 
 		$obj = json_decode($text);
-		if($obj->success === true) {
+		if(isset($obj->success) && $obj->success === TRUE) {
 			unlink($file);
 		}
 	} else {
