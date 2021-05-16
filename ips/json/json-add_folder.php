@@ -1,11 +1,7 @@
 <?php
 chdir('..');
 include getcwd().'/php/boot.php';
-if($_SESSION['login_cookie']) {
-	$login_cookie = unserialize($_SESSION['login_cookie']);
-} else {
-	$login_cookie = new UserCookie();
-}
+$login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
 if($login_cookie->CheckIt()) {
 	// Grab the current user's info.

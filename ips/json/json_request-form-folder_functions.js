@@ -276,31 +276,40 @@ $(document).ready(function() {
 		})
 			// done callback for completed calls
 			.done(function(data) {
-			  //console.log(data);
 
 			  // errors and validation
 			  if ( ! data.success) {
 
 			    // handle errors and add error message to form
 			    if (data.errors) {
-    				$('#filesInFolderForm').addClass(
-    				  'has-error'
-    				); // add the error class to show red input
-    				$('#filesInFolderForm').prepend(
-    				  '<div class="help-block">' + data.errors + '</div>'
-    				);
-    				$('#filesInFolderForm').append(
-    				  '<div class="help-block">' + data.errors + '</div>'
-    				); // add the actual error message
+
+            if (data.errors.file_exists) {
+              fileExists = data.errors.file_exists;
+              $.each(fileExists, function(i, val){
+          		  $('#filesInFolderForm').prepend(
+                  '<div class="alert alert-danger">File ' + val + ' already exists.</div>'
+                );
+                $('#filesInFolderForm').append(
+                  '<div class="alert alert-danger">File ' + val + ' already exists.</div>'
+                )
+          		});
+            } else {
+      				$('#filesInFolderForm').prepend(
+      				  '<div class="alert alert-danger">' + data.errors + '</div>'
+      				);
+      				$('#filesInFolderForm').append(
+      				  '<div class="alert alert-danger">' + data.errors + '</div>'
+      				); // add the actual error message
+            }
 			    }
 
 			  } else {
 			    // Success! Add success message to form
 			    $('#filesInFolderForm').prepend(
-				'<div class="alert alert-success">' + data.message + '</div>'
+				    '<div class="alert alert-success">' + data.message + '</div>'
 			    );
 			    $('#filesInFolderForm').append(
-			  	'<div class="alert alert-success">' + data.message + '</div>'
+			  	  '<div class="alert alert-success">' + data.message + '</div>'
 			    );
 			  }
 

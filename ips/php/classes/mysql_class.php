@@ -2,7 +2,7 @@
 
 class MySQLResult {
  	/**
-  	* $mysql = Instance of MySQL providing database connection
+  	* $sql = Instance of MySQL providing database connection
   	* $query = Query resource
   	*/
  	private $sql;
@@ -49,7 +49,7 @@ class MySQLResult {
 	}
 
 	function getId(){
-		return mysqli_insert_id();
+		return mysqli_insert_id($this->sql->dbConn);
 	}
 
  	/**

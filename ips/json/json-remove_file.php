@@ -69,15 +69,14 @@ if(ADMIN_STATUS){
 	$errors['privilege'] = 'You do not have sufficient privileges to remove files. Please contact your administrator.';
 }
 
-// return a response =============================================
+// return an error response if there are errors ===================================
 
+  if ( ! empty($errors)) {
 	// if there are any errors in our errors array,
 	// return a success boolean of false
-  if ( ! empty($errors)) {
-
+	$data['success'] = false;
 	// if there are items in our errors array,
 	// return those errors
-	$data['success'] = false;
 	$data['errors'] = $errors;
   } else {
 
@@ -100,7 +99,7 @@ if(ADMIN_STATUS){
 		  $dirname = preg_replace('/^.*files\/?/', '', $file['dirname'], 1);
 		  $show_file = $dirname.'/'.$file['filename'];
 		}
-		$data['message'] = 'show_file: ' . $show_file . '<br />';
+		//$data['message'] = 'show_file: ' . $show_file . '<br />';
 		$fileval = new FileGrab($show_file);
 		$file_id = $fileval->id;
 		$remove_object = new ActOnSingleFile();
@@ -110,9 +109,9 @@ if(ADMIN_STATUS){
 	if(isset($folders)){
 	  foreach ($folders as $key => $folder) {
 	    $folder = USER_FILES_BASE.$folder;
-	    $data['message'] .= 'folder: ' . $folder . '<br />';
+	    //$data['folder_message'] = 'folder: ' . $folder . '<br />';
 	    $scanned_dir = scandir($folder);
-	    $data['message'] .= 'scanned_dir: ' . $scanned_dir[2] . '<br />';
+	    //$data['scan_message'] .= 'scanned_dir: ' . $scanned_dir[2] . '<br />';
 	    if (count($scanned_dir) !== 2) {
 		if ($scanned_dir[2] === 'thumbnail') {
 		  rmdir($folder.'/thumbnail');
@@ -122,7 +121,7 @@ if(ADMIN_STATUS){
 //	    $db_folder_pattern = '/^.*files\/?/';
 //	    $db_folder_replacement = '';
 	    $db_folder = preg_replace('/^.*files\/?/', '', $folder);
-	    $data['message'] .= 'db_folder: ' . $db_folder . '<br />'; // ##DBUG##
+	    $data['db_folder_message'] = 'db_folder: ' . $db_folder . '<br />'; // ##DBUG##
 	    $db_create = FALSE;
 	    $db_folderval = new FolderGrab($db_folder, $db_create);
 	    $db_folderval->removeFolder();
@@ -132,7 +131,7 @@ if(ADMIN_STATUS){
 	// show a message of success and provide a true
 	// success variable
 	$data['success'] = true;
-	$data['message'] .= 'Success!';
+	$data['message'] = 'Success!';
   }
 
   // complete our ajax handling with our json output

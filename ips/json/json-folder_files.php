@@ -132,6 +132,7 @@ if($login_cookie->CheckIt()) {
   // Remove entries with no information remaining other than the id
 	// and change name and url for db formatting.
   foreach ($files_from_js as $key => $array) {
+		$data['tidings'][$key] = $array;
 	  if(!array_key_exists('name', $array)
 			AND !array_key_exists('url', $array)
 		  AND !array_key_exists('title', $array)
@@ -139,11 +140,16 @@ if($login_cookie->CheckIt()) {
 	  ) {
 	    unset($files_from_js[$key]);
 	  }
+		
 	  if(array_key_exists('name', $array)) {
+			$filename_out = $folder_name.'/'.$array['name'];
+			if(file_exists('files/'.$filename_out)) {
+				$errors['file_exists'][$array['id']] = $array['name'];
+				unset($files_from_js[$key]);
+			}
 	    $files_from_js[$key]['name'] = $folder_name.'/'.$array['name'];
 	  }
   }
-
 
 // return a response =============================================
 
@@ -165,6 +171,8 @@ if($login_cookie->CheckIt()) {
 
 	// Database processing
 	$folderval->updateFolderFiles($files_from_js);
+	$data['files_from_js'] = $files_from_js;
+	$data['files_from_db'] = $files_from_db;
 	// Filesystem processing
 	foreach ($files_from_js as $key => $array) {
 	  if(isset($array['name'])) {
@@ -175,7 +183,7 @@ if($login_cookie->CheckIt()) {
 	    $thumbnail_to_name = basename($to_name);
 	    $thumbnail_to_name = 'files/'.$folder_name.'/thumbnail/'.$thumbnail_to_name;
 	    if(is_readable($thumbnail)){
-		rename($thumbnail, $thumbnail_to_name);
+				rename($thumbnail, $thumbnail_to_name);
 	    }
 	  }
 	}
