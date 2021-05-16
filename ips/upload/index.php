@@ -1,6 +1,6 @@
 <?php
-session_start();
 chdir('..');
+require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
 $login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
@@ -9,7 +9,7 @@ if($login_cookie->CheckIt()) {
 	$userval = new UserGrab(USERNAME);
 	define("ADMIN_STATUS", $userval->admin);
 /*
- * jQuery File Upload Plugin PHP 
+ * jQuery File Upload Plugin PHP
  * https://github.com/blueimp/jQuery-File-Upload
  *
  * Copyright 2010, Sebastian Tschan
