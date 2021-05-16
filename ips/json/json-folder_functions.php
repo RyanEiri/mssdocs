@@ -43,7 +43,7 @@ if($login_cookie->CheckIt()) {
 		// replace slashes with dashes
 		$zip_filename = preg_replace('/\//', '-', $zip_filename);
 		// remove all other special characters
-		$zip_filename = preg_replace('/[^\d\wðÐþÞáÁöÖúÚéÉíÍóÓ\_\-\s]/', 'o', $zip_filename);
+		$zip_filename = preg_replace('/[^\d\w\s\_\-]/', '', $zip_filename);
 		// add .zip at the end
 		$zip_filename = $zip_filename.'.zip';
 		// Zip full path and filename for archive creation.
