@@ -9,6 +9,9 @@ RewriteRule "^js/*" - [L]
 RewriteRule "^img/*" - [L]
 RewriteRule "^upload/image_server.php" - [L]
 
+# Redirect exception for public shares with keys
+RewriteRule "^download.php" - [L]
+
 # Redirect if HTTP is used instead of HTTPS
 #RewriteCond %{HTTPS} !=on
 #RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
