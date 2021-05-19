@@ -44,6 +44,7 @@ define("CLASSES_CONFIG_FILE", 'config.php');
 define("PROGRAM_CLASSES_CONFIG", CLASSES_DIR.CLASSES_CONFIG_FILE);
 define("PROGRAM_WEB_BASE", BASE_URL.'/'.INSTALL_DIR.'/');
 define("USER_FILES_URL", PROGRAM_WEB_BASE.'upload/files/');
+define("USER_ARCHIVES_URL", PROGRAM_WEB_BASE.'upload/archives/');
 define("USER_FILES_BASE", PROGRAM_BASE.'upload/');
 define("BACKUP_BASE", PROGRAM_BASE.'backups/');
 

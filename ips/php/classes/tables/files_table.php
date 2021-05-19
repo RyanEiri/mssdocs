@@ -334,8 +334,8 @@ class FolderGrab {
 			if(!isset($this->duplicate)){
 			  $this->duplicateSQL = "SELECT folder_id, zip_name
 				FROM ziparchives
-				WHERE zip_name='"
-				. $this->zip_name . "'
+				WHERE folder_id='"
+				. $this->folder_id . "'
 				";
 			  $this->duplicateResult = $db->query($this->duplicateSQL);
 			  $this->duplicate_zip = $this->duplicateResult->fetchArray();
