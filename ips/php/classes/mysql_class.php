@@ -147,7 +147,6 @@ class SQL {
 	* The array should look like
 	* $params[] = Array( 'type' => 's', 'value' => 'my value' );
 	*
-	* Currently this addition was only made for INSERT statements
 	*
 	*/
 	public function query($statement, $params = NULL){ // default for $params set to NULL
