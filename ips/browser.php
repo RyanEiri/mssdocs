@@ -25,7 +25,7 @@ if($login_cookie->CheckIt()) {
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-	<title>FHP File browser</title>
+	<title>File browser</title>
 
 	<!-- Bootstrap for CSS -->
 	<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>bootstrap/bootstrap.min.css">

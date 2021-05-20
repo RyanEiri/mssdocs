@@ -25,7 +25,7 @@ if($login_cookie->CheckIt()) {
 <![endif]-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fragile Heritage Project::Internal Proofing System</title>
+<title>Fragile Heritage Project</title>
 <meta name="author" content="Ryan Eric Johnson" >
 <meta name="date" content="2020-12-20" >
 <meta name="copyright" content="Fragile Heritage Project 2016-2020" >
@@ -78,23 +78,16 @@ if($login_cookie->CheckIt()) {
 				<p><a class="btn btn-secondary" href="<?php echo PROGRAM_WEB_BASE ?>browser.php" role="button">Browse &raquo;</a></p>
 			</div>
 			<div class="col-md-4">
-				<h2>XML Editor</h2>
-				<p class="lead">Coming soon!</p>
-				<p>Create a descriptive file about your manuscript.</p>
-				<p><a class="btn btn-secondary" href="<?php echo PROGRAM_WEB_BASE ?>xml/" role="button">Edit &raquo;</a></p>
-			</div>
-			<div class="col-md-4">
 				<h2>Backups</h2>
 				<p class="lead">Index of backups</p>
-				<p>Index of the ips/backups directory</p>
-				<p><a class="btn btn-secondary" href="<?php echo PROGRAM_WEB_BASE ?>backups/" role="button">Backups &raquo;</a>    </p>
+				<p>Index of the ips/backups directory.</p>
+				<p><a class="btn btn-secondary" href="<?php echo PROGRAM_WEB_BASE ?>backups/" role="button">Backups &raquo;</a></p>
 			</div>
 			<div class="col-md-4">
-				<h2>Contact Database</h2>
-				<p class="lead">Coming soon!</p>
-				<p>Share contact information about public and private collections of manuscripts.</p>
-				<p><a class="btn btn-secondary" href="#" role="button">Contact &raquo;</a></p>
-			</div>
+				<h2>Zip Archives</h2>
+				<p class="lead">Index of zip archives</p>
+				<p>Index of the upload/archives directory.</p>
+				<p><a class="btn btn-secondary" href="<?php echo PROGRAM_WEB_BASE ?>archives/" role="button">Zips &raquo;</a></p>
 		</div>
 
 		<hr>
