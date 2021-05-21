@@ -10,50 +10,40 @@ if($continue === TRUE) {
 	switch ($file_id) {
 		case "3556":
 			$contentid = 'zip';
-			$filename = 'vesturheimsrit_com-20210506.zip';
+			$filename = 'vesturheimsrit_com-20210520.zip';
 			$file_size = filesize(BACKUP_BASE.$filename);
 			$testurlkey = keymaker($contentid);
-			if($testurlkey === $urlkey) {
-				header('Pragma: public');
-				header('Expires: 0');
-	      header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-	      header('Cache-Control: public');
-	      header('Content-Description: File Transfer');
-	      header('Content-type: application/zip');
-	      header('Content-Disposition: attachment; filename="'.$filename.'"');
-	      header('Content-Transfer-Encoding: binary');
-	      header('Content-Length: '.$file_size);
-	      ob_end_flush();
-	      @readfile(BACKUP_BASE.$filename);
-	      exit;
-			} else {
-				die("Authentication error.");
-			}
 			break;
 		case "3557":
 			$contentid = 'sql';
-			$filename = 'vesturheimsrit_com-db-20210506.sql';
-			$file_size =
+			$filename = 'vesturheimsrit_com-db-20210520.sql';
+			$file_size = filesize(BACKUP_BASE.$filename);
 			$testurlkey = keymaker($contentid);
-			if($testurlkey === $urlkey) {
-				header('Pragma: public');
-				header('Expires: 0');
-	      header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-	      header('Cache-Control: public');
-	      header('Content-Description: File Transfer');
-	      header('Content-type: application/sql');
-	      header('Content-Disposition: attachment; filename="'.$filename.'"');
-	      header('Content-Transfer-Encoding: binary');
-	      header('Content-Length: '.$file_size);
-	      ob_end_flush();
-	      @readfile(BACKUP_BASE.$filename);
-	      exit;
-			} else {
-				die("Authentication error.");
-			}
+			break;
+		case "3558":
+			$contentid = 'upload_files';
+			$filename = 'vesturheimsrit_com-upload_files-20210519.zip';
+			$file_size = filesize(BACKUP_BASE.$filename);
+			$testurlkey = keymaker($contentid);
 			break;
 	}
+	if($testurlkey === $urlkey) {
+		header('Pragma: public');
+		header('Expires: 0');
+		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+		header('Cache-Control: public');
+		header('Content-Description: File Transfer');
+		header('Content-type: application/sql');
+		header('Content-Disposition: attachment; filename="'.$filename.'"');
+		header('Content-Transfer-Encoding: binary');
+		header('Content-Length: '.$file_size);
+		ob_end_flush();
+		@readfile(BACKUP_BASE.$filename);
+		exit;
+	} else {
+		die("Authentication error.");
+	}
 } else {
-	echo "You don't appear to have the right information.";
+	echo "You don't appear to have the correct information.";
 }
 ?>

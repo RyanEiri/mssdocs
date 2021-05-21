@@ -19,7 +19,11 @@ if($login_cookie->CheckIt()) {
       3557 => array(
         "contentid" => "sql",
         "urlkey"    => keymaker("sql")
-      )
+      ),
+			3558 => array(
+				"contentid" => "upload_files",
+				"urlkey"		=> keymaker("upload_files")
+			)
     );
 
 ?>
