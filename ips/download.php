@@ -13,18 +13,21 @@ if($continue === TRUE) {
 			$filename = 'vesturheimsrit_com-20210520.zip';
 			$file_size = filesize(BACKUP_BASE.$filename);
 			$testurlkey = keymaker($contentid);
+			$content_type = 'zip';
 			break;
 		case "3557":
 			$contentid = 'sql';
 			$filename = 'vesturheimsrit_com-db-20210520.sql';
 			$file_size = filesize(BACKUP_BASE.$filename);
 			$testurlkey = keymaker($contentid);
+			$content_type = 'sql';
 			break;
 		case "3558":
 			$contentid = 'upload_files';
 			$filename = 'vesturheimsrit_com-upload_files-20210519.zip';
 			$file_size = filesize(BACKUP_BASE.$filename);
 			$testurlkey = keymaker($contentid);
+			$content_type = 'zip';
 			break;
 	}
 	if($testurlkey === $urlkey) {
@@ -33,7 +36,7 @@ if($continue === TRUE) {
 		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 		header('Cache-Control: public');
 		header('Content-Description: File Transfer');
-		header('Content-type: application/sql');
+		header('Content-type: application/"'.$content_type.'"');
 		header('Content-Disposition: attachment; filename="'.$filename.'"');
 		header('Content-Transfer-Encoding: binary');
 		header('Content-Length: '.$file_size);
