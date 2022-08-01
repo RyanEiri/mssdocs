@@ -122,6 +122,7 @@ include getcwd().'/ips/php/boot.php';
 						<a class="prev">‹</a>
 						<a class="next">›</a>
 						<a class="close">×</a>
+						<a class="orientation"></a>
 						<a class="play-pause"></a>
 						<ol class="indicator"></ol>
 				</div>
@@ -155,9 +156,9 @@ include getcwd().'/ips/php/boot.php';
 <!-- End of base script files -->
 
 <!-- Blueimp Gallery JS -->
-<script src="../ips/js/canvas-to-blob.min.js"></script>
-<script src="../ips/js/load-image.all.min.js"></script>
-<script src="../ips/js/jquery.blueimp-gallery.min.js"></script>
+<script src="../js/blueimp-canvas-to-blob/canvas-to-blob.min.js"></script>
+<script src="../js/blueimp-load-image/load-image.all.min.js"></script>
+<script src="../js/blueimp-gallery/blueimp-gallery.js"></script>
 <script>
 document.getElementById('links').onclick = function (event) {
     event = event || window.event;
@@ -168,12 +169,11 @@ document.getElementById('links').onclick = function (event) {
     blueimp.Gallery(links, options);
 };
 </script>
-<script>
+<!--<script>
   //$('#blueimp-gallery').data('fullScreen', 'true');
 	//$('#blueimp-gallery').data('')
-</script>
+</script>-->
 <!-- JSON Scripts -->
 <script src="json_request-file_info.js"></script>
-
 </body>
 </html>
