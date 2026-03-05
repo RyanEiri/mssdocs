@@ -4,7 +4,7 @@ $(function(){
 	var filemanager = $('.filemanager'),
 		breadcrumbs = $('.breadcrumbs'),
 		fileList = filemanager.find('.data'),
-		buttons = $('.filebrowser-buttonbar'); /* FHP Addition */
+		buttons = $('.filebrowser-buttonbar'); /* local addition */
 
 	// Start by fetching the file data from scan.php with an AJAX request
 
@@ -103,9 +103,9 @@ $(function(){
 		});
 
 
-		// Begin FHP Additions
+		// Begin local additions
 
-		// added to select folders for manipulation::FHP
+		// added to select folders for manipulation
 		$('#selectAllFolderList').click(function(){
 		  if(this.checked){
 		    $(fileList).find('input.folderCheckbox').each(function() {
@@ -170,7 +170,7 @@ $(function(){
 			currentPath = nextDir;
 		});
 
-		// added to select folder for manipulation::FHP
+		// added to select folder for manipulation
 		fileList.on('contextmenu', 'li.folders', function(e){
 			e.preventDefault();
 
@@ -184,7 +184,7 @@ $(function(){
 		});
 
 
-		// added to select files for manipulation::FHP
+		// added to select files for manipulation
 		// Clicking on selectAllFile toggle
     $('#selectAllFileList').click(function(){
       if(this.checked){
@@ -274,7 +274,7 @@ $(function(){
 			$('#folderFunctions').modal('show');
 		});
 
-		// end of FHP additions
+		// end of local additions
 
 
 		// Clicking on breadcrumbs
@@ -332,7 +332,7 @@ $(function(){
 							currentPath = hash[0];
 							breadcrumbsUrls = generateBreadcrumbs(hash[0]);
 
-							// added to send path to add folder form::FHP
+							// added to send path to add folder form
 							$('.path_value').remove(); // remove prior instance of path
 							$.each(breadcrumbsUrls, function(i){
 							  $('.path_value').remove(); // remove so we only see the final value containing the full path
@@ -347,7 +347,7 @@ $(function(){
 							currentPath = hash[0];
 							breadcrumbsUrls = generateBreadcrumbs(hash[0]);
 
-							// added to send path to add folder form::FHP
+							// added to send path to add folder form
 							$('.path_value').remove(); // remove prior instance of path
 							$.each(breadcrumbsUrls, function(i){
 							  $('.path_value').remove(); // remove so we only see the final value containing the full path
@@ -366,7 +366,7 @@ $(function(){
 					currentPath = data.path;
 					breadcrumbsUrls.push(data.path);
 
-					// added to send path to add folder form::FHP
+					// added to send path to add folder form
 					$('.path_value').remove();
 					$('#add_folder-group').append('<input type="hidden" class="path_value" name="path_value" value="'+breadcrumbsUrls+'">');
 					// end of FHP addition

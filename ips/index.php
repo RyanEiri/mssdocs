@@ -21,10 +21,10 @@ if($login_cookie->CheckIt()) {
 <![endif]-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Internal Proofing System::FHP</title>
+<title>Internal Proofing System::<?php echo SITE_ABBR ?></title>
 <meta name="author" content="Ryan Eric Johnson" >
 <meta name="date" content="2020-12-20" >
-<meta name="copyright" content="Fragile Heritage Project 2016-2020" >
+<meta name="copyright" content="<?php echo COPYRIGHT_HOLDER . ' ' . COPYRIGHT_YEARS ?>" >
 <meta http-equiv="expires" content="0" >
 
 <!-- Bootstrap for CSS -->
@@ -52,7 +52,7 @@ if($login_cookie->CheckIt()) {
 </header>
 
 <main role="main">
-<!-- Info Panel about FHP -->
+<!-- Info Panel -->
 <div class="jumbotron">
 <div class="container">
 	<h1 class="display-4">Í fótspor Árna Magnússonar í Vesturheimi</h3>

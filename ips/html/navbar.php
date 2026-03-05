@@ -1,6 +1,6 @@
 <!-- Top navigation bar -->
 <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
-	<a class="navbar-brand" href="<?php echo BASE_URL ?>"><img class="m-1" src="<?php echo PROGRAM_WEB_BASE ?>img/logo/logo32.png" alt="FH" width="32" height="32">Fragile Heritage Project</a>
+	<a class="navbar-brand" href="<?php echo BASE_URL ?>"><img class="m-1" src="<?php echo PROGRAM_WEB_BASE ?>img/logo/logo32.png" alt="" width="32" height="32"><?php echo SITE_NAME ?></a>
 	<button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#fhp-navbar-collapse-1" aria-expanded="false">
 	  <span class="sr-only">Toggle navigation</span>
 	  <span class="navbar-toggler-icon"></span>

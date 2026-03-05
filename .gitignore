@@ -7,3 +7,12 @@ ips/backups/*
 !ips/upload/tmp/.gitkeep
 !ips/backups/.gitkeep
 
+# Live config — copy config.example.php and fill in your values
+ips/php/classes/config.php
+
+# Contacts card data — site-specific content
+ips/contacts/cardfile/*.html
+ips/contacts/cardfile/*.CRD
+ips/contacts/cardfile/*.parsed
+ips/contacts/cardfile/*.parsed.bkp
+

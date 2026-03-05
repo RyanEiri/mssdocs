@@ -19,7 +19,7 @@ if($login_cookie->CheckIt()) {
 <![endif]-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FHP::Users</title>
+<title><?php echo SITE_ABBR ?>::Users</title>
 <meta name="author" content="Ryan Eric Johnson" >
 <meta name="date" content="2018-06-06" >
 <meta name="copyright" content="Ryan Johnson & Katelin Parsons 2018" >

@@ -22,12 +22,12 @@ if(!empty($_GET['file']) && ADMIN_STATUS){
 <![endif]-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fragile Heritage Project :: TEI:XML Parsing</title>
+<title><?php echo SITE_NAME ?> :: TEI:XML Parsing</title>
 <meta name="author" content="Ryan Eric Johnson" >
 <meta name="date" content="2018-07-24" >
-<meta name="copyright" content="Fragile Heritage Project 2018" >
+<meta name="copyright" content="<?php echo COPYRIGHT_HOLDER . ' ' . COPYRIGHT_YEARS ?>" >
 <meta name="keywords" content="manuscript, manuscripts, description, proofing" >
-<meta name="description" content="The Fragile Heritage Project aims to create a digital collection of Icelandic language manuscripts held in public and private collections in Canada and the U.S.A." >
+<meta name="description" content="<?php echo SITE_DESCRIPTION ?>" >
 <meta http-equiv="expires" content="0" >
 
 <!-- Bootstrap for CSS -->

@@ -22,12 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="ID=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Internal Proofing System::FHP</title>
+<title>Internal Proofing System::<?php echo SITE_ABBR ?></title>
 <meta name="author" content="Ryan Eric Johnson" >
 <meta name="date" content="2019-05-18" >
-<meta name="copyright" content="Fragile Heritage Project 2016-2020" >
+<meta name="copyright" content="<?php echo COPYRIGHT_HOLDER . ' ' . COPYRIGHT_YEARS ?>" >
 <meta name="keywords" content="manuscript, manuscripts, description, proofing" >
-<meta name="description" content="The Fragile Heritage Project aims to create a digital collection of Icelandic language manuscripts held in public and private collections in Canada and the U.S.A." >
+<meta name="description" content="<?php echo SITE_DESCRIPTION ?>" >
 <meta http-equiv="expires" content="0" >
 
 <!-- Bootstrap for CSS -->
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
 </form>
 
-<center>&copy; 2016-2019 Fragile Heritage Project</center>
+<center>&copy; <?php echo COPYRIGHT_YEARS . ' ' . COPYRIGHT_HOLDER ?></center>
 
 <!-- jQuery for javascript -->
 <script src="<?php echo PROGRAM_JS_BASE.'jquery.min.js' ?>"></script>
