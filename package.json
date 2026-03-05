@@ -1,0 +1,17 @@
+{
+  "name": "mssdocs",
+  "description": "Web-based internal proofing system for manuscript images",
+  "license": "GPL-3.0",
+  "private": true,
+  "dependencies": {
+    "blueimp-canvas-to-blob": "^3.29.0",
+    "blueimp-file-upload": "^10.32.0",
+    "blueimp-gallery": "^3.4.0",
+    "blueimp-load-image": "^5.16.0",
+    "blueimp-tmpl": "^3.20.0"
+  },
+  "notes": {
+    "vendored-files": "Dist files from the above packages are vendored in ips/js/ and ips/css/. The versions pinned here reflect the latest available at the time of the 0.1 release; the exact versions originally vendored are unknown as the files contain no version headers.",
+    "modified-files": "ips/js/jquery.fileupload-main.js is derived from the blueimp-file-upload example and has been modified for PHP/MySQL database integration — see the file header. Review this file carefully before upgrading blueimp-file-upload."
+  }
+}
