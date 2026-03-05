@@ -132,7 +132,7 @@ class SQL {
         return ('Query failed: ' . mysqli_error($this->dbConn) . ' SQL: ' .
                 $this->previousStatement);
       } else {
-        return ('Query failed: ' . mysql_error($this->dbConn));
+        return ('Query failed: ' . mysqli_error($this->dbConn));
       }
 		}
 	}

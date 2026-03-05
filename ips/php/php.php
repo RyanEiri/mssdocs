@@ -21,8 +21,7 @@ function get_full_url() {
  * currently uses md5 but another hash type should be considered
  */
 function keymaker($id){
-  $secretkey='56e9943836a3fb0af947f83acd8da2ab53a503e961bd213b9e0063d96501bf3ac6c23fc5ff7f044a03c5426a345f27455fb483f191957b92df7511029b192b52';
-  $key=hash('sha512', $id.$secretkey);
+  $key=hash('sha512', $id.KEYMAKER_SECRET);
   return $key;
 }
 

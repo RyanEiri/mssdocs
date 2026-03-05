@@ -1,7 +1,6 @@
 RewriteEngine On
-# Redirect exceptions for mss. images,
-# i.e. No block on the following directories from public access.
-RewriteRule "^upload/files/ryan/Daren Gislason/Book Collections/*" - [L]
+# Add site-specific public directory exceptions here (paths accessible without login).
+# Example: RewriteRule "^upload/files/public/*" - [L]
 
 # Redirect exception for css, javascript, base images, and image_server
 RewriteRule "^css/*" - [L]
@@ -19,5 +18,5 @@ RewriteCond %{HTTPS} !=on
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
 
 # Redirect to login if no login hash detected
-RewriteCond %{HTTP_COOKIE} !zsYjZ5RdavKHU43Xi6DbWKuAu=lhE8IXrx1Ks90w7glk0VUlqTe [NC]
+RewriteCond %{HTTP_COOKIE} !GATE_COOKIE_NAME=GATE_COOKIE_VALUE [NC]
 RewriteRule /*	login.php

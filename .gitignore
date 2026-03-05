@@ -10,6 +10,9 @@ ips/backups/*
 # Live config — copy config.example.php and fill in your values
 ips/php/classes/config.php
 
+# Live .htaccess — copy .htaccess.example, set GATE_COOKIE_NAME/VALUE to match config.php
+ips/.htaccess
+
 # Contacts card data — site-specific content
 ips/contacts/cardfile/*.html
 ips/contacts/cardfile/*.CRD
