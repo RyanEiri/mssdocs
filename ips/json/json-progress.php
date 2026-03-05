@@ -1,28 +1,28 @@
 <?php
 chdir('..');
 require_once(getcwd().'/php/boot.php');
+
 $login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
-if($login_cookie->CheckIt()) {
-	$username = $login_cookie->username;
-	$userval = new UserGrab($username);
-	$admin = $userval->admin;
-
-	$file = isset($_POST['session_id']) ? $_POST['session_id'] : NULL;
-	$file = USER_FILES_BASE . "tmp/" . $file . ".txt";
-
-	header('HTTP/1.1 200 OK');
-	header('Content-Type: application/json');
-	if(file_exists($file)) {
-		$text = file_get_contents($file);
-		echo $text;
-
-		$obj = json_decode($text);
-		if(isset($obj->success) && $obj->success === TRUE) {
-			unlink($file);
-		}
-	} else {
-		echo json_encode(array("percent" => 0));
-	}
+if (!$login_cookie->CheckIt()) {
+    header('Content-Type: application/json');
+    echo json_encode(['percent' => 0, 'error' => 'not authenticated']);
+    exit;
 }
-?>
+
+$token = preg_replace('/[^a-zA-Z0-9_]/', '', $_POST['token'] ?? $_GET['token'] ?? '');
+
+header('Content-Type: application/json');
+
+if (!$token) {
+    echo json_encode(['percent' => 0, 'error' => 'no token']);
+    exit;
+}
+
+$progress_file = getcwd() . '/upload/tmp/' . $token . '_progress.json';
+
+if (file_exists($progress_file)) {
+    echo file_get_contents($progress_file);
+} else {
+    echo json_encode(['percent' => 0, 'done' => false]);
+}

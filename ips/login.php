@@ -17,10 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- No Indexing -->
+<meta name="robots" content="noindex">
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="ID=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fragile Heritage Project::Internal Proofing System</title>
+<title>Internal Proofing System::FHP</title>
 <meta name="author" content="Ryan Eric Johnson" >
 <meta name="date" content="2019-05-18" >
 <meta name="copyright" content="Fragile Heritage Project 2016-2020" >

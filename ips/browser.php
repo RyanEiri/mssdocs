@@ -30,12 +30,14 @@ if($login_cookie->CheckIt()) {
 	<!-- Bootstrap for CSS -->
 	<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>bootstrap/bootstrap.min.css">
 	<!-- Browser stylesheet -->
-	<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>browser.css">
+	<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>browser.css?v=<?php echo filemtime(PROGRAM_BASE.CSS_BASE.'/browser.css'); ?>">
 	<!-- Custom styles for this page -->
 	<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>bootstrap/sticky-footer-navbar.css">
 
 	<!-- File icons -->
   <link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>fileicon.css/fileicon.css">
+	<!-- blueimp Gallery styles -->
+	<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>blueimp-gallery.min.css">
 
 	<!-- Internet Explorer Tweaks -->
 	<!-- IE10 CSS Viewport Workaround -->
@@ -192,29 +194,20 @@ if($login_cookie->CheckIt()) {
 		  <div class="card border-dark mb-3" style="width: 90%;" id="folderFunctionsZip">
 				<h5 class="card-header">Zip Folder</h5>
 			  <div class="card-body">
-			  <form class="form-horizontal" id="folderFunctionsForm" class="form-error" method="POST" action="json-folder_functions.php" accept-charset="utf-8">
+			  <form class="form-horizontal" id="folderFunctionsForm" method="POST" accept-charset="utf-8">
 			    <div class="form-group form-check">
 						<label class="form-check-label">
-
 						<input class="form-check-input" type="radio" placeholder="No Folder" id="folderNameRadio" name="folderNameRadio" checked>
 						<span id="folderNameText"></span>
-						<div class="progress progress-style">
-							<div id="zip_progress" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-						</div>
-						<div id="zip_message" class="mt-3"></div>
-						<div id="zip_name" class="mt-3"><h5>Current zip file:</h5></div>
-
 						</label>
 			    </div>
-					<legend>
-						Zip
-						<button type="submit" class="btn btn-primary" data-toggle="tooltip" data-html="true"
-						title="<b>Click and wait for the success message.</b>">
-							<span data-feather="archive"></span>
-						</button>
-					</legend>
+					<div id="zip_message" class="mt-2 mb-2"></div>
+					<button type="submit" class="btn btn-primary" data-toggle="tooltip" data-html="true"
+					title="<b>Creates a zip and downloads it immediately.</b>">
+						<span data-feather="archive"></span> Download Zip
+					</button>
 			  </form>
-			  </div>
+				  </div>
 			</div>
 			<div class="card border-dark mb-3" style="width: 90%;" id="folderFunctionsFiles">
 				<h5 class="card-header">Files in Folder</h5>
@@ -454,13 +447,31 @@ if($login_cookie->CheckIt()) {
 	<script src="<?php echo PROGRAM_JS_BASE ?>bootstrap/bootstrap.min.js"></script>
 	<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 	<script src="<?php echo PROGRAM_JS_BASE ?>ie10-viewport-bug-workaround.js"></script>
-	<script src="<?php echo PROGRAM_JS_BASE ?>browser.js"></script>
+	<!-- blueimp Gallery scripts -->
+	<script src="<?php echo PROGRAM_JS_BASE ?>blueimp-gallery.min.js"></script>
+	<script src="<?php echo PROGRAM_JS_BASE ?>jquery.blueimp-gallery.min.js"></script>
+	<script src="<?php echo PROGRAM_JS_BASE ?>browser.js?v=<?php echo filemtime(PROGRAM_BASE.JS_BASE.'/browser.js'); ?>"></script>
 	<script src="<?php echo PROGRAM_JSON_BASE ?>json_request-file_info.js"></script>
 	<script src="<?php echo PROGRAM_JSON_BASE ?>json_request-form-move_file.js"></script>
 	<script src="<?php echo PROGRAM_JSON_BASE ?>json_request-form-add_folder.js"></script>
 	<script src="<?php echo PROGRAM_JSON_BASE ?>json_request-form-remove_file.js"></script>
 	<script src="<?php echo PROGRAM_JSON_BASE ?>json_request-form-file_functions.js"></script>
-	<script src="<?php echo PROGRAM_JSON_BASE ?>json_request-form-folder_functions.js"></script>
+	<script src="<?php echo PROGRAM_JSON_BASE ?>json_request-form-folder_functions.js?v=<?php echo filemtime(PROGRAM_BASE.JSON_BASE.'/json_request-form-folder_functions.js'); ?>"></script>
+
+<!-- blueimp Gallery widget -->
+<div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls">
+	<div class="slides"></div>
+	<h3 class="title"></h3>
+	<a class="prev">‹</a>
+	<a class="next">›</a>
+	<a class="close">×</a>
+	<a class="play-pause"></a>
+	<a class="rotate-left" title="Rotate left">↺</a>
+	<a class="rotate-right" title="Rotate right">↻</a>
+	<a class="zoom-in" title="Zoom in">+</a>
+	<a class="zoom-out" title="Zoom out">−</a>
+	<ol class="indicator"></ol>
+</div>
 
 	<!-- Icons -->
   <script src="<?php echo PROGRAM_JS_BASE ?>icons/feather.min.js"></script>

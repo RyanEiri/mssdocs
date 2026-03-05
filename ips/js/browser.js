@@ -15,7 +15,14 @@ $(function(){
 			breadcrumbsUrls = [];
 
 		var folders = [],
-			files = [];
+			files = [],
+			galleryLinks = [],
+			currentGalleryIndex = -1,
+			rotations = {},
+			currentGallery = null,
+			currentSlideIndex = 0,
+			currentSlideElement = null,
+			zooms = {};
 
 		// This event listener monitors changes on the URL. We use it to
 		// capture back/forward navigation in the browser.
@@ -133,6 +140,12 @@ $(function(){
 			  $('#selectAllFolderList').prop('checked', true);
 			}
                 });
+
+		fileList.on('dblclick', 'li.files.image-file', function(e){
+			e.preventDefault();
+			var index = parseInt($(this).attr('data-gallery-index'));
+			blueimp.Gallery(galleryLinks, { index: index, container: '#blueimp-gallery' });
+		});
 
 		fileList.on('dblclick', 'li.folders', function(e){
 			e.preventDefault();
@@ -491,6 +504,9 @@ $(function(){
 
 			}
 
+			var imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+			galleryLinks = [];
+
 			if(scannedFiles.length) {
 
 				scannedFiles.forEach(function(f) {
@@ -505,7 +521,10 @@ $(function(){
 
 					icon = '<span class="icon file file-icon file-icon-lg" data-type="'+fileType+'"></span>';
 
-					var file = $('<li class="files"><input type="checkbox" class="fileCheckbox" value="'+f.path+'"><a href="'+ f.path+'" title="'+ f.path +'" class="files">'+icon+'<span class="name">'+ name +'</span> <span class="details">'+fileSize+'</span></a></li>');
+					if (imageTypes.indexOf(fileType) !== -1) {
+						galleryLinks.push({ href: 'upload/' + f.path, title: name });
+					}
+					var file = $('<li class="files"><input type="checkbox" class="fileCheckbox" value="'+f.path+'"><a href="'+f.path+'" title="'+f.path+'" class="files">'+icon+'<span class="name">'+ name +'</span> <span class="details">'+fileSize+'</span></a></li>');
 					file.appendTo(fileList);
 				});
 
@@ -575,6 +594,14 @@ $(function(){
 			var fileNameContext = grabfile.replace(/^.*[\\\/]/, '');
 			var thumbnailContext = 'upload/' + dirNameContext + '/thumbnail/' + fileNameContext;
 			dbData.context = 'file';
+			// Find gallery index for this file
+			currentGalleryIndex = -1;
+			for (var gi = 0; gi < galleryLinks.length; gi++) {
+				if (galleryLinks[gi].href === 'upload/' + grabfile) {
+					currentGalleryIndex = gi;
+					break;
+				}
+			}
 			dbData.fileName = fileNameContext;
 			var fsDirName = dirNameContext;
 			var dbDirName = dirNameContext.match(/files.*$/i);
@@ -626,8 +653,28 @@ $(function(){
 							$('#fileSize').text(data.fileSize);
 							$('#fileType').text(data.fileType);
 							$('#fileUrl').val(fileURL);
-							$('#fileUrlLink').html('<a href="' + data.fileUrl +'">' + data.fileUrl + '</a>');
-							$('.fileUrl').attr('href', data.fileUrl);
+							if (currentGalleryIndex >= 0) {
+								$('#fileUrlLink').text(data.fileUrl);
+								$('.fileUrl')
+									.attr('href', data.fileUrl)
+									.off('click.gallery')
+									.on('click.gallery', function(e) {
+										e.preventDefault();
+										$('#fileFunctions').modal('hide');
+										currentGallery = blueimp.Gallery(galleryLinks, {
+											index: currentGalleryIndex,
+											container: '#blueimp-gallery',
+											onslide: function(index, slide) {
+												currentSlideIndex = index;
+												currentSlideElement = slide;
+												applyTransform(slide, index);
+											}
+										});
+									});
+							} else {
+								$('#fileUrlLink').text(data.fileUrl);
+								$('.fileUrl').attr('href', data.fileUrl).off('click.gallery');
+							}
 							$('#fileTitle').attr('value', data.fileTitle);
 							$('#previousFileTitle').attr('value', data.fileTitle);
 							$('#fileDescription').attr('value', data.fileDescription);
@@ -718,5 +765,26 @@ $(function(){
 
 			   });
 		}
+		// Apply combined rotation + zoom transform to a slide's image
+		function applyTransform(slideEl, index) {
+			var r = rotations[index] || 0;
+			var z = zooms[index] || 1;
+			$(slideEl).find('img').css('transform', 'rotate(' + r + 'deg) scale(' + z + ')');
+		}
+
+		// Rotate buttons in gallery
+		$('#blueimp-gallery').on('click', '.rotate-left, .rotate-right', function(e) {
+			e.preventDefault();
+			var delta = $(this).hasClass('rotate-left') ? -90 : 90;
+			rotations[currentSlideIndex] = ((rotations[currentSlideIndex] || 0) + delta + 360) % 360;
+			if (currentSlideElement) { applyTransform(currentSlideElement, currentSlideIndex); }
+		});
+		// Zoom buttons in gallery
+		$('#blueimp-gallery').on('click', '.zoom-in, .zoom-out', function(e) {
+			e.preventDefault();
+			var step = $(this).hasClass('zoom-in') ? 0.25 : -0.25;
+			zooms[currentSlideIndex] = Math.max(0.5, Math.min(4, (zooms[currentSlideIndex] || 1) + step));
+			if (currentSlideElement) { applyTransform(currentSlideElement, currentSlideIndex); }
+		});
 	});
 });

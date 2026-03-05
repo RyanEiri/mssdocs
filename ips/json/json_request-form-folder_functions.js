@@ -1,330 +1,164 @@
 $(document).ready(function() {
-  $.ajax({
-    type: 'POST',
-    url: 'json/json-session_id.php',
-    success: function(session) {
-      var sessionID = session.session_id;
-      var timer;
 
   // turn tooltips on
-  $(function () {
-    $('[data-toggle="tooltip"]').tooltip()
-  })
+  $('[data-toggle="tooltip"]').tooltip();
 
-	// process the form
-	$('#folderFunctionsForm').submit(function(event) {
+  // Zip folder form
+  $('#folderFunctionsForm').submit(function(event) {
+    event.preventDefault();
 
-		$('.form-error').removeClass('has-error'); // remove the error class from a prior submission
-		$('.help-block').remove(); // remove the error text from a prior submission
-		$('.alert-success').remove();
+    var folderPath = $('#folderNameRadio').val();
+    if (!folderPath) return;
 
-		// get the form data
+    var token = Date.now().toString();
 
-    // initialize object to send selection info
-		var dataObj = {};
+    // Show progress bar at 0%
+    $('#zip_message').html(
+      '<div class="progress mt-2 mb-1">' +
+        '<div class="progress-bar progress-bar-striped progress-bar-animated" ' +
+             'id="zip-progress-bar" role="progressbar" ' +
+             'style="width:0%;min-width:2em" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>' +
+      '</div>' +
+      '<small class="text-muted" id="zip-progress-text">Starting&hellip;</small>'
+    );
 
-		// add the selected files to the dataObject
-		var fileArr = [];
-		fileArr = $('input:checkbox:checked.fileCheckbox').map(function() {
-		  return $(this).val()
-		}).get()
+    // Phase 1: start the background zip worker
+    $.ajax({
+      type:    'POST',
+      url:     'json/json-folder_functions.php',
+      data:    { folderToZip: folderPath, token: token },
+      dataType: 'json'
+    }).done(function(data) {
+      if (!data.success) {
+        $('#zip_message').html(
+          '<div class="alert alert-danger mt-2">' + (data.error || 'Failed to start') + '</div>'
+        );
+        return;
+      }
 
-		dataObj['selectedFiles'] = {};
-		$.each(fileArr, function(i, val){
-		  var dirname = val.match(/(.*)[\/\\]/)[1]||'';
-      var filename = val.replace(/^.*[\\\/]/, '');
-      dataObj['selectedFiles'][i] = {};
-      dataObj['selectedFiles'][i]['filename'] = filename;
-      dataObj['selectedFiles'][i]['dirname'] = dirname;
-		});
+      var count = data.count || 0;
+      $('#zip-progress-text').text('Queuing ' + count.toLocaleString() + ' files\u2026');
 
+      // Phase 2: poll progress until done
+      var pollInterval = setInterval(function() {
+        $.ajax({
+          type:    'POST',
+          url:     'json/json-progress.php',
+          data:    { token: token },
+          dataType: 'json'
+        }).done(function(p) {
+          var pct = p.percent || 0;
+          $('#zip-progress-bar')
+            .css('width', Math.max(pct, 2) + '%')
+            .attr('aria-valuenow', pct)
+            .text(pct + '%');
 
-		// add the selected folders to the dataObject
-		var folderArr = [];
-		var folderArr = $('input:checkbox:checked.folderCheckbox').map(function() {
-		  return $(this).val()
-		}).get()
-
-		dataObj['selectedFolders'] = {};
-		$.each(folderArr, function(i, val){
-		  dataObj['selectedFolders'][i] = val;
-		});
-
-		// add the single folder selection to the dataObject
-		dataObj['folderToZip'] = $('#folderNameRadio').val();
-
-    zipFolder(dataObj);
-      timer = window.setInterval(refreshProgress, 500);
-
-		// process the zip form through json-folder_functions
-  	function zipFolder(dObj){
-  		$.ajax({
-  		  type      : 'POST', //define the type of HTTP connection we want to use
-  		  url       : 'json/json-folder_functions.php', //the url where we want to POST
-  		  data		  : dObj, // our data object
-  		  //dataType	: 'json', // what type of data do we expect back from the server
-  		  //encode		: true
-  		})
-  			/* //using the done promise callback
-  			.done(function(data) {
-
-  				// log data to the console for debugging
-  				// console.log(data);
-
-  				// here we will handle errors and validation messages
-  				if ( ! data.success) {
-
-  				  // handle errors for zip archive file -------
-  				  if (data.errors.archiveFile) {
-  					 $('#folderFunctionsForm').addClass(
-  					   'has-error'
-  					 ); // add the error class to show red input
-  					 $('#folderFunctionsForm').append(
-  					   '<div class="help-block">' + data.errors.archiveFile + '</div>'
-  					 ); // add the actual error message under our input
-           }
-
-  				  // handle errors for selected files and folders -------
-  				  if (data.errors.folderToZip) {
-  					$('#folderFunctionsForm').addClass(
-  					  'has-error'
-  					); // add the error class to show red input
-  					$('#folderFunctionsForm').append(
-  					  '<div class="help-block">' + data.errors.folderToZip + '</div>'
-  					); // add the actual error message under our input
-  				  }
-
-  				} else {
-
-  					// ALL GOOD! Show success and alter form as needed.
-  					$("#zip_message").html(
-  					  '<div class="alert alert-success">' + data.message + '</div>'
-  					);
-  					$('#zipname').html(
-  					  '<br /><h5>Newly created zip file:</h5><a type="application/zip" href="' + data.zipURL + '">' + data.zipFilename + '</a>'
-  					);
-
-  				}
-  			})
-
-  			// using the fail promise callback
-  			.fail(function(data) {
-
-  			// uncomment to show any errors from php
-        // console.log(data);
-      }); */
-  	}
-
-    function refreshProgress(){
-
-      $.ajax({
-        type: 'POST',
-        url: 'json/json-progress.php',
-        data: {
-          "session_id": sessionID
-        },
-        success: function(data) {
-        	$("#zip_progress").css('width', data.percent + '%');
-        	$("#zip_progress").attr('aria-valuenow', data.percent + '%');
-          $("#zip_message").html('Adding files... ' + data.percent + '%');
-          if(data.percent === 100) {
-            $("#zip_message").empty();
-            window.clearInterval(timer);
-            timer = window.setInterval(filesAdded, 500);
+          if (p.finalizing) {
+            $('#zip-progress-text').text('Finalizing zip\u2026');
+          } else if (p.total > 0) {
+            $('#zip-progress-text').text(
+              'Queued ' + (p.count || 0).toLocaleString() +
+              ' of ' + p.total.toLocaleString() + ' files\u2026'
+            );
           }
-        }
-      });
-    }
 
-    function filesAdded() {
-      $("#zip_message").html('All files added to archive. Saving file. Please wait... <img src=img/loading.gif height="18">');
-      window.clearInterval(timer);
-      timer = window.setInterval(zipArchive, 500);
-    }
+          if (p.done) {
+            clearInterval(pollInterval);
 
-    function zipArchive() {
-      $.ajax({
-        type: 'POST',
-        url: 'json/json-progress.php',
-        data: {
-          "session_id": sessionID
-        },
-        success: function(data) {
-          if(data.success === true) {
-            // ALL GOOD! Show success and alter form as needed.
-            $("#zip_message").empty();
-            $("#zip_message").append(
-  					  '<div class="alert alert-success">' + data.message + '</div>'
-  					);
-            $('#zip_name').empty();
-  					$('#zip_name').append(
-  					  '<h5>Newly created zip file:</h5><a type="application/zip" href="'
-              + data.zipURL + '">' + data.zipFilename + '</a>'
-  					);
-          } else if(data.success === false) {
-            // handle errors for zip archive file -------
-            if (data.errors.archiveFile) {
-              $('#folderFunctionsForm').addClass(
-               'has-error'
-              ); // add the error class to show red input
-              $('#folderFunctionsForm').append(
-               '<div class="help-block">' + data.errors.archiveFile + '</div>'
-              ); // add the actual error message under our input
-            }
+            // Snap bar to green 100%
+            $('#zip-progress-bar')
+              .css('width', '100%')
+              .attr('aria-valuenow', 100)
+              .removeClass('progress-bar-animated')
+              .addClass('bg-success')
+              .text('100%');
+            $('#zip-progress-text').text('Done! Starting download\u2026');
 
-            // handle errors for selected files and folders -------
-            if (data.errors.folderToZip) {
-              $('#folderFunctionsForm').addClass(
-                'has-error'
-              ); // add the error class to show red input
-              $('#folderFunctionsForm').append(
-                '<div class="help-block">' + data.errors.folderToZip + '</div>'
-              ); // add the actual error message under our input
-            }
+            // Trigger download — Content-Length is now known so browser shows progress
+            var dlUrl = 'json/json-download.php?token=' + encodeURIComponent(p.token || token) +
+                        '&filename=' + encodeURIComponent(p.filename || 'download.zip');
+            var a = document.createElement('a');
+            a.href = dlUrl;
+            a.download = p.filename || 'download.zip';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            setTimeout(function() {
+              $('#zip_message').html('<div class="alert alert-success mt-2">Download started!</div>');
+            }, 1500);
           }
-        }
-      });
-    }
+        });
+      }, 800);
 
-		// stop the form from submitting the normal way and refreshing the page
-		event.preventDefault();
-	});
+      // Safety: stop polling after 2 hours
+      setTimeout(function() { clearInterval(pollInterval); }, 7200000);
 
-	// reset the folderFunctionsForm
-	$('#folderFunctionsForm').bind('reset', function(event) {
-	  // event.preventDefault();
-	});
-
-	$('#filesInFolderForm').submit(function(event) {
-
-		$('.form-error').removeClass('has-error'); // remove error class from prior submission
-		$('.help-block').remove(); // remove the error text from a prior submission
-		$('.alert-success').remove();
-
-		// create data object to send to php
-		var dataObj = {};
-
-		// pull the form variables
-		var folderName = $('#folder_name').val();
-		var folderId = $('#folder_id').val();
-
-		// pull the table fields into separate arrays
-		var fileId = $("input[name='file_id\\[\\]']")
-				.map(function(){return $(this).val();}).get();
-    var fileURL = $("input[name='file_url\\[\\]']")
-        .map(function(){return $(this).val();}).get();
-		var fileName = $("input[name='file_name\\[\\]']")
-				.map(function(){return $(this).val();}).get();
-		var fileTitle = $("input[name='file_title\\[\\]']")
-				.map(function(){return $(this).val();}).get();
-		var fileDescription = $("input[name='file_description\\[\\]']")
-				.map(function(){return $(this).val();}).get();
-
-		// collate the separate form field types into an object
-		var folderFilesObj = {};
-		$.each(fileId, function(i, val){
-		  var id = val;
-		  folderFilesObj[i] = {};
-		  folderFilesObj[i]['id'] = id;
-		});
-    $.each(fileURL, function(i, val){
-      var url = val.match(/(.*[\/\\])/)[1]||'';
-      url = url + fileName[i];
-      folderFilesObj[i]['url'] = url;
+    }).fail(function() {
+      $('#zip_message').html(
+        '<div class="alert alert-danger mt-2">Request failed. Please try again.</div>'
+      );
     });
-		$.each(fileName, function(i, val){
-		  var name = val;
-		  folderFilesObj[i]['name'] = name;
-		});
-		$.each(fileTitle, function(i, val){
-		  var title = val;
-		  folderFilesObj[i]['title'] = title;
-		});
-		$.each(fileDescription, function(i, val){
-		  var description = val;
-		  folderFilesObj[i]['description'] = description;
-		});
+  });
 
-		// place the folder files object into the data object
-		dataObj['filesInFolder'] = folderFilesObj;
-		dataObj['folderName'] = folderName;
-		dataObj['folderId'] = folderId;
-		//console.log(dataObj);
+  // Files-in-folder form (unchanged)
+  $('#filesInFolderForm').submit(function(event) {
+    event.preventDefault();
 
-		// The following is how jQuery formats vars so that they can be
-		// placed in a GET string. POST is better, and I have not thus
-		// far had a problem sending an object to php. However,
-		// I have played around with this. Looks like work for
-		// little reward at this point. I would rather create objects
-		// that can be manipulated as multi-dimensional arrays in PHP.
-		// JS does not support multi-dimensional arrays, hence the
-		// need for objects which store multiple arrays.
+    $('.form-error').removeClass('has-error');
+    $('.help-block').remove();
+    $('.alert-success').remove();
 
-		// **WARNING**
-		// The following annotation provides a serialized form string.
-		// It does not provide a multidimensional array,
-		// and does not currently work with any of the PHP scripts
-		// currently written for this project.
-//		var datastring = $("#filesInFolderForm").serialize();
+    var dataObj = {};
+    var folderName = $('#folder_name').val();
+    var folderId   = $('#folder_id').val();
 
-		$.ajax({
-		  type : 'post',
-		  url  : 'json/json-folder_files.php',
-		  data : dataObj,
-		  dataType	: 'json',
-		  encode	: true
-		})
-			// done callback for completed calls
-			.done(function(data) {
+    var fileId          = $("input[name='file_id\\[\\]']").map(function(){ return $(this).val(); }).get();
+    var fileURL         = $("input[name='file_url\\[\\]']").map(function(){ return $(this).val(); }).get();
+    var fileName        = $("input[name='file_name\\[\\]']").map(function(){ return $(this).val(); }).get();
+    var fileTitle       = $("input[name='file_title\\[\\]']").map(function(){ return $(this).val(); }).get();
+    var fileDescription = $("input[name='file_description\\[\\]']").map(function(){ return $(this).val(); }).get();
 
-			  // errors and validation
-			  if ( ! data.success) {
+    var folderFilesObj = {};
+    $.each(fileId, function(i, val) {
+      folderFilesObj[i] = { id: val };
+    });
+    $.each(fileURL, function(i, val) {
+      var url = val.match(/(.*[\/\\])/)[1] || '';
+      folderFilesObj[i]['url'] = url + fileName[i];
+    });
+    $.each(fileName,        function(i, val) { folderFilesObj[i]['name']        = val; });
+    $.each(fileTitle,       function(i, val) { folderFilesObj[i]['title']       = val; });
+    $.each(fileDescription, function(i, val) { folderFilesObj[i]['description'] = val; });
 
-			    // handle errors and add error message to form
-			    if (data.errors) {
+    dataObj['filesInFolder'] = folderFilesObj;
+    dataObj['folderName']    = folderName;
+    dataObj['folderId']      = folderId;
 
-            if (data.errors.file_exists) {
-              fileExists = data.errors.file_exists;
-              $.each(fileExists, function(i, val){
-          		  $('#filesInFolderForm').prepend(
-                  '<div class="alert alert-danger">File ' + val + ' already exists.</div>'
-                );
-                $('#filesInFolderForm').append(
-                  '<div class="alert alert-danger">File ' + val + ' already exists.</div>'
-                )
-          		});
-            } else {
-      				$('#filesInFolderForm').prepend(
-      				  '<div class="alert alert-danger">' + data.errors + '</div>'
-      				);
-      				$('#filesInFolderForm').append(
-      				  '<div class="alert alert-danger">' + data.errors + '</div>'
-      				); // add the actual error message
-            }
-			    }
+    $.ajax({
+      type:     'post',
+      url:      'json/json-folder_files.php',
+      data:     dataObj,
+      dataType: 'json',
+      encode:   true
+    })
+    .done(function(data) {
+      if (!data.success) {
+        if (data.errors) {
+          if (data.errors.file_exists) {
+            $.each(data.errors.file_exists, function(i, val) {
+              $('#filesInFolderForm').prepend('<div class="alert alert-danger">File ' + val + ' already exists.</div>');
+            });
+          } else {
+            $('#filesInFolderForm').prepend('<div class="alert alert-danger">' + data.errors + '</div>');
+          }
+        }
+      } else {
+        $('#filesInFolderForm').prepend('<div class="alert alert-success">' + data.message + '</div>');
+        $('#filesInFolderForm').append('<div class="alert alert-success">'  + data.message + '</div>');
+      }
+    })
+    .fail(function() {});
+  });
 
-			  } else {
-			    // Success! Add success message to form
-			    $('#filesInFolderForm').prepend(
-				    '<div class="alert alert-success">' + data.message + '</div>'
-			    );
-			    $('#filesInFolderForm').append(
-			  	  '<div class="alert alert-success">' + data.message + '</div>'
-			    );
-			  }
-
-			})
-
-			// fail callback for uncompleted calls
-			.fail(function(data) {
-			  // uncomment to show errors from php
-//			  console.log(data);
-			});
-
-		// stop form from submitting the normal way and refreshing the page
-		event.preventDefault();
-
-	});
-  }
-  })
 });

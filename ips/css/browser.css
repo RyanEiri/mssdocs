@@ -128,7 +128,7 @@ body {
 	display: none;
 	outline: none;
 	border: none;
-	padding-right: 10px;
+	padding-right: 52px;
 	-webkit-appearance: none;
 }
 
@@ -569,3 +569,46 @@ footer #tzine-actions iframe{
 @media (max-width: 1024px) {
 	#bsaHolder, footer{ display:none;}
 }
+
+/* Gallery rotate buttons */
+#blueimp-gallery .rotate-left,
+#blueimp-gallery .rotate-right {
+	position: absolute;
+	top: 20px;
+	display: none;
+	font-size: 28px;
+	line-height: 1;
+	color: white;
+	text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+	cursor: pointer;
+	padding: 8px 12px;
+	background: rgba(0,0,0,0.3);
+	border-radius: 4px;
+	z-index: 10;
+}
+#blueimp-gallery .rotate-left  { right: 100px; }
+#blueimp-gallery .rotate-right { right: 52px; }
+#blueimp-gallery.blueimp-gallery-controls .rotate-left,
+#blueimp-gallery.blueimp-gallery-controls .rotate-right { display: block; }
+
+/* Gallery zoom buttons */
+#blueimp-gallery .zoom-in,
+#blueimp-gallery .zoom-out {
+    position: absolute;
+    top: 65px;
+    display: none;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    cursor: pointer;
+    padding: 6px 12px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 4px;
+    z-index: 10;
+}
+#blueimp-gallery .zoom-in  { right: 52px; }
+#blueimp-gallery .zoom-out { right: 100px; }
+#blueimp-gallery.blueimp-gallery-controls .zoom-in,
+#blueimp-gallery.blueimp-gallery-controls .zoom-out { display: block; }

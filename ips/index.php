@@ -15,17 +15,13 @@ if($login_cookie->CheckIt()) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-	<!-- Tell search engines not to index the proofing app page -->
-	<meta name="robots" content="noindex">
-
 <!-- Force latest IE rendering engine or ChromeFrame if installed -->
 <!--[if IE]>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <![endif]-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fragile Heritage Project</title>
+<title>Internal Proofing System::FHP</title>
 <meta name="author" content="Ryan Eric Johnson" >
 <meta name="date" content="2020-12-20" >
 <meta name="copyright" content="Fragile Heritage Project 2016-2020" >
