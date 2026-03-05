@@ -338,7 +338,7 @@ $(function(){
 							  $('.path_value').remove(); // remove so we only see the final value containing the full path
 							  $('#add_folder-group').append('<input type="hidden" class="path_value" name="path_value" value="'+breadcrumbsUrls[i]+'">');
 							});
-							// end of FHP addition
+							// end of local addition
 
 							render(rendered);
 
@@ -353,7 +353,7 @@ $(function(){
 							  $('.path_value').remove(); // remove so we only see the final value containing the full path
 							  $('#add_folder-group').append('<input type="hidden" class="path_value" name="path_value" value="'+breadcrumbsUrls[i]+'">');
 							});
-							// end of FHP addition
+							// end of local addition
 
 							render(rendered);
 						}
@@ -369,7 +369,7 @@ $(function(){
 					// added to send path to add folder form
 					$('.path_value').remove();
 					$('#add_folder-group').append('<input type="hidden" class="path_value" name="path_value" value="'+breadcrumbsUrls+'">');
-					// end of FHP addition
+					// end of local addition
 
 					render(searchByPath(data.path));
 				}
