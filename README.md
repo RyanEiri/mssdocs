@@ -90,18 +90,25 @@ location /ips/upload/tmp/ {
 
 ### 6. Create the first admin user
 
-Insert an initial admin user directly into the database. Passwords are stored as SHA-512 hashes. Generate one:
+Insert an initial admin user directly into the database. Passwords are stored with PHP's `password_hash()` (bcrypt) and checked with `password_verify()`, so a plain SHA-512 hash will not log in. Generate the hash and the secretword:
 
 ```bash
-echo -n "yourpassword" | sha512sum
+php -r 'echo password_hash("yourpassword", PASSWORD_DEFAULT), "\n";'
+openssl rand -hex 30      # 60 characters, for the secretword
 ```
 
 ```sql
 INSERT INTO users (username, email, password, secretword, admin)
-VALUES ('admin', 'admin@example.com', '<sha512-hash>', '<random-60-char-string>', 1);
+VALUES ('admin', 'admin@example.com', '<password_hash output>', '<60-char-random-string>', 1);
 ```
 
-The `secretword` is a random token used for session cookies — generate any 60-character random string.
+The `secretword` is a per-user random token that signs the login cookie; changing a user's password replaces it, which signs that user out.
+
+## Security notes
+
+- **Login cookie:** `login` is `HttpOnly`, `SameSite=Lax`, and `Secure` unless you define `SITE_ENV` (see `config.example.php`; only needed for a plain-HTTP local copy).
+- **User management is CSRF-protected.** `json-add_user.php`, `json-change_user.php` and `json-remove_user.php` accept only same-origin POSTs that carry the signed-in user's token in an `X-CSRF` header; `users.php` sends it on every request (`$.ajaxSetup`). If you build your own client for those endpoints, read the token from `UserCookie::CsrfToken()` on a page the user is signed in to.
+- **Guards:** an admin cannot delete their own account, the last administrator cannot be removed or demoted, and editing a user with the password fields left blank keeps their current password (and their session).
 
 ## Upgrade / update
 

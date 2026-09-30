@@ -25,6 +25,10 @@ define("KEYMAKER_SECRET", "replace-with-output-of-openssl-rand-hex-64");
 define("GATE_COOKIE_NAME",  "replace_with_random_string");
 define("GATE_COOKIE_VALUE", "replace_with_random_string");
 
+// Optional. Leave unset in production: login cookies are then always `Secure` (HTTPS only). For a local
+// plain-HTTP development copy, set it to anything other than "production" so the browser keeps the cookie.
+// define("SITE_ENV", "dev");
+
 define("PROGRAM_MYSQL_CLASSES", CLASSES_DIR.'classes.php');
 require_once(PROGRAM_MYSQL_CLASSES);
 
