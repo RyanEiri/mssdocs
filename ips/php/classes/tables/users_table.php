@@ -55,12 +55,28 @@ class UserCookie {
 
     public	$username;
     private	$secretword;
+    private	$result;
+
+	// Cookie attributes shared by sign-in and sign-out. `secure` follows SITE_ENV when a site
+	// defines it (dev stacks serve plain HTTP, where browsers silently drop `secure` cookies);
+	// sites that don't define it keep the historical always-secure behaviour. SameSite=Lax
+	// keeps the login cookie off cross-site POSTs (it previously had no SameSite attribute).
+	private static function cookieOptions($expires){
+		return [
+			'expires'  => $expires,
+			'path'     => '/',
+			'domain'   => $_SERVER['SERVER_NAME'],
+			'secure'   => defined('SITE_ENV') ? SITE_ENV === 'production' : true,
+			'httponly' => true,
+			'samesite' => 'Lax',
+		];
+	}
 
 	function DeleteIt(){
 		if(isset($_GET['header'])){
 			if ($_GET['header']==='cookieDel') {
-		    setcookie('login', '', time()-86400, '/', $_SERVER['SERVER_NAME'], true, true);
-				setcookie(GATE_COOKIE_NAME, '', time()-86400, '/', $_SERVER['SERVER_NAME'], true, true);
+		    setcookie('login', '', self::cookieOptions(time()-86400));
+				setcookie(GATE_COOKIE_NAME, '', self::cookieOptions(time()-86400));
 				session_destroy();
 			  header('Location: ./login.php');
 			  exit;
@@ -76,8 +92,8 @@ class UserCookie {
 		$this->SecretWord();
 		if ($this->secretword==$secret) {
 			session_regenerate_id(true);
-			setcookie('login', $user.','.hash("sha512", $user.$this->secretword), 0, '/', $_SERVER['SERVER_NAME'], true, true);
-			setcookie(GATE_COOKIE_NAME, GATE_COOKIE_VALUE, 0, '/', $_SERVER['SERVER_NAME'], true, true);
+			setcookie('login', $user.','.hash("sha512", $user.$this->secretword), self::cookieOptions(0));
+			setcookie(GATE_COOKIE_NAME, GATE_COOKIE_VALUE, self::cookieOptions(0));
 			header('Location: ./index.php');
 			exit;
 		} else {
@@ -88,16 +104,79 @@ class UserCookie {
 
 	function CheckIt(){
 		if (isset($_COOKIE['login'])){
-		  list($username,$hash) = preg_split('/\,/', $_COOKIE['login']);
-			$this->username = $username;
-			$this->SecretWord();
-	    if (hash_equals(hash("sha512", $username.$this->secretword), $hash)){
-				return true;
-			} else {
-				return false;
-			}
+			// Peek() also rejects a cookie for a nonexistent user (whose "secretword" would
+			// otherwise hash as an empty string, letting sha512(username) forge a login).
+			return $this->Peek() !== false;
 	  } else {
 			header('Location: ./login.php');
+			exit;
+		}
+	}
+
+	// Non-redirecting counterpart to CheckIt(), for endpoints that also serve anonymous
+	// visitors. Returns the username only for a well-formed cookie whose user exists,
+	// has a non-empty secretword, and whose hash matches.
+	function Peek(){
+		global $db;
+		if (!isset($_COOKIE['login']) || !is_string($_COOKIE['login'])) {
+			return false;
+		}
+		$parts = explode(',', $_COOKIE['login'], 2);
+		if (count($parts) !== 2 || $parts[0] === '' || $parts[1] === '') {
+			return false;
+		}
+		list($username, $hash) = $parts;
+		$params = [['type' => 's', 'value' => $username]];
+		$result = $db->query("SELECT secretword FROM users WHERE username=? LIMIT 1", $params);
+		$rows = $result->fetchArray();
+		if (!is_array($rows) || !isset($rows[0]['secretword']) || $rows[0]['secretword'] === '') {
+			return false;
+		}
+		if (!hash_equals(hash("sha512", $username.$rows[0]['secretword']), $hash)) {
+			return false;
+		}
+		$this->username = $username;
+		$this->secretword = $rows[0]['secretword'];
+		return $username;
+	}
+
+	// Per-user CSRF token for state-changing endpoints. Only meaningful after a successful
+	// Peek()/CheckIt(); derived from the user's secretword so it can't be guessed.
+	function CsrfToken(){
+		return hash_hmac('sha256', 'iv-edit-csrf', $this->secretword);
+	}
+
+	// null if this is an acceptable state-changing request, else [http status, message].
+	// Shared by RequireCsrf() below and by any JSON endpoint that needs the same checks.
+	static function WriteRequestProblem($token, $expect_json){
+		if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+			return [405, 'POST required'];
+		}
+		if ($expect_json && stripos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== 0) {
+			return [415, 'application/json required'];
+		}
+		$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+		$host = $origin !== '' ? parse_url($origin, PHP_URL_HOST) : null;
+		$port = $origin !== '' ? parse_url($origin, PHP_URL_PORT) : null;
+		$expected = $host === null || $host === false ? null : $host.($port ? ':'.$port : '');
+		if ($expected === null || strcasecmp($expected, $_SERVER['HTTP_HOST'] ?? '') !== 0) {
+			return [403, 'Cross-origin request refused'];
+		}
+		$sent = $_SERVER['HTTP_X_CSRF'] ?? '';
+		if (!is_string($sent) || $sent === '' || !hash_equals($token, $sent)) {
+			return [403, 'Bad CSRF token'];
+		}
+		return null;
+	}
+
+	// For the form-encoded user-management endpoints: refuse unless this is a same-origin POST
+	// carrying this user's token (X-CSRF header). Call after CheckIt() has validated the login.
+	function RequireCsrf(){
+		$problem = self::WriteRequestProblem($this->CsrfToken(), false);
+		if ($problem !== null) {
+			http_response_code($problem[0]);
+			header('Content-Type: application/json');
+			echo json_encode(['success' => false, 'errors' => ['csrf' => $problem[1]], 'error' => $problem[1]]);
 			exit;
 		}
 	}
@@ -115,6 +194,10 @@ class UserCookie {
 
 // UserList and ActOnSingleUser classes for administration of user accounts.
 class UserList {
+	public $sql,
+		$result,
+		$userlist
+		;
 
 	function __construct(
 		) {
@@ -138,7 +221,25 @@ class ActOnSingleUser {
 		$user_entry,
 		$email,
 		$mysqlError,
-		$duplicateError
+		$duplicateError,
+		$removeError,
+		$username,
+		$admin,
+		$duplicate,
+		$duplicateSQL,
+		$duplicateResult,
+		$addSQL,
+		$addresult,
+		$entryid,
+		$changeresult,
+		$secretword_sql,
+		$secretword_result,
+		$secretword_entry,
+		$password_sql,
+		$password_result,
+		$password_entry,
+		$remove_id,
+		$removeSQL
 		;
 
 	function __construct(
@@ -156,9 +257,11 @@ class ActOnSingleUser {
 		  $this->user_entry      = $this->select_result->fetchArray();
 		  $this->secretword_entry = $this->secretword_result->fetchArray();
 		  $this->password_entry  = $this->password_result->fetchArray();
-		  $this->password        = $this->password_entry[0]['password'];
-		  $this->secretword      = $this->secretword_entry[0]['secretword'];
-		  $this->email           = $this->user_entry[0]['email'];
+		  // $_SESSION['user_id'] outlives the request that set it, so it can name a user who has
+		  // since been removed: these lookups then come back empty, hence the `?? null`.
+		  $this->password        = $this->password_entry[0]['password'] ?? null;
+		  $this->secretword      = $this->secretword_entry[0]['secretword'] ?? null;
+		  $this->email           = $this->user_entry[0]['email'] ?? null;
 		}
 	}
 
@@ -170,8 +273,8 @@ class ActOnSingleUser {
 		  $this->duplicateSQL = "SELECT username FROM users WHERE username=?";
 		  $dup_param = [['type' => 's', 'value' => $this->username]];
 		  $this->duplicateResult = $db->query($this->duplicateSQL, $dup_param);
-		  $this->duplicate = $this->duplicateResult->fetchArray();
-		  $this->duplicate = $this->duplicate[0]['username'];
+		  $duplicate_rows = $this->duplicateResult->fetchArray();
+		  $this->duplicate = is_array($duplicate_rows) ? $duplicate_rows[0]['username'] : null;
 		}
 		$this->password = $_SESSION['password'];
 		$this->password = password_hash($this->password, PASSWORD_DEFAULT);
@@ -205,10 +308,17 @@ class ActOnSingleUser {
 		global $db;
 		$this->username = $_SESSION['username'];
 		$this->email = $_SESSION['email'];
-		$this->password = $_SESSION['password'];
-		$this->password = password_hash($this->password, PASSWORD_DEFAULT);
-		$this->secretword = getToken(60);
+		// Empty password = keep the stored hash and secretword (loaded in the constructor),
+		// so editing a user's email/role doesn't sign them out.
+		if ($_SESSION['password'] !== '') {
+			$this->password = password_hash($_SESSION['password'], PASSWORD_DEFAULT);
+			$this->secretword = getToken(60);
+		}
 		$this->admin = (int)$_SESSION['admin'];
+		if (!$this->admin && !empty($this->user_entry[0]['admin']) && $this->adminCount() <= 1) {
+			$this->mysqlError = 'The last administrator cannot lose the administrator role.';
+			return false;
+		}
 		$this->change_sql = "UPDATE users SET username=?, email=?, password=?, secretword=?, admin=? WHERE id=?";
 		$change_params = [
 			['type' => 's', 'value' => $this->username],
@@ -236,15 +346,35 @@ class ActOnSingleUser {
 		}
 	}
 
+	private function adminCount(){
+		global $db;
+		$rows = $db->query("SELECT COUNT(*) AS n FROM users WHERE admin=1")->fetchArray();
+		return is_array($rows) ? (int)$rows[0]['n'] : 0;
+	}
+
 	function removeUser(){
 		global $db;
 		$this->remove_id = (int)$_POST['id'];
+		$target = $db->query("SELECT username, admin FROM users WHERE id=?", [['type' => 'i', 'value' => $this->remove_id]])->fetchArray();
+		if (!is_array($target)) {
+			$this->removeError = 'No such user.';
+			return false;
+		}
+		if (defined('USERNAME') && $target[0]['username'] === USERNAME) {
+			$this->removeError = 'You cannot remove your own account.';
+			return false;
+		}
+		if (!empty($target[0]['admin']) && $this->adminCount() <= 1) {
+			$this->removeError = 'The last administrator cannot be removed.';
+			return false;
+		}
 		$this->removeSQL = "DELETE FROM users WHERE id=?";
 		$remove_param = [['type' => 'i', 'value' => $this->remove_id]];
 		$result = $db->query($this->removeSQL, $remove_param);
 		if($result->isError()) {
 			die('Delete statement failed: Entry not deleted');
 		}
+		return true;
 	}
 }
 
