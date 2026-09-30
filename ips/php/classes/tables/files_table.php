@@ -8,6 +8,117 @@ function str_params(...$values) {
 	}, $values);
 }
 
+// ---- Path confinement for the file-browser endpoints --------------------------------------------
+// The Browse page sends filesystem paths (../upload/files/img) that the endpoints act on with unlink(),
+// rename(), mkdir() and scandir(). Every client-supplied path must resolve inside upload/files/; anything
+// else (../../php, /etc, a name containing a slash) is refused before the endpoint touches the disk.
+
+// upload/ with a trailing slash. Some per-site variants bootstrap through ../config.php and never define
+// USER_FILES_BASE, so fall back to the upload/ directory beside json/.
+function ips_upload_base() {
+	if (defined('USER_FILES_BASE')) {
+		return USER_FILES_BASE;
+	}
+	$ips = realpath(getcwd() . (basename(getcwd()) === 'json' ? '/..' : ''));
+	return $ips . '/upload/';
+}
+
+function ips_files_root() {
+	return realpath(ips_upload_base() . 'files');
+}
+
+// Paths are resolved the way the endpoint itself resolves them: against upload/ for the endpoints that
+// chdir('..') to ips/ first, against the json/ directory for the older per-site variants that don't. The
+// ../upload/files/... strings the page sends name the same folder either way.
+function ips_files_base() {
+	return basename(getcwd()) === 'json' ? getcwd() . '/' : ips_upload_base();
+}
+
+// A single path component: no slashes, not '.' or '..', no NUL.
+function ips_safe_name($name) {
+	return is_string($name) && $name !== '' && $name !== '.' && $name !== '..' && strpbrk($name, "/\\\0") === false;
+}
+
+// True when $path names an existing directory inside upload/files/ (the files root itself only when
+// $allow_root). realpath() resolves symlinks, so a link pointing out of the tree is refused too.
+function ips_confined_dir($path, $allow_root = true) {
+	if (!is_string($path) || $path === '' || $path[0] === '/' || strpos($path, "\0") !== false) {
+		return false;
+	}
+	$root = ips_files_root();
+	$real = realpath(ips_files_base() . $path);
+	if ($root === false || $real === false || !is_dir($real)) {
+		return false;
+	}
+	return $real === $root ? $allow_root : strpos($real . '/', $root . '/') === 0;
+}
+
+function ips_refuse_path($key) {
+	header('Content-Type: application/json');
+	echo json_encode(['success' => false, 'errors' => [$key => 'Invalid path.']]);
+	exit;
+}
+
+// Call once the request is parsed and before any filesystem work: 'remove', 'move', 'add_folder',
+// 'file_functions' or 'file_info' (json-file_info.php's older variants pass their own directory to
+// ips_require_confined_dir() instead).
+function ips_confine_request($endpoint) {
+	$post = $_POST;
+	$files = isset($post['files']) && is_array($post['files']) ? $post['files'] : [];
+	$folders = isset($post['folders']) && is_array($post['folders']) ? $post['folders'] : [];
+	switch ($endpoint) {
+		case 'remove':
+		case 'move':
+			foreach ($files as $file) {
+				if (!is_array($file) || !ips_confined_dir($file['dirname'] ?? null) || !ips_safe_name($file['filename'] ?? null)) {
+					ips_refuse_path('files');
+				}
+			}
+			foreach ($folders as $folder) {
+				if (!ips_confined_dir($folder, false)) {
+					ips_refuse_path('files');
+				}
+			}
+			if ($endpoint === 'move' && isset($post['moveToFolder']) && !ips_confined_dir($post['moveToFolder'])) {
+				ips_refuse_path('moveToFolder');
+			}
+			break;
+		case 'add_folder':
+			if (isset($post['path']) && !ips_confined_dir($post['path'])) {
+				ips_refuse_path('path');
+			}
+			if (isset($post['folder']) && $post['folder'] !== '' && !ips_safe_name($post['folder'])) {
+				ips_refuse_path('folder');
+			}
+			break;
+		case 'file_functions':
+			foreach (['previousFileFolder', 'fsDirName'] as $key) {
+				if (!empty($post[$key]) && !ips_confined_dir($post[$key])) {
+					ips_refuse_path($key);
+				}
+			}
+			foreach (['previousFileName', 'fileName'] as $key) {
+				if (!empty($post[$key]) && !ips_safe_name($post[$key])) {
+					ips_refuse_path($key);
+				}
+			}
+			break;
+		case 'file_info':
+			if (isset($post['dir']) && !ips_confined_dir($post['dir'])) {
+				ips_refuse_path('dir');
+			}
+			break;
+	}
+}
+
+// Returns $path unchanged when it is a directory inside upload/files/, otherwise answers and exits.
+function ips_require_confined_dir($path) {
+	if (!ips_confined_dir($path)) {
+		ips_refuse_path('dir');
+	}
+	return $path;
+}
+
 // Classes for acting on files table
 class FileGrab {
 	private	$result,

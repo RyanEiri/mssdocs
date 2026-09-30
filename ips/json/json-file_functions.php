@@ -22,6 +22,8 @@ if($login_cookie->CheckIt()) {
   // If the file_id value is the same as the current id, invalidate
   // and do not update filename.
 
+	// Refuse paths outside upload/files/ (see ips_confine_request in files_table.php).
+	ips_confine_request('file_functions');
   if (empty($_POST['fileId'])) {
 		$errors['fileId'] = 'No File ID found! Aborting operation.';
   } else {

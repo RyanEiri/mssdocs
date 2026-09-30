@@ -16,6 +16,8 @@ if($login_cookie->CheckIt()) {
 		$recursive = '0';
 	}
 
+	// Refuse paths outside upload/files/ (see ips_confine_request in files_table.php).
+	ips_confine_request('file_info');
 	$dir = (isset($_POST['dir'])) ? USER_FILES_BASE.$_POST['dir']
 	 : $dir = USER_FILES_BASE."files";
 	if(isset($dir)){
