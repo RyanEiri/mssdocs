@@ -13,14 +13,20 @@ function str_params(...$values) {
 // rename(), mkdir() and scandir(). Every client-supplied path must resolve inside upload/files/; anything
 // else (../../php, /etc, a name containing a slash) is refused before the endpoint touches the disk.
 
-// upload/ with a trailing slash. Some per-site variants bootstrap through ../config.php and never define
-// USER_FILES_BASE, so fall back to the upload/ directory beside json/.
+// The directory that holds files/ (with a trailing slash): USER_FILES_BASE where the site defines it.
+// Some per-site variants bootstrap through ../config.php and never define it; theirs is the directory that
+// holds the uploader (upload/index.php), or server/ in the oldest layout (server/index.php).
 function ips_upload_base() {
 	if (defined('USER_FILES_BASE')) {
 		return USER_FILES_BASE;
 	}
 	$ips = realpath(getcwd() . (basename(getcwd()) === 'json' ? '/..' : ''));
-	return $ips . '/upload/';
+	foreach (['upload', 'server'] as $dir) {
+		if (is_file("$ips/$dir/index.php")) {
+			return "$ips/$dir/";
+		}
+	}
+	return "$ips/upload/";
 }
 
 function ips_files_root() {
