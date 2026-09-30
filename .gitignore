@@ -7,6 +7,9 @@ ips/backups/*
 !ips/upload/tmp/.gitkeep
 !ips/backups/.gitkeep
 
+# CKEditor 4 for the HTML editor module: third-party, install it per ips/html_editor/README.md
+ips/html_editor/ckeditor/
+
 # Live config — copy config.example.php and fill in your values
 ips/php/classes/config.php
 
