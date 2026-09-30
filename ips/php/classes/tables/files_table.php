@@ -39,9 +39,9 @@ function ips_safe_name($name) {
 	return is_string($name) && $name !== '' && $name !== '.' && $name !== '..' && strpbrk($name, "/\\\0") === false;
 }
 
-// True when $path names an existing directory inside upload/files/ (the files root itself only when
-// $allow_root). realpath() resolves symlinks, so a link pointing out of the tree is refused too.
-function ips_confined_dir($path, $allow_root = true) {
+// The real path of $path when it names an existing directory inside upload/files/ (the files root itself
+// included), else false. realpath() resolves symlinks, so a link pointing out of the tree is refused too.
+function ips_resolve_dir($path) {
 	if (!is_string($path) || $path === '' || $path[0] === '/' || strpos($path, "\0") !== false) {
 		return false;
 	}
@@ -50,12 +50,41 @@ function ips_confined_dir($path, $allow_root = true) {
 	if ($root === false || $real === false || !is_dir($real)) {
 		return false;
 	}
-	return $real === $root ? $allow_root : strpos($real . '/', $root . '/') === 0;
+	return ($real === $root || strpos($real . '/', $root . '/') === 0) ? $real : false;
 }
 
-function ips_refuse_path($key) {
+// True when $path names an existing directory inside upload/files/ (the files root itself only when
+// $allow_root).
+function ips_confined_dir($path, $allow_root = true) {
+	$real = ips_resolve_dir($path);
+	return $real !== false && ($allow_root || $real !== ips_files_root());
+}
+
+// Regular users own upload/files/<their username>/ (that is where their uploads go). True when the real path
+// $real lies inside that folder (the folder itself only when $allow_own_root).
+function ips_in_users_tree($real, $username, $allow_own_root = true) {
+	$root = ips_files_root();
+	if ($real === false || $root === false || !ips_safe_name($username)) {
+		return false;
+	}
+	$own = realpath($root . '/' . $username);
+	if ($own === false) {
+		return false;
+	}
+	return $real === $own ? $allow_own_root : strpos($real . '/', $own . '/') === 0;
+}
+
+// [username, is_admin] of the signed-in user (the endpoints have already passed CheckIt()).
+function ips_current_user() {
+	global $login_cookie;
+	$name = $login_cookie->username ?? '';
+	$user = new UserGrab($name);
+	return [$name, !empty($user->admin)];
+}
+
+function ips_refuse_path($key, $message = 'Invalid path.') {
 	header('Content-Type: application/json');
-	echo json_encode(['success' => false, 'errors' => [$key => 'Invalid path.']]);
+	echo json_encode(['success' => false, 'errors' => [$key => $message]]);
 	exit;
 }
 
@@ -106,6 +135,86 @@ function ips_confine_request($endpoint) {
 		case 'file_info':
 			if (isset($post['dir']) && !ips_confined_dir($post['dir'])) {
 				ips_refuse_path('dir');
+			}
+			break;
+	}
+	ips_check_writes($endpoint);
+}
+
+// Who may change what, and never over the top of something that already exists. Regular users may only move,
+// rename and create folders inside upload/files/<their username>/; administrators may work anywhere. Nobody
+// gets to replace an existing file or folder (rename() silently would). Runs after the path checks, so every
+// path used here has already been shown to resolve inside upload/files/.
+function ips_check_writes($endpoint) {
+	$post = $_POST;
+	[$username, $admin] = ips_current_user();
+	$own = function ($real, $allow_root = true) use ($username, $admin) {
+		return $admin || ips_in_users_tree($real, $username, $allow_root);
+	};
+	$only_own = "You can only change files inside your own folder (files/$username).";
+	switch ($endpoint) {
+		case 'move':
+			$files = isset($post['files']) && is_array($post['files']) ? $post['files'] : [];
+			$folders = isset($post['folders']) && is_array($post['folders']) ? $post['folders'] : [];
+			$dest = ips_resolve_dir($post['moveToFolder'] ?? null);
+			if ($dest === false || (!$files && !$folders)) {
+				return; // the endpoint reports its own missing-input errors
+			}
+			$taken = [];
+			foreach ($files as $file) {
+				$from = ips_resolve_dir($file['dirname']);
+				if (!$own($dest) || !$own($from)) {
+					ips_refuse_path('moveToFolder', $only_own);
+				}
+				$target = $dest . '/' . $file['filename'];
+				if ($from !== $dest && (file_exists($target) || isset($taken[$target]))) {
+					ips_refuse_path('moveToFolder', $file['filename'] . ' already exists in the destination.');
+				}
+				$taken[$target] = true;
+			}
+			foreach ($folders as $folder) {
+				$from = ips_resolve_dir($folder);
+				if (!$own($dest) || !$own($from, false)) {
+					ips_refuse_path('moveToFolder', $only_own);
+				}
+				if ($dest === $from || strpos($dest . '/', $from . '/') === 0) {
+					ips_refuse_path('moveToFolder', 'A folder cannot be moved into itself.');
+				}
+				$target = $dest . '/' . basename($from);
+				if (dirname($from) !== $dest && (file_exists($target) || isset($taken[$target]))) {
+					ips_refuse_path('moveToFolder', basename($from) . ' already exists in the destination.');
+				}
+				$taken[$target] = true;
+			}
+			break;
+		case 'add_folder':
+			$parent = ips_resolve_dir($post['path'] ?? null);
+			if ($parent === false || empty($post['folder'])) {
+				return;
+			}
+			if (!$own($parent)) {
+				ips_refuse_path('path', $only_own);
+			}
+			if (file_exists($parent . '/' . $post['folder'])) {
+				ips_refuse_path('folder', $post['folder'] . ' already exists here.');
+			}
+			break;
+		case 'file_functions':
+			$from_dir = ips_resolve_dir($post['previousFileFolder'] ?? null);
+			$to_dir = ips_resolve_dir($post['fsDirName'] ?? null);
+			$from_name = $post['previousFileName'] ?? '';
+			$to_name = $post['fileName'] ?? '';
+			if ($from_dir === false || $to_dir === false || $from_name === '' || $to_name === '') {
+				return;
+			}
+			if ($from_dir === $to_dir && $from_name === $to_name) {
+				return; // title/description only
+			}
+			if (!$own($from_dir) || !$own($to_dir)) {
+				ips_refuse_path('fsDirName', $only_own);
+			}
+			if (file_exists($to_dir . '/' . $to_name)) {
+				ips_refuse_path('fileName', $to_name . ' already exists in that folder.');
 			}
 			break;
 	}
