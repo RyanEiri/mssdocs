@@ -59,6 +59,8 @@
   }
   function parseTime(t) { if (!t) return null; const d = new Date(String(t).replace(" ", "T")); return isNaN(d) ? null : d; }
   function fmtDate(t) { const d = parseTime(t); return d ? d.getDate() + " " + MONTHS[d.getMonth()] + " " + d.getFullYear() : "—"; }
+  // A Unix timestamp (seconds) from the listing endpoint.
+  const fmtEpoch = (sec) => { const d = sec ? new Date(sec * 1000) : null; return d ? d.getDate() + " " + MONTHS[d.getMonth()] + " " + d.getFullYear() : "—"; };
   const plural = (n, one, many) => n + " " + (n === 1 ? one : many || one + "s");
 
   // ---- file types ---------------------------------------------------------------------------------------------
@@ -104,7 +106,7 @@
 
   window.IPS = Object.assign(window.IPS || {}, {
     cfg: CFG, getJSON, postForm, postJSON,
-    util: { bytesToSize, fmtDate, parseTime, plural, extOf, typeOf, TYPE_EXT },
+    util: { bytesToSize, fmtDate, fmtEpoch, parseTime, plural, extOf, typeOf, TYPE_EXT },
     Icon, toasts, toast, dismissToast,
     homePanels: [],
     registerHomePanel(panel) { window.IPS.homePanels.push(panel); },

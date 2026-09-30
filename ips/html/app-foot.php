@@ -26,7 +26,12 @@ $ips_config = array_merge([
 $ips_js = function ($path) {
 	return PROGRAM_WEB_BASE . $path . '?v=' . (is_file(PROGRAM_BASE . $path) ? filemtime(PROGRAM_BASE . $path) : 0);
 };
-$ips_scripts = ['js/ips-icons.js', 'js/ui/core.js', 'js/ui/shell.js', 'js/ui/login.js', 'js/ui/home.js', 'js/ui/users.js'];
+$ips_scripts = ['js/ips-icons.js', 'js/ui/core.js', 'js/ui/shell.js'];
+if ($ips_config['view'] === 'browser') {
+	array_push($ips_scripts, 'js/ui/browser-store.js', 'js/ui/browser-parts.js', 'js/ui/browser.js');
+} else {
+	array_push($ips_scripts, 'js/ui/login.js', 'js/ui/home.js', 'js/ui/users.js');
+}
 if (is_file(PROGRAM_BASE . 'js/site-home.js')) {
 	$ips_scripts[] = 'js/site-home.js';
 }
