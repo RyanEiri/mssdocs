@@ -106,7 +106,17 @@ class UserCookie {
 		if (isset($_COOKIE['login'])){
 			// Peek() also rejects a cookie for a nonexistent user (whose "secretword" would
 			// otherwise hash as an empty string, letting sha512(username) forge a login).
-			return $this->Peek() !== false;
+			if ($this->Peek() !== false) {
+				return true;
+			}
+			// A stale cookie (the password was changed) or another site's cookie on the same host
+			// would otherwise leave a page load blank. Send page loads to the login form;
+			// POST endpoints still get false so they can answer in JSON.
+			if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+				header('Location: ./login.php');
+				exit;
+			}
+			return false;
 	  } else {
 			header('Location: ./login.php');
 			exit;
