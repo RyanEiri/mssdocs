@@ -1,5 +1,13 @@
 <?php
 
+// Every statement in this file binds its values (see SQL::query) rather than splicing them into the SQL string.
+// str_params() turns plain values into the ['type' => 's', 'value' => ...] list that query() expects.
+function str_params(...$values) {
+	return array_map(function($value) {
+		return ['type' => 's', 'value' => $value];
+	}, $values);
+}
+
 // Classes for acting on files table
 class FileGrab {
 	private	$result,
@@ -25,9 +33,9 @@ class FileGrab {
 		global $db;
 		$this->sql = "SELECT id, size, type, url, title, description, date
 			FROM files
-			WHERE name='" . $this->name . "'
+			WHERE name=?
 			LIMIT 1";
-		$this->result = $db->query($this->sql);
+		$this->result = $db->query($this->sql, str_params($this->name));
 		$this->query = $this->result->fetchArray();
 		if(is_array($this->query)) {
 			extract($this->query[0]);
@@ -96,9 +104,9 @@ class FolderGrab {
 			FROM folders
 			LEFT JOIN ziparchives ON
 			ziparchives.folder_id = folders.folder_id
-			WHERE folders.folder_name='" . $this->folder_name . "'
+			WHERE folders.folder_name=?
 			LIMIT 1";
-		$this->grab_result = $db->query($this->grab_sql);
+		$this->grab_result = $db->query($this->grab_sql, str_params($this->folder_name));
 		$this->grab_query = $this->grab_result->fetchArray();
 		if(is_array($this->grab_query)) {
 			extract($this->grab_query[0]);
@@ -126,8 +134,8 @@ class FolderGrab {
 
 	function createFolder(){
 		global $db;
-		$create_sql = "INSERT INTO folders (folder_name) VALUES ('$this->folder_name')";
-		$create_result = $db->query($create_sql);
+		$create_sql = "INSERT INTO folders (folder_name) VALUES (?)";
+		$create_result = $db->query($create_sql, str_params($this->folder_name));
 		$this->folder_id = $create_result->getId();
 
 // The following lines allow the folder_id to be added to the files stored
@@ -150,12 +158,9 @@ class FolderGrab {
 	){
 		global $db;
 		$update_folder_sql = "UPDATE folders
-			SET `folder_name` =
-			'$update_folder' WHERE
-			`folder_id` =
-			'$this->folder_id'
-			";
-		$db->query($update_folder_sql)
+			SET `folder_name` = ?
+			WHERE `folder_id` = ?";
+		$db->query($update_folder_sql, str_params($update_folder, $this->folder_id))
 		  or die ('Update folder query failed!');
 		if(is_array($this->files)){
 			foreach ($this->files as $key => $value) {
@@ -164,14 +169,10 @@ class FolderGrab {
 				$file_url = USER_FILES_URL.$file_name;
 				$file_id = $value['id'];
 				$update_files_sql = "UPDATE files
-					SET `name` =
-					'$file_name',
-					`url` =
-					'$file_url'
-					WHERE `id` =
-					'$file_id'
-					";
-				$db->query($update_files_sql)
+					SET `name` = ?,
+					`url` = ?
+					WHERE `id` = ?";
+				$db->query($update_files_sql, str_params($file_name, $file_url, $file_id))
 				  or die ('Folder file update query failed.');
 			}
 		}
@@ -181,9 +182,9 @@ class FolderGrab {
 						FROM `files`
 						LEFT JOIN `folders` ON
 						folders.folder_id = files.folder_id
-						WHERE files.folder_id='" . $value['folder_id'] . "'
+						WHERE files.folder_id=?
 						ORDER BY files.name";
-				$result = $db->query($sql)
+				$result = $db->query($sql, str_params($value['folder_id']))
 					or die ('Subfolder files SELECT statement failed.');
 				$query = $result->fetchArray();
 				if(is_array($this->subfolders_files)){
@@ -202,29 +203,26 @@ class FolderGrab {
 				$file_url = USER_FILES_URL.$file_name;
 				$file_id = $value['id'];
 				$update_sql = "UPDATE `files`
-					SET 	`name` 	= '$file_name',
-								`url` 	= '$file_url'
-					WHERE `id` 		= '$file_id'";
-				$db->query($update_sql)
+					SET 	`name` 	= ?,
+								`url` 	= ?
+					WHERE `id` 		= ?";
+				$db->query($update_sql, str_params($file_name, $file_url, $file_id))
 					or die ('Subfolder file update query failed.');
 				$old_subfolder = dirname($value['name']);
 				$subfolder_grab_id_sql = "SELECT `folder_id`, `folder_name`
 					FROM `folders`
-					WHERE `folder_name`='" . $old_subfolder . "'
+					WHERE `folder_name`=?
 					LIMIT 1";
-				$subfolder_grab_id_result = $db->query($subfolder_grab_id_sql);
+				$subfolder_grab_id_result = $db->query($subfolder_grab_id_sql, str_params($old_subfolder));
 				$subfolder_grab_id_query = $subfolder_grab_id_result->fetchArray();
 				if(is_array($subfolder_grab_id_query)) {
 					extract($subfolder_grab_id_query[0]);
 				}
 				if(isset($folder_id) && $folder_name !== $update_subfolder){
 					$subfolder_push_new_sql = "UPDATE `folders`
-						SET `folder_name` =
-						'$update_subfolder' WHERE
-						`folder_id` =
-						'$folder_id'
-						";
-					$db->query($subfolder_push_new_sql)
+						SET `folder_name` = ?
+						WHERE `folder_id` = ?";
+					$db->query($subfolder_push_new_sql, str_params($update_subfolder, $folder_id))
 						or die ('Update subfolder query failed!');
 				}
 			}
@@ -237,9 +235,9 @@ class FolderGrab {
 				FROM files
 				LEFT JOIN folders ON
 				folders.folder_id = files.folder_id
-				WHERE files.folder_id='" . $this->folder_id . "'
+				WHERE files.folder_id=?
 				ORDER BY files.name";
-		$result = $db->query($sql)
+		$result = $db->query($sql, str_params($this->folder_id))
 		  or die ('Select statement failed for grabbing folder files.');
 		$query = $result->fetchArray();
 		$this->files = $query;
@@ -247,9 +245,10 @@ class FolderGrab {
 
 	function grabFolderSubfolders(){
 		global $db;
-		$parent_folder_search = $this->folder_name.'/%';
-		$sql = "SELECT * FROM folders WHERE folder_name LIKE '" . $parent_folder_search . "'";
-		$result = $db->query($sql)
+		// A folder name can contain % or _ (html_templates), which LIKE would read as wildcards.
+		$parent_folder_search = addcslashes($this->folder_name, '\\%_').'/%';
+		$sql = "SELECT * FROM folders WHERE folder_name LIKE ?";
+		$result = $db->query($sql, str_params($parent_folder_search))
 			or die ('Select statement failed for grabbing folder subfolders.');
 		$query = $result->fetchArray();
 		$this->subfolders = $query;
@@ -269,38 +268,26 @@ class FolderGrab {
 		    $id = $value['id'];
 				if(isset($value['url'])){
 					$url = $value['url'];
-					$sql_url = "UPDATE files
-					SET `url` = '$url'
-					WHERE id='" . $id . "'
-					";
-					$db->query($sql_url)
+					$sql_url = "UPDATE files SET `url` = ? WHERE id=?";
+					$db->query($sql_url, str_params($url, $id))
 				or die ('Update url failed.');
 				}
 		    if(isset($value['name'])){
 		    	$name = $value['name'];
-					$sql_name = "UPDATE files
-			    SET `name` = '$name'
-			    WHERE id='" . $id . "'
-			    ";
-					$db->query($sql_name)
+					$sql_name = "UPDATE files SET `name` = ? WHERE id=?";
+					$db->query($sql_name, str_params($name, $id))
 			  or die ('Update name failed.');
 		    }
 		    if(isset($value['title'])){
 		    	$title = $value['title'];
-					$sql_title = "UPDATE files
-			    SET `title` = '$title'
-			    WHERE id='" . $id . "'
-			    ";
-					$db->query($sql_title)
+					$sql_title = "UPDATE files SET `title` = ? WHERE id=?";
+					$db->query($sql_title, str_params($title, $id))
 			  or die ('Update title failed.');
 		    }
 		    if(isset($value['description'])){
 		    	$description = $value['description'];
-					$sql_description = "UPDATE files
-			    SET `description` = '$description'
-			    WHERE id='" . $id . "'
-			    ";
-					$db->query($sql_description)
+					$sql_description = "UPDATE files SET `description` = ? WHERE id=?";
+					$db->query($sql_description, str_params($description, $id))
 			  or die ('Update description failed.');
 		    }
 		  }
@@ -312,15 +299,11 @@ class FolderGrab {
 		// test for them and ignore if matched
 		if(!preg_match($this->folder_pattern, $this->folder_name)){
 		  global $db;
-		  $removeZipSQL = "DELETE FROM ziparchives
-			  WHERE folder_id='" . $this->folder_id . "'
-			  ";
-		  $db->query($removeZipSQL)
+		  $removeZipSQL = "DELETE FROM ziparchives WHERE folder_id=?";
+		  $db->query($removeZipSQL, str_params($this->folder_id))
 			  or die ('Delete ziparchives statement failed.');
-		  $removeFolderSQL = "DELETE FROM folders
-			  WHERE folder_id='" . $this->folder_id . "'
-			  ";
-		  $db->query($removeFolderSQL)
+		  $removeFolderSQL = "DELETE FROM folders WHERE folder_id=?";
+		  $db->query($removeFolderSQL, str_params($this->folder_id))
 			  or die ('Delete folders statement failed: Entry not deleted');
 		}
 	}
@@ -334,10 +317,8 @@ class FolderGrab {
 			if(!isset($this->duplicate)){
 			  $this->duplicateSQL = "SELECT folder_id, zip_name
 				FROM ziparchives
-				WHERE folder_id='"
-				. $this->folder_id . "'
-				";
-			  $this->duplicateResult = $db->query($this->duplicateSQL);
+				WHERE folder_id=?";
+			  $this->duplicateResult = $db->query($this->duplicateSQL, str_params($this->folder_id));
 			  $this->duplicate_zip = $this->duplicateResult->fetchArray();
 			  $this->duplicateZipname = $this->duplicate_zip[0]['zip_name'];
 			  $this->duplicateZipFolderID = $this->duplicate_zip[0]['folder_id'];
@@ -347,23 +328,18 @@ class FolderGrab {
 			$this->addzip_sql = "
 				      INSERT INTO ziparchives
 				      (folder_id, zip_name, zip_url)
-				      VALUES (
-					'$this->folder_id',
-					'$this->zip_name',
-					'$this->zip_url'
-				      )";
+				      VALUES (?, ?, ?)";
 			$this->updatezip_sql = "
 					UPDATE ziparchives SET
-					`zip_date` = '$this->date',
-				        `zip_url` = '$this->zip_url',
-					`zip_name` = '$this->zip_name'
-					WHERE `folder_id`='$this->duplicateZipFolderID'
-					";
+					`zip_date` = ?,
+					`zip_url` = ?,
+					`zip_name` = ?
+					WHERE `folder_id`=?";
 			if($this->zip_name === $this->duplicateZipname){
-			  $this->updatezip_result = $db->query($this->updatezip_sql)
+			  $this->updatezip_result = $db->query($this->updatezip_sql, str_params($this->date, $this->zip_url, $this->zip_name, $this->duplicateZipFolderID))
 				or die ('UPDATE statement failed');
 			} else {
-			  $this->addzip_result = $db->query($this->addzip_sql)
+			  $this->addzip_result = $db->query($this->addzip_sql, str_params($this->folder_id, $this->zip_name, $this->zip_url))
 				or die ('INSERT statement failed');
 			  $this->zipid = $this->addzip_result->getId();
 			}
@@ -455,28 +431,23 @@ class ActOnSingleFile {
 	function addFile(){
 		global $db;
 		$this->name = $_POST['file_name'];
-		$this->name = addslashes($this->name);
 		if(!isset($this->duplicate)){
-		  $this->duplicateSQL = "SELECT name FROM files WHERE name='" . $this->name . "'";
-		  $this->duplicateResult = $db->query($this->duplicateSQL);
+		  $this->duplicateSQL = "SELECT name FROM files WHERE name=?";
+		  $this->duplicateResult = $db->query($this->duplicateSQL, str_params($this->name));
 		  $this->duplicate = $this->duplicateResult->fetchArray();
 		  $this->duplicate = $this->duplicate[0]['name'];
 		}
 		$this->size = $_POST['file_size'];
 		$this->type = $_POST['file_type'];
-		$this->type = addslashes($this->type);
 		$this->url = $_POST['file_url'];
-		$this->url = addslashes($this->url);
 		$this->title = $_POST['file_title'];
-		$this->title = addslashes($this->title);
 		$this->description = $_POST['file_description'];
-		$this->description = addslashes($this->description);
-		$this->addSQL = "INSERT INTO files (name, size, type, url, title, description) VALUES ('$this->name', '$this->size', '$this->type', '$this->url', '$this->title', '$this->description')";
+		$this->addSQL = "INSERT INTO files (name, size, type, url, title, description) VALUES (?, ?, ?, ?, ?, ?)";
 		if($_POST['file_name'] === $this->duplicate){
 			$this->duplicate = null;
 			return false;
 		} else {
-			$this->addresult = $db->query($this->addSQL);
+			$this->addresult = $db->query($this->addSQL, str_params($this->name, $this->size, $this->type, $this->url, $this->title, $this->description));
 			$this->entryid = $this->addresult->getId();
 		}
 	}
@@ -490,13 +461,10 @@ class ActOnSingleFile {
 		global $db;
 		$this->change_file_id = $file_id;
 		$this->change_file_name = $file_name;
-		//$this->change_file_name = addslashes($name);
 		$this->change_file_url = $file_url;
-		//$this->change_file_url = addslashes($url);
 		$this->change_file_folder_id = $file_folder_id;
-		$this->change_file_sql = "UPDATE files SET `name`='$this->change_file_name', `url`='$this->change_file_url', `folder_id`='$this->change_file_folder_id' WHERE `id`='$this->change_file_id'";
-		//$db->query($changeSQL) or die ('Update statement failed: Entry not updated');
-		$this->change_file_result = $db->query($this->change_file_sql);
+		$this->change_file_sql = "UPDATE files SET `name`=?, `url`=?, `folder_id`=? WHERE `id`=?";
+		$this->change_file_result = $db->query($this->change_file_sql, str_params($this->change_file_name, $this->change_file_url, $this->change_file_folder_id, $this->change_file_id));
 		if($this->change_file_result->isError()) {
 			$this->change_file_mysql_error = $this->change_file_result->queryErrorMessage();
 			return false;
@@ -513,11 +481,9 @@ class ActOnSingleFile {
 		global $db;
 		$change_id = $file_id;
 		$title = $file_title;
-		$title = addslashes($title);
 		$description = $file_description;
-		$description = addslashes($description);
-		$changeSQL = "UPDATE files SET `title`='$title', `description`='$description' WHERE `id`='$change_id'";
-		$db->query($changeSQL) or die ('Update statement failed: Entry not updated');
+		$changeSQL = "UPDATE files SET `title`=?, `description`=? WHERE `id`=?";
+		$db->query($changeSQL, str_params($title, $description, $change_id)) or die ('Update statement failed: Entry not updated');
 	}
 
 	function removeFile(
@@ -525,8 +491,8 @@ class ActOnSingleFile {
 		){
 		  global $db;
 		  $remove_id = $file_id;
-		  $removeSQL = "DELETE FROM files WHERE id='" . $remove_id . "'";
-		  $db->query($removeSQL) or die ('Delete statement failed: Entry not deleted');
+		  $removeSQL = "DELETE FROM files WHERE id=?";
+		  $db->query($removeSQL, str_params($remove_id)) or die ('Delete statement failed: Entry not deleted');
 	}
 
 	/* DEPRECATED -- Remove in future versions
