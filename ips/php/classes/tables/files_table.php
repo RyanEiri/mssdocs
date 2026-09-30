@@ -39,14 +39,16 @@ function ips_safe_name($name) {
 	return is_string($name) && $name !== '' && $name !== '.' && $name !== '..' && strpbrk($name, "/\\\0") === false;
 }
 
+// $base overrides how the path is resolved for the endpoints that always resolve it against upload/
+// (json-add_folder.php: '../upload/'.$path in the older variants, USER_FILES_BASE.$path upstream).
 // The real path of $path when it names an existing directory inside upload/files/ (the files root itself
 // included), else false. realpath() resolves symlinks, so a link pointing out of the tree is refused too.
-function ips_resolve_dir($path) {
+function ips_resolve_dir($path, $base = null) {
 	if (!is_string($path) || $path === '' || $path[0] === '/' || strpos($path, "\0") !== false) {
 		return false;
 	}
 	$root = ips_files_root();
-	$real = realpath(ips_files_base() . $path);
+	$real = realpath(($base ?? ips_files_base()) . $path);
 	if ($root === false || $real === false || !is_dir($real)) {
 		return false;
 	}
@@ -55,8 +57,8 @@ function ips_resolve_dir($path) {
 
 // True when $path names an existing directory inside upload/files/ (the files root itself only when
 // $allow_root).
-function ips_confined_dir($path, $allow_root = true) {
-	$real = ips_resolve_dir($path);
+function ips_confined_dir($path, $allow_root = true, $base = null) {
+	$real = ips_resolve_dir($path, $base);
 	return $real !== false && ($allow_root || $real !== ips_files_root());
 }
 
@@ -113,7 +115,7 @@ function ips_confine_request($endpoint) {
 			}
 			break;
 		case 'add_folder':
-			if (isset($post['path']) && !ips_confined_dir($post['path'])) {
+			if (isset($post['path']) && !ips_confined_dir($post['path'], true, ips_upload_base())) {
 				ips_refuse_path('path');
 			}
 			if (isset($post['folder']) && $post['folder'] !== '' && !ips_safe_name($post['folder'])) {
@@ -188,7 +190,7 @@ function ips_check_writes($endpoint) {
 			}
 			break;
 		case 'add_folder':
-			$parent = ips_resolve_dir($post['path'] ?? null);
+			$parent = ips_resolve_dir($post['path'] ?? null, ips_upload_base());
 			if ($parent === false || empty($post['folder'])) {
 				return;
 			}
