@@ -58,5 +58,37 @@
     }).catch(() => ({ ok: false, message: "Couldn’t reach the server." }));
   }
 
-  IPS.browser.actions = { problem, loadDetail, saveFile };
+  const asFile = (n) => ({ dirname: parentOf(n.path), filename: n.name });
+
+  // POST json-add_folder.php {path, folder}: creates `name` inside `parent` (and its thumbnail directory and database row).
+  function addFolder(parent, name) {
+    return IPS.postForm("json/json-add_folder.php", { path: parent, folder: name }).then((r) => {
+      if (!r || r.success !== true) return { ok: false, message: problem(r, "The folder couldn’t be created.") };
+      return B.load().then(() => ({ ok: true, path: parent + "/" + name }));
+    }).catch(() => ({ ok: false, message: "Couldn’t reach the server." }));
+  }
+
+  // POST (JSON) json-move_file.php {files: [{dirname, filename}], folders: [path], moveToFolder, dbMoveToFolder}.
+  function moveItems(nodes, dest) {
+    const body = { files: nodes.filter((n) => !n.folder).map(asFile), folders: nodes.filter((n) => n.folder).map((n) => n.path), moveToFolder: dest, dbMoveToFolder: dest };
+    if (!body.files.length) delete body.files;
+    if (!body.folders.length) delete body.folders;
+    return IPS.postJSON("json/json-move_file.php", body).then((r) => {
+      if (!r || r.success !== true) return { ok: false, message: problem(r, "The move didn’t go through.") };
+      nodes.forEach((n) => delete st.details[n.path]);
+      return B.load().then(() => ({ ok: true }));
+    }).catch(() => ({ ok: false, message: "Couldn’t reach the server." }));
+  }
+
+  // POST json-remove_file.php {files: [{dirname, filename}], folders: [path]} (administrators only; folders must be empty).
+  function removeItems(nodes) {
+    const body = { files: nodes.filter((n) => !n.folder).map(asFile), folders: nodes.filter((n) => n.folder).map((n) => n.path) };
+    return IPS.postForm("json/json-remove_file.php", body).then((r) => {
+      if (!r || r.success !== true) return { ok: false, message: problem(r, "The removal didn’t go through.") };
+      nodes.forEach((n) => delete st.details[n.path]);
+      return B.load().then(() => ({ ok: true }));
+    }).catch(() => ({ ok: false, message: "Couldn’t reach the server." }));
+  }
+
+  IPS.browser.actions = { problem, loadDetail, saveFile, addFolder, moveItems, removeItems };
 })();

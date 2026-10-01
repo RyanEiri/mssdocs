@@ -28,7 +28,7 @@ $ips_js = function ($path) {
 };
 $ips_scripts = ['js/ips-icons.js', 'js/ui/core.js', 'js/ui/shell.js'];
 if ($ips_config['view'] === 'browser') {
-	array_push($ips_scripts, 'js/ui/browser-store.js', 'js/ui/browser-actions.js', 'js/ui/browser-parts.js', 'js/ui/browser-panel.js', 'js/ui/browser.js');
+	array_push($ips_scripts, 'js/ui/browser-store.js', 'js/ui/browser-actions.js', 'js/ui/browser-parts.js', 'js/ui/browser-dialogs.js', 'js/ui/browser-panel.js', 'js/ui/browser.js');
 } else {
 	array_push($ips_scripts, 'js/ui/login.js', 'js/ui/home.js', 'js/ui/users.js');
 }

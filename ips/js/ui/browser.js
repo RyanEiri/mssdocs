@@ -42,7 +42,7 @@
       }
       onMounted(() => { document.addEventListener("keydown", onKey); B.load(); });
       onBeforeUnmount(() => document.removeEventListener("keydown", onKey));
-      return { S, B, st, FILTERS, SORTS, VIEWS, title, subtitle, summary, empty, pick, open, plural: U.plural };
+      return { cfg: IPS.cfg, S, B, st, FILTERS, SORTS, VIEWS, title, subtitle, summary, empty, pick, open, plural: U.plural };
     },
     template: `
       <div class="h-screen flex flex-col overflow-hidden bg-paper text-ink select-none">
@@ -68,6 +68,7 @@
                     @keydown.esc.stop="st.query = ''" :class="S.input" class="!pl-9 !pr-8">
                   <button v-if="st.query" type="button" aria-label="Clear search" @click="st.query = ''" class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted hover:text-ink cursor-pointer"><ips-icon name="x" :size="14"></ips-icon></button>
                 </label>
+                <button type="button" @click.stop="B.openDialog('add')" :disabled="!B.can.add()" data-act="add" :title="B.can.add() ? 'New folder' : 'You can add folders inside files/' + cfg.user" :class="S.btnSecondary"><ips-icon name="folder-plus" :size="15"></ips-icon>New folder</button>
                 <button type="button" @click.stop="B.togglePanel()" :aria-pressed="st.panelOpen" :aria-label="st.panelOpen ? 'Hide details' : 'Show details'" title="Details panel"
                   :class="['grid place-items-center w-9 h-9 rounded-lg border border-line cursor-pointer', st.panelOpen ? 'bg-sidebar' : 'bg-surface hover:bg-hover']"><ips-icon name="sidebar" :size="16" class="-scale-x-100"></ips-icon></button>
               </div>
@@ -76,6 +77,8 @@
             <div class="mt-3.5 px-6 pb-3.5 min-h-[40px] flex items-center gap-3 border-b border-line" @click.stop>
               <div v-if="st.selection.length" class="flex items-center gap-1 h-9 pl-3.5 pr-1.5 rounded-lg bg-ink text-paper text-[13px] shrink-0 whitespace-nowrap">
                 <span class="font-medium mr-1.5">{{ st.selection.length }} selected</span>
+                <button type="button" @click="B.openDialog('move', B.selected())" :disabled="!B.can.move(B.selected())" data-act="move" class="inline-flex items-center gap-1.5 h-[26px] px-2 rounded-md hover:bg-ink-hover cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"><ips-icon name="move" :size="14"></ips-icon>Move</button>
+                <button v-if="cfg.admin" type="button" @click="B.openDialog('remove', B.selected())" data-act="remove" class="inline-flex items-center gap-1.5 h-[26px] px-2 rounded-md hover:bg-ink-hover cursor-pointer"><ips-icon name="trash-2" :size="14"></ips-icon>Remove</button>
                 <button type="button" @click="B.clearSelection()" class="grid place-items-center h-[26px] px-2 rounded-md hover:bg-ink-hover cursor-pointer" aria-label="Clear selection"><ips-icon name="x" :size="14"></ips-icon></button>
               </div>
               <div class="flex items-center gap-1.5 min-w-0 overflow-x-auto py-0.5" role="group" aria-label="Filter by type">
@@ -116,6 +119,7 @@
           </section>
           <ips-panel v-if="st.panelOpen" @close="B.togglePanel()"></ips-panel>
         </div>
+        <ips-dialogs></ips-dialogs>
         <ips-toasts></ips-toasts>
       </div>`,
   };
