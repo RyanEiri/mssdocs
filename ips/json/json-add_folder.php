@@ -16,6 +16,8 @@ if($login_cookie->CheckIt()) {
   // If any of these variables don't exist, add an error to our
   // $errors array. If they do exist add them to a variable value.
 
+	// Refuse paths outside upload/files/ (see ips_confine_request in files_table.php).
+	ips_confine_request('add_folder');
   if (empty($_POST['folder'])){
 	$errors['folder'] = 'A folder name is required.';
   } elseif(isset($_POST['folder'])){

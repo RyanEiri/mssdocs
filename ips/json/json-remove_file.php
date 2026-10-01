@@ -22,6 +22,8 @@ if(ADMIN_STATUS){
   // If the folder value is the same as the current path, invalidate
   // and pass error.
 
+	// Refuse paths outside upload/files/ (see ips_confine_request in files_table.php).
+	ips_confine_request('remove');
   if (empty($_POST['files']) && empty($_POST['folders'])){
 	$errors['files'] = 'No files or folders selected!';
   }
