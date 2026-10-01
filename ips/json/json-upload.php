@@ -56,7 +56,9 @@ $options = array(
 	'user_dirs' => true
 );
 
-error_reporting(E_ALL | E_STRICT);
+// The reply is JSON: PHP notices (the vendored handler raises PHP 8 deprecations) go to the log, never into the response.
+ini_set('display_errors', '0');
+error_reporting(E_ALL);
 require(PROGRAM_BASE.'upload/UploadHandler.php');
 
 class CustomUploadHandler extends UploadHandler {
