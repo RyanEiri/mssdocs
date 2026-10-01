@@ -19,6 +19,24 @@ if($login_cookie->CheckIt()) {
  * http://www.opensource.org/licenses/MIT
  */
 
+// Where the files go: the folder the page names in `dir` (files/..., relative to upload/, like the other endpoints), else the user's own folder.
+// Anyone may name their own folder (files/<username> and below); only administrators may name another one.
+function ips_upload_target() {
+	if (!isset($_REQUEST['dir']) || $_REQUEST['dir'] === '') {
+		return USERNAME;
+	}
+	$real = ips_resolve_dir($_REQUEST['dir']);
+	$root = ips_files_root();
+	if ($real === false || $real === $root || !(ADMIN_STATUS || ips_in_users_tree($real, USERNAME))) {
+		http_response_code(403);
+		header('Content-Type: application/json');
+		echo json_encode(['files' => [['name' => '', 'error' => 'You can only upload into your own folder (files/' . USERNAME . ').']]]);
+		exit;
+	}
+	return substr($real, strlen($root) + 1);
+}
+define('IPS_UPLOAD_TARGET', ips_upload_target());
+
 $options = array(
 	'delete_type' => 'POST',
 	'db_host' => DB_HOST,
@@ -46,13 +64,13 @@ class CustomUploadHandler extends UploadHandler {
 	}
 
 	protected function get_user_id() {
-		$username = USERNAME;
-		return $username;
+		return IPS_UPLOAD_TARGET;
 	}
 
 	protected function handle_form_data($file, $index) {
-	  $file->title = @$_REQUEST['title'][$index];
-	  $file->description = @$_REQUEST['description'][$index];
+	  // The file browser sends no title or description (those are edited afterwards); the columns don't take NULL.
+	  $file->title = (string) (@$_REQUEST['title'][$index] ?? '');
+	  $file->description = (string) (@$_REQUEST['description'][$index] ?? '');
 	}
 
 	protected function handle_file_upload($uploaded_file, $name, $size, $type, $error, $index = null, $content_range = null) {
@@ -76,8 +94,32 @@ class CustomUploadHandler extends UploadHandler {
 	    );
 	    $query->execute();
 	    $file->id = $this->db->insert_id;
+	    $this->attach_to_folder($file->id, dirname($file->name) === '.' ? '' : dirname($file->name));
 	  }
 	  return $file;
+	}
+
+	// The catalogue groups files by folder row (batch edit and the folder listings read it), so link the new file to its folder's.
+	private function attach_to_folder($file_id, $folder) {
+	  if ($folder === '') {
+	    return;
+	  }
+	  $find = $this->db->prepare('SELECT `folder_id` FROM `folders` WHERE `folder_name`=?');
+	  $find->bind_param('s', $folder);
+	  $find->execute();
+	  $find->bind_result($folder_id);
+	  if (!$find->fetch()) {
+	    $find->close();
+	    $make = $this->db->prepare('INSERT INTO `folders` (`folder_name`) VALUES (?)');
+	    $make->bind_param('s', $folder);
+	    $make->execute();
+	    $folder_id = $this->db->insert_id;
+	  } else {
+	    $find->close();
+	  }
+	  $link = $this->db->prepare('UPDATE `files` SET `folder_id`=? WHERE `id`=?');
+	  $link->bind_param('ii', $folder_id, $file_id);
+	  $link->execute();
 	}
 
 	protected function set_additional_file_properties($file) {

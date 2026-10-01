@@ -50,6 +50,7 @@ if($login_cookie->CheckIt()) {
 							"name" => $f,
 							"type" => "folder",
 							"path" => $path . '/' . $f,
+							"modified" => filemtime($dir . '/' . $f),
 							"items" => scan($dir . '/' . $f, $recursive,$path . '/' . $f) // Recursively get the contents of the folder
 						);
 
@@ -64,6 +65,7 @@ if($login_cookie->CheckIt()) {
 							"name" => $f,
 							"type" => "folder",
 							"path" => $path . '/' . $f,
+							"modified" => filemtime($dir . '/' . $f),
 							"items" => count(scandir($dir . '/' . $f))-2
 						);
 
@@ -79,6 +81,7 @@ if($login_cookie->CheckIt()) {
 						"name" => $f,
 						"type" => "file",
 						"path" => $path . '/' . $f,
+						"modified" => filemtime($dir . '/' . $f),
 						"size" => filesize($dir . '/' . $f) // Gets the size of this file
 					);
 				}

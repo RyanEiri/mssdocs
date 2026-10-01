@@ -1,0 +1,48 @@
+/* Design tokens of the admin UI ("Reading room"), as CSS variables. A site re-themes by defining any of these again in
+   css/site-theme.css, which is loaded after this file; no rebuild is needed. Brand pieces (name, logo) come from
+   config.php (SITE_NAME) and img/logo/logo32.png, not from here. */
+:root {
+  --ips-paper: #f7f4ee;
+  --ips-surface: #fffdf9;
+  --ips-sidebar: #efeae1;
+  --ips-line: #e2dbcf;
+  --ips-line-strong: #cfc6b6;
+  --ips-hover: #f1ece3;
+  --ips-tree-hover: #e6e0d5;
+  --ips-stripe: #e7e1d6;
+
+  --ips-ink: #2a2622;
+  --ips-muted: #6b645b;
+  --ips-faint: #8e867b;
+  --ips-ink-hover: #3d3833;
+  --ips-on-ink-danger: #f3b4ae;
+  --ips-on-ink-link: #9cc9d3;
+
+  --ips-accent: #2f6f7e;
+  --ips-accent-hover: #255b67;
+  --ips-accent-soft: #e1edef;
+  --ips-accent-ring: #cfe2e6;
+
+  --ips-danger: #b3261e;
+  --ips-danger-soft: #f6e3e1;
+  --ips-success: #3f8f5b;
+
+  --ips-viewer: #1b1916;
+  --ips-viewer-surface: #2c2925;
+  --ips-viewer-surface-2: #34302b;
+
+  /* file-type badges */
+  --ips-ft-image: #f4b400;
+  --ips-ft-pdf: #e13d34;
+  --ips-ft-doc: #307cf1;
+  --ips-ft-xls: #0f9d58;
+  --ips-ft-txt: #5eb533;
+  --ips-ft-audio: #8e44ad;
+  --ips-ft-video: #7a3ce7;
+  --ips-ft-archive: #acacac;
+  --ips-ft-default: #018fef;
+
+  --ips-font-display: "Newsreader", Georgia, "Times New Roman", serif;
+  --ips-font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ips-font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}

@@ -1,0 +1,60 @@
+/* Tailwind v4 input for the admin UI. `@theme inline` points every utility at the --ips-* variables in
+   ips/css/ips-theme.css, so a site's css/site-theme.css can re-theme the compiled stylesheet at run time.
+   tools/build-ui-css.sh prepends the @source lines. */
+@import "tailwindcss";
+
+@theme inline {
+  --color-paper: var(--ips-paper);
+  --color-surface: var(--ips-surface);
+  --color-sidebar: var(--ips-sidebar);
+  --color-line: var(--ips-line);
+  --color-line-strong: var(--ips-line-strong);
+  --color-hover: var(--ips-hover);
+  --color-tree-hover: var(--ips-tree-hover);
+  --color-stripe: var(--ips-stripe);
+  --color-ink: var(--ips-ink);
+  --color-muted: var(--ips-muted);
+  --color-faint: var(--ips-faint);
+  --color-ink-hover: var(--ips-ink-hover);
+  --color-on-ink-danger: var(--ips-on-ink-danger);
+  --color-on-ink-link: var(--ips-on-ink-link);
+  --color-accent: var(--ips-accent);
+  --color-accent-hover: var(--ips-accent-hover);
+  --color-accent-soft: var(--ips-accent-soft);
+  --color-accent-ring: var(--ips-accent-ring);
+  --color-danger: var(--ips-danger);
+  --color-danger-soft: var(--ips-danger-soft);
+  --color-success: var(--ips-success);
+  --color-viewer: var(--ips-viewer);
+  --color-viewer-surface: var(--ips-viewer-surface);
+  --color-viewer-surface-2: var(--ips-viewer-surface-2);
+  --color-ft-image: var(--ips-ft-image);
+  --color-ft-pdf: var(--ips-ft-pdf);
+  --color-ft-doc: var(--ips-ft-doc);
+  --color-ft-xls: var(--ips-ft-xls);
+  --color-ft-txt: var(--ips-ft-txt);
+  --color-ft-audio: var(--ips-ft-audio);
+  --color-ft-video: var(--ips-ft-video);
+  --color-ft-archive: var(--ips-ft-archive);
+  --color-ft-default: var(--ips-ft-default);
+
+  --font-display: var(--ips-font-display);
+  --font-sans: var(--ips-font-sans);
+  --font-mono: var(--ips-font-mono);
+
+  --shadow-menu: 0 12px 32px rgba(42, 38, 34, 0.16), 0 2px 6px rgba(42, 38, 34, 0.08);
+  --shadow-modal: 0 24px 64px rgba(42, 38, 34, 0.25);
+  --shadow-toast: 0 10px 30px rgba(42, 38, 34, 0.25);
+  --shadow-tree-active: 0 1px 2px rgba(42, 38, 34, 0.08);
+  --animate-rise: fbIn 160ms ease-out;
+}
+
+@keyframes fbIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@layer base {
+  html, body { background: var(--ips-paper); color: var(--ips-ink); font-family: var(--ips-font-sans); font-size: 14px; }
+  input, textarea, select, button { font: inherit; }
+}

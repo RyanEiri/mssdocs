@@ -2,112 +2,25 @@
 require_once(getcwd().'/php/start_sess.php');
 include getcwd().'/php/boot.php';
 $login_cookie = new UserCookie();
-// Check for sign out signal
 $login_cookie->DeleteIt();
-
 if($login_cookie->CheckIt()) {
-	$_SESSION['login_cookie'] = $login_cookie;
-	define("USERNAME", $login_cookie->username);
-
-	$userval = new UserGrab(USERNAME);
-	define("ADMIN_STATUS", $userval->admin);
+	$userval = new UserGrab($login_cookie->username);
+	$ips_config = ['view' => 'home', 'user' => $login_cookie->username, 'admin' => (bool)$userval->admin, 'csrf' => $login_cookie->CsrfToken()];
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Force latest IE rendering engine or ChromeFrame if installed -->
-<!--[if IE]>
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-<![endif]-->
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Internal Proofing System::<?php echo SITE_ABBR ?></title>
-<meta name="author" content="Ryan Eric Johnson" >
-<meta name="date" content="2020-12-20" >
-<meta name="copyright" content="<?php echo COPYRIGHT_HOLDER . ' ' . COPYRIGHT_YEARS ?>" >
-<meta http-equiv="expires" content="0" >
-
-<!-- Bootstrap for CSS -->
-<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>bootstrap/bootstrap.min.css">
-<!-- Custom styles for this page -->
-<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>bootstrap/jumbotron.css">
-<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>bootstrap/sticky-footer-navbar.css">
-
-<!-- Internet Explorer Tweaks -->
-<!-- IE10 CSS Viewport Workaround -->
-<link rel="stylesheet" href="<?php echo PROGRAM_CSS_BASE ?>ie10-viewport-bug-workaround.css">
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
+<title>Home · <?php echo htmlspecialchars(SITE_NAME) ?></title>
+<?php include(HTML_TEMPLATES.'app-head.php'); ?>
 </head>
-
 <body>
-
-<header>
-<!-- Fixed Navbar -->
-<?php include(HTML_TEMPLATES.'navbar.php'); ?>
-</header>
-
-<main role="main">
-<!-- Info Panel -->
-<div class="jumbotron">
-<div class="container">
-	<h1 class="display-4">Í fótspor Árna Magnússonar í Vesturheimi</h3>
-	<p class="lead">The internal proofing system...</p>
-	<p>Welcome to our internal proofing system web application. The goal of this application is to ease the ability to collaborate with interested parties across the North American continent, in collecting manuscript images and organizing information about them and the people and institutions that possess them.</p>
-</div>
-</div>
-
-	<div class="container">
-		<div class="row">
-			<div class="col-md-4">
-				<h2>File Uploader</h2>
-				<p>Upload some files to create your user directory. You can then navigate to that directory and sort files using the browser.</p>
-				<p><a class="btn btn-secondary" href="<?php echo PROGRAM_WEB_BASE ?>upload.php" role="button">Upload &raquo;</a></p>
-			</div>
-			<div class="col-md-4">
-				<h2>Browse the collection</h2>
-				<p>Browse the currently available images in the collection. Navigate to your user directory to sort your uploaded files.</p>
-				<p><a class="btn btn-secondary" href="<?php echo PROGRAM_WEB_BASE ?>browser.php" role="button">Browse &raquo;</a></p>
-			</div>
-			<div class="col-md-4">
-				<h2>Backups</h2>
-				<p class="lead">Index of backups</p>
-				<p>Index of the ips/backups directory.</p>
-				<p><a class="btn btn-secondary" href="<?php echo PROGRAM_WEB_BASE ?>backups/" role="button">Backups &raquo;</a></p>
-			</div>
-			<div class="col-md-4">
-				<h2>Zip Archives</h2>
-				<p class="lead">Index of zip archives</p>
-				<p>Index of the upload/archives directory.</p>
-				<p><a class="btn btn-secondary" href="<?php echo PROGRAM_WEB_BASE ?>archives/" role="button">Zips &raquo;</a></p>
-		</div>
-
-		<hr>
-
-	</div> <!-- /container -->
-
-</main>
-
-<!-- Footer template -->
-<?php include(HTML_TEMPLATES.'footer.php'); ?>
-
-<!-- jQuery for javascript -->
-<script src="<?php echo PROGRAM_JS_BASE ?>jquery.min.js"></script>
-<!-- JSON scripts -->
-
-<!-- End of JSON scripts -->
-<!-- Bootstrap extensions for jQuery -->
-<script src="<?php echo PROGRAM_JS_BASE ?>bootstrap/popper.min.js"></script>
-<script src="<?php echo PROGRAM_JS_BASE ?>bootstrap/bootstrap.min.js"></script>
-<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-<script src="js/ie10-viewport-bug-workaround.js"></script>
-
+<div id="app"></div>
+<?php include(HTML_TEMPLATES.'app-foot.php'); ?>
 </body>
 </html>
 <?php
+} else {
+	header('Location: ./login.php');
+	exit;
 }
 ?>
