@@ -24,11 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html lang="en">
 <head>
 <title>Sign in · <?php echo htmlspecialchars(SITE_NAME) ?></title>
-<?php include(HTML_TEMPLATES.'app-head.php'); ?>
+<?php include(HTML_TEMPLATES.'ui-head.php'); ?>
 </head>
 <body>
 <div id="app"></div>
-<?php include(HTML_TEMPLATES.'app-foot.php'); ?>
+<?php include(HTML_TEMPLATES.'ui-foot.php'); ?>
 </body>
 </html>
 <?php

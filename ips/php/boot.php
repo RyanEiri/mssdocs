@@ -52,6 +52,11 @@ define("BACKUP_BASE", PROGRAM_BASE.'backups/');
 require_once(PROGRAM_PHP_FUNCTIONS);
 // Instantiate MySQL configuration.
 require_once(PROGRAM_CLASSES_CONFIG);
+// A site's own settings that belong in the synced code tree (php/classes/config.php is per host and is not synced): an optional
+// php/site-config.php, for example define('IPS_UPLOAD_TYPES', '/\.(pdf|zip)$/i'). Never part of the base.
+if (is_file(PROGRAM_BASE.FUNCTIONS_BASE_DIR.'/site-config.php')) {
+	require_once(PROGRAM_BASE.FUNCTIONS_BASE_DIR.'/site-config.php');
+}
 
 // Define HTML constants for templates.
 define("HTML_BREAK", '<br />');

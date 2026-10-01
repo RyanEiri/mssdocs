@@ -38,6 +38,9 @@ function ips_upload_target() {
 define('IPS_UPLOAD_TARGET', ips_upload_target());
 
 $options = array(
+	// Which file names may be uploaded: a site sets IPS_UPLOAD_TYPES (a regular expression) in php/site-config.php; the default is
+	// images, TIFF, XML and PDF.
+	'accept_file_types' => defined('IPS_UPLOAD_TYPES') ? IPS_UPLOAD_TYPES : '/\.(gif|jpe?g|png|tif?f|xml|pdf)$/i',
 	'delete_type' => 'POST',
 	'db_host' => DB_HOST,
 	'db_user' => DB_USER,
