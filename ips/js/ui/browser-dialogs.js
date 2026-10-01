@@ -90,11 +90,11 @@
         if (k === "move") { const first = targets.value.find((p) => !nodes.value.every((n) => parentOf(n.path) === p)); dest.value = first || ""; }
       });
 
-      function done(r, message, after) {
+      function done(r, message, after, opts) {
         busy.value = false;
         if (!r.ok) { error.value = r.message; return; }
         close();
-        IPS.toast(message);
+        if (message) IPS.toast(message, opts);
         if (after) after(r);
       }
       function submit() {
@@ -104,12 +104,12 @@
           if (!name.value.trim() || nameProblem.value) return;
           busy.value = true;
           const v = name.value.trim();
-          A.addFolder(st.cwd, v).then((r) => done(r, "Created “" + v + "”", () => { st.expanded[st.cwd] = true; B.go(r.path); }));
+          A.addFolder(st.cwd, v).then((r) => done(r, "Created “" + v + "”", () => { st.expanded[st.cwd] = true; B.go(r.path); }, IPS.cfg.admin ? { ms: 10000, undo: () => A.undoAddFolder(r.path) } : undefined));
         } else if (dialog.kind === "move") {
           if (!dest.value || here.value || clash.value) return;
           busy.value = true;
           const moved = nodes.value, to = dest.value;
-          A.moveItems(moved, to).then((r) => done(r, "Moved " + (moved.length === 1 ? "“" + moved[0].name + "”" : U.plural(moved.length, "item")) + " to " + folderLabel(to), () => { st.selection = []; }));
+          A.moveWithUndo(moved, to).then((r) => done(r, null, () => { st.selection = []; }));
         } else if (dialog.kind === "batch") {
           if (!changed.value.length || badName.value) return;
           busy.value = true;

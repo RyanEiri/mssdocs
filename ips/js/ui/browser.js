@@ -29,20 +29,31 @@
         return "folder";
       });
       function pick(n, ev) { B.select(n.path, ev); }
-      function open(n) { if (n.folder) B.go(n.path); }
+      function open(n) { B.openNode(n); }
+      function context(n, ev) { B.showMenu(n, ev); }
       function onKey(e) {
         if (/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName) && e.key !== "Escape") return;
+        if (B.dialog.kind || B.viewer.path) return; // a dialog or the viewer has its own keys
         if (e.key === "Escape") {
           if (B.searching.value) st.query = "";
           else B.clearSelection();
+        } else if (e.key === "Delete" && B.can.remove(B.selected())) {
+          B.openDialog("remove", B.selected());
+        } else if (e.key === "/" && !e.ctrlKey && !e.metaKey) {
+          e.preventDefault();
+          document.querySelector("input[type=search]").focus();
+        } else if (e.key === "ArrowUp" && e.altKey && st.cwd !== B.ROOT) {
+          e.preventDefault();
+          B.go(B.path.parentOf(st.cwd));
         } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") {
           e.preventDefault();
           B.selectAll();
         }
       }
-      onMounted(() => { document.addEventListener("keydown", onKey); B.load(); });
-      onBeforeUnmount(() => document.removeEventListener("keydown", onKey));
-      return { cfg: IPS.cfg, S, B, st, FILTERS, SORTS, VIEWS, title, subtitle, summary, empty, pick, open, plural: U.plural };
+      let stopDnd = null;
+      onMounted(() => { document.addEventListener("keydown", onKey); stopDnd = B.dnd(); B.load(); });
+      onBeforeUnmount(() => { document.removeEventListener("keydown", onKey); if (stopDnd) stopDnd(); });
+      return { cfg: IPS.cfg, S, B, st, FILTERS, SORTS, VIEWS, title, subtitle, summary, empty, pick, open, context, plural: U.plural };
     },
     template: `
       <div class="h-screen flex flex-col overflow-hidden bg-paper text-ink select-none">
@@ -110,17 +121,19 @@
                 <button v-if="empty === 'filter'" type="button" @click="st.filter = 'all'" :class="S.btnSecondary" class="mt-4">Show everything</button>
               </div>
               <ips-items v-else :items="B.visible.value" :view="st.view" :selection="st.selection" :titles="st.titles" :sort-key="st.sortKey" :sort-dir="st.sortDir" :searching="B.searching.value"
-                @pick="pick" @open="open" @check="(n) => B.toggle(n.path)" @sort="B.setSort" @check-all="st.selection.length === B.visible.value.length ? B.clearSelection() : B.selectAll()"></ips-items>
+                @pick="pick" @open="open" @context="context" @check="(n) => B.toggle(n.path)" @sort="B.setSort" @check-all="st.selection.length === B.visible.value.length ? B.clearSelection() : B.selectAll()"></ips-items>
             </div>
 
             <footer class="flex items-center gap-4 h-[34px] px-6 border-t border-line text-[12px] text-muted shrink-0" @click.stop>
               <span>{{ summary }}</span>
-              <span class="ml-auto hidden lg:inline">⌘/Ctrl-click to add to the selection · Shift-click for a range</span>
+              <span class="ml-auto hidden lg:inline">Ctrl-click adds to the selection · Shift-click selects a range · Right-click for actions · / searches · Delete removes</span>
             </footer>
           </section>
           <ips-panel v-if="st.panelOpen" @close="B.togglePanel()"></ips-panel>
         </div>
         <ips-dialogs></ips-dialogs>
+        <ips-viewer></ips-viewer>
+        <ips-context-menu></ips-context-menu>
         <ips-upload-tray></ips-upload-tray>
         <ips-drop-overlay></ips-drop-overlay>
         <ips-toasts></ips-toasts>

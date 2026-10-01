@@ -68,6 +68,10 @@
     }).catch(() => ({ ok: false, message: "Couldn’t reach the server." }));
   }
 
+  const join = (a, b) => a + "/" + b;
+  const label = (nodes) => (nodes.length === 1 ? "“" + nodes[0].name + "”" : IPS.util.plural(nodes.length, "item"));
+  const where = (p) => (p === B.ROOT ? "All files" : p.replace(/^files\//, "").split("/").join(" / "));
+
   // POST (JSON) json-move_file.php {files: [{dirname, filename}], folders: [path], moveToFolder, dbMoveToFolder}.
   function moveItems(nodes, dest) {
     const body = { files: nodes.filter((n) => !n.folder).map(asFile), folders: nodes.filter((n) => n.folder).map((n) => n.path), moveToFolder: dest, dbMoveToFolder: dest };
@@ -78,6 +82,36 @@
       nodes.forEach((n) => delete st.details[n.path]);
       return B.load().then(() => ({ ok: true }));
     }).catch(() => ({ ok: false, message: "Couldn’t reach the server." }));
+  }
+
+  // A move with its undo: the toast offers to put every item back in the folder it came from.
+  function moveWithUndo(nodes, dest) {
+    const from = nodes.map((n) => ({ name: n.name, parent: parentOf(n.path) }));
+    return moveItems(nodes, dest).then((r) => {
+      if (!r.ok) return r;
+      IPS.toast("Moved " + label(nodes) + " to " + where(dest), { ms: 10000, undo: () => undoMove(from, dest) });
+      return r;
+    });
+  }
+  async function undoMove(from, dest) {
+    const parents = [...new Set(from.map((f) => f.parent))];
+    for (const parent of parents) {
+      const back = from.filter((f) => f.parent === parent).map((f) => B.nodes.value[join(dest, f.name)]).filter(Boolean);
+      const r = back.length ? await moveItems(back, parent) : { ok: true };
+      if (!r.ok) { IPS.toast("Couldn’t undo: " + r.message, { icon: "alert-circle" }); return; }
+    }
+    IPS.toast("Moved back");
+  }
+
+  // A new folder's undo (administrators only: removing is theirs): the empty folder is taken away again.
+  function undoAddFolder(path) {
+    const node = B.nodes.value[path];
+    if (!node) return;
+    if (B.stats(path).files || B.children(path).length) { IPS.toast("Not undone: the folder is no longer empty.", { icon: "alert-circle" }); return; }
+    const inside = st.cwd === path || st.cwd.startsWith(path + "/"); // load() sends a vanished folder's viewer to the root
+    removeItems([node]).then((r) => {
+      if (r.ok) { if (inside) B.go(parentOf(path)); IPS.toast("Removed “" + node.name + "”"); } else IPS.toast("Couldn’t undo: " + r.message, { icon: "alert-circle" });
+    });
   }
 
   // POST json-remove_file.php {files: [{dirname, filename}], folders: [path]} (administrators only; folders must be empty).
@@ -121,5 +155,5 @@
     }).catch(() => ({ ok: false, message: "Couldn’t reach the server." }));
   }
 
-  IPS.browser.actions = { problem, loadDetail, saveFile, addFolder, moveItems, removeItems, startZip, zipProgress, zipUrl, loadFolderFiles, saveFolderFiles };
+  IPS.browser.actions = { moveWithUndo, undoAddFolder, problem, loadDetail, saveFile, addFolder, moveItems, removeItems, startZip, zipProgress, zipUrl, loadFolderFiles, saveFolderFiles };
 })();

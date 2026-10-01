@@ -77,7 +77,7 @@
     },
     template: `
       <li role="treeitem" :aria-expanded="kids.length ? !!st.expanded[path] : null">
-        <div :class="['flex items-center h-[30px] rounded-md text-[13px] cursor-pointer select-none', st.cwd === path ? 'bg-surface text-accent-hover font-semibold shadow-tree-active' : 'hover:bg-tree-hover']"
+        <div :data-drop="path" :class="['flex items-center h-[30px] rounded-md text-[13px] cursor-pointer select-none', st.cwd === path ? 'bg-surface text-accent-hover font-semibold shadow-tree-active' : 'hover:bg-tree-hover']"
           :style="{ paddingLeft: 4 + depth * 14 + 'px' }" @click="$emit('go', path)">
           <button type="button" :aria-label="st.expanded[path] ? 'Collapse' : 'Expand'" @click.stop="toggle" :class="['grid place-items-center w-4 h-4 text-muted', kids.length ? '' : 'opacity-0 pointer-events-none']">
             <ips-icon :name="st.expanded[path] ? 'chevron-down' : 'chevron-right'" :size="13"></ips-icon>
@@ -113,7 +113,7 @@
       <div>
         <!-- cards -->
         <div v-if="view === 'grid'" class="grid gap-2.5 grid-cols-[repeat(auto-fill,minmax(232px,1fr))]">
-          <div v-for="n in items" :key="n.path" :data-path="n.path" role="button" tabindex="0"
+          <div v-for="n in items" :key="n.path" :data-path="n.path" :data-drop="n.folder ? n.path : null" draggable="true" role="button" tabindex="0"
             :class="['flex items-center gap-3 h-[68px] px-3.5 rounded-[10px] border cursor-pointer', isOn(n) ? 'bg-accent-soft border-accent' : 'bg-surface border-line hover:border-line-strong']"
             @click.stop="$emit('pick', n, $event)" @dblclick="$emit('open', n)" @keydown.enter="$emit('open', n)" @contextmenu.prevent.stop="$emit('context', n, $event)">
             <span v-if="n.folder" class="grid place-items-center w-10 h-10 rounded-[9px] bg-accent-soft text-accent shrink-0"><ips-icon name="folder" :size="20"></ips-icon></span>
@@ -137,7 +137,7 @@
               {{ c[1] }}<ips-icon v-if="sortKey === c[0]" :name="sortDir > 0 ? 'arrow-up' : 'arrow-down'" :size="11"></ips-icon>
             </button>
           </div>
-          <div v-for="n in items" :key="n.path" :data-path="n.path" role="button" tabindex="0"
+          <div v-for="n in items" :key="n.path" :data-path="n.path" :data-drop="n.folder ? n.path : null" draggable="true" role="button" tabindex="0"
             :class="['grid grid-cols-[40px_minmax(0,2.2fr)_minmax(0,2fr)_70px_90px_150px] items-center min-h-[46px] pr-3 text-[13px] border-b border-sidebar last:border-0 cursor-pointer', isOn(n) ? 'bg-accent-soft' : 'hover:bg-paper']"
             @click.stop="$emit('pick', n, $event)" @dblclick="$emit('open', n)" @keydown.enter="$emit('open', n)" @contextmenu.prevent.stop="$emit('context', n, $event)">
             <span class="grid place-items-center"><ips-check :on="isOn(n)" :label="'Select ' + n.name" @toggle="$emit('check', n)"></ips-check></span>
@@ -154,7 +154,7 @@
 
         <!-- thumbnails -->
         <div v-else class="grid gap-3.5 grid-cols-[repeat(auto-fill,minmax(190px,1fr))]">
-          <div v-for="n in items" :key="n.path" :data-path="n.path" role="button" tabindex="0"
+          <div v-for="n in items" :key="n.path" :data-path="n.path" :data-drop="n.folder ? n.path : null" draggable="true" role="button" tabindex="0"
             :class="['relative rounded-[10px] border overflow-hidden cursor-pointer bg-surface', isOn(n) ? 'border-accent ring-[3px] ring-accent-ring' : 'border-line hover:border-line-strong']"
             @click.stop="$emit('pick', n, $event)" @dblclick="$emit('open', n)" @keydown.enter="$emit('open', n)" @contextmenu.prevent.stop="$emit('context', n, $event)">
             <div class="relative grid place-items-center aspect-[4/3] bg-sidebar border-b border-line" :style="isImage(n) ? STRIPES : null">
