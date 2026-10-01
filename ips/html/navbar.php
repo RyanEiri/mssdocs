@@ -20,6 +20,9 @@
 			  <div class="dropdown-menu" aria-labelledby="proofingDropdown">
 			    <a class="dropdown-item" href="<?php echo PROGRAM_WEB_BASE ?>upload.php">Upload</a>
 			    <a class="dropdown-item" href="<?php echo PROGRAM_WEB_BASE ?>browser.php">Browse</a>
+<?php if (is_dir(PROGRAM_BASE.'html_editor')) { ?>
+			    <a class="dropdown-item" href="<?php echo PROGRAM_WEB_BASE ?>html_editor/">HTML Editor</a>
+<?php } ?>
 			  </div>
 			</li>
 		</ul>
