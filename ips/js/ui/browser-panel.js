@@ -138,6 +138,10 @@
               <div class="py-2.5"><div class="font-display text-[20px] font-medium">{{ U.bytesToSize(folderInfo.size) }}</div><div class="text-[11.5px] text-muted">Size</div></div>
             </div>
             <div v-if="node.path !== st.cwd"><button type="button" @click="B.go(node.path)" :class="S.btnSecondary" class="!h-[30px] !rounded-[7px] !text-[12.5px]"><ips-icon name="folder" :size="14"></ips-icon>Open</button></div>
+            <div v-if="node.path !== B.ROOT" class="flex flex-wrap gap-2">
+              <button type="button" @click="B.openDialog('zip', [node])" data-act="zip" :class="S.btnSecondary" class="!h-[30px] !rounded-[7px] !text-[12.5px]"><ips-icon name="download" :size="14"></ips-icon>Download as zip</button>
+              <button v-if="CFG.admin" type="button" @click="B.openDialog('batch', [node])" data-act="batch" :class="S.btnSecondary" class="!h-[30px] !rounded-[7px] !text-[12.5px]"><ips-icon name="edit-3" :size="14"></ips-icon>Edit files…</button>
+            </div>
             <dl class="grid grid-cols-[110px_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-[12.5px]">
               <dt class="text-muted">Last modified</dt><dd>{{ when(node.modified) }}</dd>
             </dl>

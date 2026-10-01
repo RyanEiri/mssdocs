@@ -90,5 +90,36 @@
     }).catch(() => ({ ok: false, message: "Couldn’t reach the server." }));
   }
 
-  IPS.browser.actions = { problem, loadDetail, saveFile, addFolder, moveItems, removeItems };
+  // Zip a folder in the background: POST json-folder_functions.php {folderToZip, token} starts a worker, json-progress.php
+  // {token} reports {percent, count, total, done, filename, error}; json-download.php?token=&filename= serves the result.
+  const newToken = () => "z" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+  function startZip(path) {
+    const token = newToken();
+    return IPS.postForm("json/json-folder_functions.php", { folderToZip: path, token })
+      .then((r) => (r && r.success ? { ok: true, token, total: r.count } : { ok: false, message: (r && r.error) || problem(r, "The zip couldn’t be started.") }))
+      .catch(() => ({ ok: false, message: "Couldn’t reach the server." }));
+  }
+  const zipProgress = (token) => IPS.postForm("json/json-progress.php", { token }).catch(() => ({ percent: 0, error: "Couldn’t reach the server." }));
+  const zipUrl = (token, filename) => IPS.cfg.base + "json/json-download.php?token=" + encodeURIComponent(token) + "&filename=" + encodeURIComponent(filename);
+
+  // Batch edit (administrators): POST json-database_info.php {context: "folder", dirName} lists the folder's catalogue rows,
+  // POST json-folder_files.php saves names, titles and descriptions of those rows in one go (a changed name renames the file).
+  function loadFolderFiles(path) {
+    return IPS.postForm("json/json-database_info.php", { context: "folder", dirName: path }).then((r) => {
+      if (!r || r.success !== true) return { ok: false, message: problem(r, "This folder’s files couldn’t be listed.") };
+      const files = Object.values(r.files || {}).map((f) => ({ id: f.id, url: f.url, name: nameOf(f.name), original: nameOf(f.name), title: f.title || "", description: f.description || "" }));
+      return { ok: true, folderId: r.folderId, folderName: r.folderName, files };
+    }).catch(() => ({ ok: false, message: "Couldn’t reach the server." }));
+  }
+  function saveFolderFiles(folder, rows) {
+    const filesInFolder = {};
+    rows.forEach((f, i) => { filesInFolder[i] = { id: f.id, url: f.name === f.original ? f.url : f.url.replace(/[^/]*$/, "") + encodeURIComponent(f.name), name: f.name, title: f.title, description: f.description }; });
+    return IPS.postForm("json/json-folder_files.php", { filesInFolder, folderName: folder.folderName, folderId: folder.folderId }).then((r) => {
+      if (r && r.success === true) return B.load().then(() => { st.details = {}; return { ok: true }; });
+      const clash = r && r.errors && r.errors.file_exists ? Object.values(r.errors.file_exists).map((n) => "“" + n + "” already exists.").join(" ") : "";
+      return { ok: false, message: clash || problem(r, "The changes couldn’t be saved.") };
+    }).catch(() => ({ ok: false, message: "Couldn’t reach the server." }));
+  }
+
+  IPS.browser.actions = { problem, loadDetail, saveFile, addFolder, moveItems, removeItems, startZip, zipProgress, zipUrl, loadFolderFiles, saveFolderFiles };
 })();

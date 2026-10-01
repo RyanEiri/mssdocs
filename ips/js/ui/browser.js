@@ -68,6 +68,7 @@
                     @keydown.esc.stop="st.query = ''" :class="S.input" class="!pl-9 !pr-8">
                   <button v-if="st.query" type="button" aria-label="Clear search" @click="st.query = ''" class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted hover:text-ink cursor-pointer"><ips-icon name="x" :size="14"></ips-icon></button>
                 </label>
+                <button type="button" @click.stop="B.upload.pick()" :disabled="!B.upload.can()" data-act="upload" :title="B.upload.can() ? 'Upload files into this folder' : B.upload.why()" :class="S.btnPrimary"><ips-icon name="upload" :size="15"></ips-icon>Upload</button>
                 <button type="button" @click.stop="B.openDialog('add')" :disabled="!B.can.add()" data-act="add" :title="B.can.add() ? 'New folder' : 'You can add folders inside files/' + cfg.user" :class="S.btnSecondary"><ips-icon name="folder-plus" :size="15"></ips-icon>New folder</button>
                 <button type="button" @click.stop="B.togglePanel()" :aria-pressed="st.panelOpen" :aria-label="st.panelOpen ? 'Hide details' : 'Show details'" title="Details panel"
                   :class="['grid place-items-center w-9 h-9 rounded-lg border border-line cursor-pointer', st.panelOpen ? 'bg-sidebar' : 'bg-surface hover:bg-hover']"><ips-icon name="sidebar" :size="16" class="-scale-x-100"></ips-icon></button>
@@ -120,6 +121,8 @@
           <ips-panel v-if="st.panelOpen" @close="B.togglePanel()"></ips-panel>
         </div>
         <ips-dialogs></ips-dialogs>
+        <ips-upload-tray></ips-upload-tray>
+        <ips-drop-overlay></ips-drop-overlay>
         <ips-toasts></ips-toasts>
       </div>`,
   };
