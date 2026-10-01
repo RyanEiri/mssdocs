@@ -4,13 +4,24 @@ A web-based internal proofing system for organizing, uploading, and browsing man
 
 ## Features
 
-- File upload with per-user directories
-- Hierarchical file browser with folder management
-- Image gallery viewer with rotate support (blueimp Gallery)
-- Zip folder download with real-time progress bar
-- User management (admin/non-admin roles)
-- TEI/XML editor view
-- Backup file download utility
+- Sign-in, a home page of module cards and user management (admin / standard roles), as one small Vue 3 shell
+- File browser: folder tree, cards, list and thumbnail views, search across all folders, filters and sorting
+- A details panel for a file or folder (title, description, rename, move), and for several selected items
+- New folder, move, remove (administrators), undo for moves, drag-and-drop between folders, a right-click menu and keys
+- Upload into the open folder, by button or by dropping files from the desktop, with a progress tray
+- Zip a folder with a progress bar; administrators can edit the names, titles and descriptions of a folder's files together
+- Image viewer with next/previous and rotate (for looking only)
+- Optional modules: the HTML editor (`ips/html_editor/`), the TEI/XML editor, backup download
+
+### The admin UI
+
+No bundler: Vue 3 (the global build) and plain scripts in `ips/js/ui/`, styled by a Tailwind stylesheet compiled in advance
+(`ips/css/ips-ui.css`). Nothing loads from a CDN: Vue, the Newsreader / IBM Plex fonts and the icons are in the tree.
+Colours, fonts and the logo are CSS variables (`ips/css/ips-theme.css`); a site re-themes by adding `ips/css/site-theme.css`
+and can add panels to the home page from `ips/js/site-home.js` (`IPS.registerHomePanel`). Rebuild the stylesheet with
+`tools/build-ui-css.sh` after adding a Tailwind class, and refresh the vendored assets with `tools/vendor-ui-assets.sh`.
+The file browser uses the existing `ips/json/*.php` endpoints and `upload/index.php`, so the server's path confinement and
+ownership rules apply to everything it does: standard users may add, move and rename only inside `files/<their username>`.
 
 ## Requirements
 
