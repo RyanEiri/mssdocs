@@ -34,9 +34,6 @@ if($login_cookie->CheckIt()) {
 	}
 	
 	// Initialize database connection
-//	define("DB_HOST", "localhost");
-//	define("DB_USER", "d7gonzo");
-//	define("DB_PASS", "aSUjiSpHfXrt2pwTxZnw");
 	define("MIH_DB_NAME", "mih");
 	$mih_db = new SQL(DB_HOST, DB_USER, DB_PASS, MIH_DB_NAME);
 
