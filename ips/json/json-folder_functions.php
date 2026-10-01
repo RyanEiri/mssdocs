@@ -13,6 +13,12 @@ if (!$login_cookie->CheckIt()) {
     exit;
 }
 
+// The worker needs PHP's zip extension; without it the progress bar would never finish.
+if (!class_exists('ZipArchive')) {
+    echo json_encode(['success' => false, 'error' => 'Zipping needs the PHP zip extension (php-zip), which is not installed on this server.']);
+    exit;
+}
+
 if (empty($_POST['folderToZip'])) {
     echo json_encode(['success' => false, 'error' => 'No folder provided']);
     exit;

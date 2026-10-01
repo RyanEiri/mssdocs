@@ -11,11 +11,11 @@ if($login_cookie->CheckIt()) {
 <html lang="en">
 <head>
 <title>Files · <?php echo htmlspecialchars(SITE_NAME) ?></title>
-<?php include(HTML_TEMPLATES.'app-head.php'); ?>
+<?php include(HTML_TEMPLATES.'ui-head.php'); ?>
 </head>
 <body>
 <div id="app"></div>
-<?php include(HTML_TEMPLATES.'app-foot.php'); ?>
+<?php include(HTML_TEMPLATES.'ui-foot.php'); ?>
 </body>
 </html>
 <?php

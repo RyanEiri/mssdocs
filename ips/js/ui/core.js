@@ -1,6 +1,6 @@
 /* IPS admin UI, core: configuration, server calls, formatting helpers, the icon component and the toast store.
    Every UI script shares one namespace, window.IPS (plain scripts, no bundler). Needs Vue (global build) and
-   window.IPS_CONFIG from html/app-foot.php. */
+   window.IPS_CONFIG from html/ui-foot.php. */
 (function () {
   "use strict";
   const { reactive, h } = Vue;

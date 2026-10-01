@@ -1,5 +1,6 @@
 <?php
-/* Shared <head> for the Vue/Tailwind admin pages (login, home, users, browser).
+/* Shared <head> for the Vue/Tailwind admin pages (login, home, users, browser). (Named ui-*, not app-*, so a site that
+ * already has its own html/app-head.php can run these pages beside its own.)
  *
  * Self-hosted: fonts, the compiled Tailwind stylesheet and Vue all come from this site, so the pages make no
  * third-party requests. A site changes the look by adding css/site-theme.css, which overrides the --ips-* tokens

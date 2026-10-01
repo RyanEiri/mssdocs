@@ -20,7 +20,7 @@
       const xhr = new XMLHttpRequest(), form = new FormData();
       form.append("files[]", item.file, item.file.name);
       form.append("dir", item.dir);
-      xhr.open("POST", IPS.cfg.base + "upload/index.php");
+      xhr.open("POST", IPS.cfg.base + "json/json-upload.php");
       xhr.setRequestHeader("X-CSRF", IPS.cfg.csrf);
       xhr.setRequestHeader("Accept", "application/json");
       xhr.withCredentials = true;

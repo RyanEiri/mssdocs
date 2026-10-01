@@ -10,7 +10,7 @@ ips/backups/*
 # CKEditor 4 for the HTML editor module: third-party, install it per ips/html_editor/README.md
 ips/html_editor/ckeditor/
 
-# A site's own additions to the admin UI (see ips/css/ips-theme.css and ips/html/app-foot.php): never part of the base
+# A site's own additions to the admin UI (see ips/css/ips-theme.css and ips/html/ui-foot.php): never part of the base
 ips/css/site-theme.css
 ips/js/site-home.js
 
@@ -26,3 +26,6 @@ ips/contacts/cardfile/*.CRD
 ips/contacts/cardfile/*.parsed
 ips/contacts/cardfile/*.parsed.bkp
 
+
+# A site's own PHP settings (see ips/php/boot.php)
+ips/php/site-config.php
