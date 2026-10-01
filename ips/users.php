@@ -305,6 +305,8 @@ foreach ($userlist as $value) {
 <?php
 if((ADMIN_STATUS) && ($_GET['users'])){
 ?>
+<!-- Send the per-user CSRF token with every user-management request -->
+<script>$.ajaxSetup({ headers: { 'X-CSRF': <?php echo json_encode($login_cookie->CsrfToken()); ?> } });</script>
 <script src="<?php echo PROGRAM_JSON_BASE ?>json_request-user_info.js"></script>
 <script src="<?php echo PROGRAM_JSON_BASE ?>json_request-form-change_user.js"></script>
 <script src="<?php echo PROGRAM_JSON_BASE ?>json_request-form-add_user.js"></script>

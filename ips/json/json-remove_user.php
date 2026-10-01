@@ -11,6 +11,8 @@ if($login_cookie->CheckIt()) {
 	define("ADMIN_STATUS", $userval->admin);
 
 if(ADMIN_STATUS){
+	// Refuse cross-site or token-less POSTs (see UserCookie::RequireCsrf).
+	$login_cookie->RequireCsrf();
   // instantiate an ActOnSingleUser object
   if(!isset($user_object)) {
 		$user_object = new ActOnSingleUser();
@@ -47,7 +49,7 @@ if(ADMIN_STATUS){
 	  $data['message'] = 'Success!';
 	  $data['value'] = $value;
 	} else {
-	  $errors['id'] = 'User not deleted!';
+	  $errors['id'] = $user_object->removeError ?: 'User not deleted!';
 	  $data['success'] = false;
 	  $data['errors'] = $errors;
 	  $data['value'] = $value;

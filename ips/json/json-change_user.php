@@ -11,6 +11,8 @@ if($login_cookie->CheckIt()) {
 	define("ADMIN_STATUS", $userval->admin);
 
 if(ADMIN_STATUS){
+	// Refuse cross-site or token-less POSTs (see UserCookie::RequireCsrf).
+	$login_cookie->RequireCsrf();
 
 // instantiate an ActOnSingleUser object
 
@@ -46,7 +48,10 @@ if(ADMIN_STATUS){
 			}
 	}
 
-	if(!empty($_POST['password']) && ($_POST['password'] === $_POST['cpassword'])) {
+	// Blank password + blank confirm = keep the current password (and the user's session).
+	if(empty($_POST['password']) && empty($_POST['cpassword'])) {
+		$_SESSION['password'] = '';
+	} elseif(!empty($_POST['password']) && ($_POST['password'] === $_POST['cpassword'])) {
     $_SESSION['password'] = test_input($_POST['password']);
     $_SESSION['cpassword'] = test_input($_POST['cpassword']);
     if (strlen($_SESSION['password']) < '8') {
