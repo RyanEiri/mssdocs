@@ -47,7 +47,7 @@
     template: `
       <div class="h-screen flex flex-col overflow-hidden bg-paper text-ink select-none">
         <ips-app-bar active="files"></ips-app-bar>
-        <div class="flex-1 min-h-0 grid" style="grid-template-columns: 248px minmax(0, 1fr)">
+        <div class="flex-1 min-h-0 grid" :style="{ gridTemplateColumns: st.panelOpen ? '248px minmax(0, 1fr) 352px' : '248px minmax(0, 1fr)' }">
           <aside class="flex flex-col min-h-0 bg-sidebar border-r border-line" aria-label="Folders">
             <div :class="S.eyebrow" class="px-4 pt-3.5 pb-1.5 !tracking-[0.08em]">Folders</div>
             <ul role="tree" class="flex-1 overflow-y-auto px-2 pb-4"><ips-tree-node v-if="st.ready" :path="B.ROOT" @go="B.go"></ips-tree-node></ul>
@@ -68,19 +68,21 @@
                     @keydown.esc.stop="st.query = ''" :class="S.input" class="!pl-9 !pr-8">
                   <button v-if="st.query" type="button" aria-label="Clear search" @click="st.query = ''" class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted hover:text-ink cursor-pointer"><ips-icon name="x" :size="14"></ips-icon></button>
                 </label>
+                <button type="button" @click.stop="B.togglePanel()" :aria-pressed="st.panelOpen" :aria-label="st.panelOpen ? 'Hide details' : 'Show details'" title="Details panel"
+                  :class="['grid place-items-center w-9 h-9 rounded-lg border border-line cursor-pointer', st.panelOpen ? 'bg-sidebar' : 'bg-surface hover:bg-hover']"><ips-icon name="sidebar" :size="16" class="-scale-x-100"></ips-icon></button>
               </div>
             </div>
 
-            <div class="mt-3.5 px-6 pb-3.5 min-h-[40px] flex flex-wrap items-center gap-3 border-b border-line" @click.stop>
-              <div v-if="st.selection.length" class="flex items-center gap-1 h-9 pl-3.5 pr-1.5 rounded-lg bg-ink text-paper text-[13px]">
+            <div class="mt-3.5 px-6 pb-3.5 min-h-[40px] flex items-center gap-3 border-b border-line" @click.stop>
+              <div v-if="st.selection.length" class="flex items-center gap-1 h-9 pl-3.5 pr-1.5 rounded-lg bg-ink text-paper text-[13px] shrink-0 whitespace-nowrap">
                 <span class="font-medium mr-1.5">{{ st.selection.length }} selected</span>
                 <button type="button" @click="B.clearSelection()" class="grid place-items-center h-[26px] px-2 rounded-md hover:bg-ink-hover cursor-pointer" aria-label="Clear selection"><ips-icon name="x" :size="14"></ips-icon></button>
               </div>
-              <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter by type">
+              <div class="flex items-center gap-1.5 min-w-0 overflow-x-auto py-0.5" role="group" aria-label="Filter by type">
                 <button v-for="f in FILTERS" :key="f[0]" type="button" @click="st.filter = f[0]" :aria-pressed="st.filter === f[0]"
-                  :class="['h-7 px-[11px] rounded-[14px] border text-[12.5px] font-medium cursor-pointer transition-colors', st.filter === f[0] ? 'bg-ink border-ink text-paper' : 'bg-surface border-line hover:border-line-strong']">{{ f[1] }}</button>
+                  :class="['h-7 px-[11px] rounded-[14px] border text-[12.5px] font-medium cursor-pointer transition-colors shrink-0', st.filter === f[0] ? 'bg-ink border-ink text-paper' : 'bg-surface border-line hover:border-line-strong']">{{ f[1] }}</button>
               </div>
-              <div class="ml-auto flex items-center gap-2">
+              <div class="ml-auto flex items-center gap-2 shrink-0">
                 <label class="flex items-center gap-2 text-[12.5px] text-muted">Sort
                   <select v-model="st.sortKey" class="h-[30px] rounded-[7px] border border-line bg-surface px-2 text-[12.5px] text-ink outline-none focus:border-accent">
                     <option v-for="s in SORTS" :key="s[0]" :value="s[0]">{{ s[1] }}</option>
@@ -112,6 +114,7 @@
               <span class="ml-auto hidden lg:inline">⌘/Ctrl-click to add to the selection · Shift-click for a range</span>
             </footer>
           </section>
+          <ips-panel v-if="st.panelOpen" @close="B.togglePanel()"></ips-panel>
         </div>
         <ips-toasts></ips-toasts>
       </div>`,

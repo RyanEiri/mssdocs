@@ -49,13 +49,15 @@
   function save(key, value) { try { localStorage.setItem("ips.browser." + key, value); } catch (e) { /* private mode */ } }
 
   const store = reactive({
-    tree: null, loading: false, ready: false, error: "", titles: {},
+    tree: null, loading: false, ready: false, error: "", titles: {}, details: {},
     cwd: cleanPath(decodeURIComponent((location.hash || "").slice(1))),
     expanded: { [ROOT]: true },
     selection: [], anchor: null,
     view: saved("view", "grid"), sortKey: "name", sortDir: 1, filter: "all", query: "",
     panelOpen: saved("panel", "1") === "1",
   });
+
+  for (let p = store.cwd; p; p = parentOf(p)) store.expanded[p] = true; // a deep link opens the tree down to its folder
 
   // path -> node for every folder and file except the thumbnail folders (they hold generated copies, not content)
   const nodes = computed(() => {
