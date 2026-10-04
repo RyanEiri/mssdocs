@@ -150,7 +150,7 @@ function ips_confine_request($endpoint) {
 }
 
 // Who may change what, and never over the top of something that already exists. Regular users may only move,
-// rename and create folders inside upload/files/<their username>/; administrators may work anywhere. Nobody
+// rename, create and remove inside upload/files/<their username>/ (never that folder itself); administrators may work anywhere. Nobody
 // gets to replace an existing file or folder (rename() silently would). Runs after the path checks, so every
 // path used here has already been shown to resolve inside upload/files/.
 function ips_check_writes($endpoint) {
@@ -161,6 +161,20 @@ function ips_check_writes($endpoint) {
 	};
 	$only_own = "You can only change files inside your own folder (files/$username).";
 	switch ($endpoint) {
+		case 'remove':
+			$files = isset($post['files']) && is_array($post['files']) ? $post['files'] : [];
+			$folders = isset($post['folders']) && is_array($post['folders']) ? $post['folders'] : [];
+			foreach ($files as $file) {
+				if (!$own(ips_resolve_dir($file['dirname']))) {
+					ips_refuse_path('files', "You can only remove files inside your own folder (files/$username).");
+				}
+			}
+			foreach ($folders as $folder) {
+				if (!$own(ips_resolve_dir($folder), false)) {
+					ips_refuse_path('files', "You can only remove folders inside your own folder (files/$username).");
+				}
+			}
+			break;
 		case 'move':
 			$files = isset($post['files']) && is_array($post['files']) ? $post['files'] : [];
 			$folders = isset($post['folders']) && is_array($post['folders']) ? $post['folders'] : [];
