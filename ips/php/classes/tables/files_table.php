@@ -82,6 +82,27 @@ function ips_in_users_tree($real, $username, $allow_own_root = true) {
 	return $real === $own ? $allow_own_root : strpos($real . '/', $own . '/') === 0;
 }
 
+// A regular user's own folder, files/<username>/, is made the first time they open the browser: its thumbnail folder and its row in the folders table
+// too, as the New folder endpoint does. Without it they would have nowhere of their own to upload to or organise (every one of their rights is inside it).
+// Administrators work anywhere and are not given one; a name that is not a plain folder name (empty, a leading dot, a slash) gets none; nothing that is
+// already there is touched.
+function ips_ensure_user_folder($username, $admin) {
+	$root = ips_files_root();
+	if ($admin || $root === false || !ips_safe_name($username) || $username[0] === '.') {
+		return;
+	}
+	$dir = $root . '/' . $username;
+	if (file_exists($dir)) {
+		return;
+	}
+	if (!@mkdir($dir, 0755) && !is_dir($dir)) {
+		error_log("ips: could not make the folder files/$username");
+		return;
+	}
+	@mkdir($dir . '/thumbnail', 0755);
+	new FolderGrab($username, TRUE);
+}
+
 // [username, is_admin] of the signed-in user (the endpoints have already passed CheckIt()).
 function ips_current_user() {
 	global $login_cookie;
