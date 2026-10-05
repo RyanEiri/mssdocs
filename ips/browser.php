@@ -5,6 +5,7 @@ $login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
 if($login_cookie->CheckIt()) {
 	$userval = new UserGrab($login_cookie->username);
+	ips_ensure_user_folder($login_cookie->username, (bool)$userval->admin);
 	$ips_config = ['view' => 'browser', 'user' => $login_cookie->username, 'admin' => (bool)$userval->admin, 'csrf' => $login_cookie->CsrfToken()];
 ?>
 <!DOCTYPE html>
