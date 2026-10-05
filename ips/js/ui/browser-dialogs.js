@@ -15,7 +15,8 @@
   const can = {
     add: () => B.canWrite(st.cwd) && !B.searching.value,
     move: (nodes) => nodes.length > 0 && nodes.every((n) => B.canWrite(n.path)),
-    remove: (nodes) => IPS.cfg.admin && nodes.length > 0,
+    // administrators anywhere; everyone else inside their own folder, but not that folder itself (the server enforces the same rule)
+    remove: (nodes) => nodes.length > 0 && nodes.every((n) => B.canWrite(n.path) && (IPS.cfg.admin || n.path !== B.path.join(B.ROOT, IPS.cfg.user))),
   };
   // A folder that still holds files can't be removed (the endpoint refuses it too); thumbnails don't count.
   const filled = (n) => n.folder && B.children(n.path).length > 0;
@@ -104,7 +105,7 @@
           if (!name.value.trim() || nameProblem.value) return;
           busy.value = true;
           const v = name.value.trim();
-          A.addFolder(st.cwd, v).then((r) => done(r, "Created “" + v + "”", () => { st.expanded[st.cwd] = true; B.go(r.path); }, IPS.cfg.admin ? { ms: 10000, undo: () => A.undoAddFolder(r.path) } : undefined));
+          A.addFolder(st.cwd, v).then((r) => done(r, "Created “" + v + "”", () => { st.expanded[st.cwd] = true; B.go(r.path); }, { ms: 10000, undo: () => A.undoAddFolder(r.path) }));
         } else if (dialog.kind === "move") {
           if (!dest.value || here.value || clash.value) return;
           busy.value = true;

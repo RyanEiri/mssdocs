@@ -15,14 +15,15 @@ if($login_cookie->CheckIt()) {
   $errors	= array();	// array to hold validation errors
   $data		= array();	// array to pass back data
 
-if(ADMIN_STATUS){
+{
 	// validate the request ==========================================
   // If any of these variables don't exist, add an error to our
   // $errors array. If they do exist add them to a variable value.
   // If the folder value is the same as the current path, invalidate
   // and pass error.
 
-	// Refuse paths outside upload/files/ (see ips_confine_request in files_table.php).
+	// Refuse paths outside upload/files/, and, for a regular user, anything outside files/<their username>/
+	// (see ips_confine_request and ips_check_writes in files_table.php). Administrators may remove anywhere.
 	ips_confine_request('remove');
   if (empty($_POST['files']) && empty($_POST['folders'])){
 	$errors['files'] = 'No files or folders selected!';
@@ -67,8 +68,6 @@ if(ADMIN_STATUS){
 			}
     }
   }
-} else {
-	$errors['privilege'] = 'You do not have sufficient privileges to remove files. Please contact your administrator.';
 }
 
 // return an error response if there are errors ===================================

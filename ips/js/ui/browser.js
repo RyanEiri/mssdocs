@@ -90,7 +90,7 @@
               <div v-if="st.selection.length" class="flex items-center gap-1 h-9 pl-3.5 pr-1.5 rounded-lg bg-ink text-paper text-[13px] shrink-0 whitespace-nowrap">
                 <span class="font-medium mr-1.5">{{ st.selection.length }} selected</span>
                 <button type="button" @click="B.openDialog('move', B.selected())" :disabled="!B.can.move(B.selected())" data-act="move" class="inline-flex items-center gap-1.5 h-[26px] px-2 rounded-md hover:bg-ink-hover cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"><ips-icon name="move" :size="14"></ips-icon>Move</button>
-                <button v-if="cfg.admin" type="button" @click="B.openDialog('remove', B.selected())" data-act="remove" class="inline-flex items-center gap-1.5 h-[26px] px-2 rounded-md hover:bg-ink-hover cursor-pointer"><ips-icon name="trash-2" :size="14"></ips-icon>Remove</button>
+                <button v-if="B.can.remove(B.selected())" type="button" @click="B.openDialog('remove', B.selected())" data-act="remove" class="inline-flex items-center gap-1.5 h-[26px] px-2 rounded-md hover:bg-ink-hover cursor-pointer"><ips-icon name="trash-2" :size="14"></ips-icon>Remove</button>
                 <button type="button" @click="B.clearSelection()" class="grid place-items-center h-[26px] px-2 rounded-md hover:bg-ink-hover cursor-pointer" aria-label="Clear selection"><ips-icon name="x" :size="14"></ips-icon></button>
               </div>
               <div class="flex items-center gap-1.5 min-w-0 overflow-x-auto py-0.5" role="group" aria-label="Filter by type">

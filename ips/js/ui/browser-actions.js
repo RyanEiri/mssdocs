@@ -103,7 +103,7 @@
     IPS.toast("Moved back");
   }
 
-  // A new folder's undo (administrators only: removing is theirs): the empty folder is taken away again.
+  // A new folder's undo: the empty folder is taken away again.
   function undoAddFolder(path) {
     const node = B.nodes.value[path];
     if (!node) return;
@@ -114,7 +114,7 @@
     });
   }
 
-  // POST json-remove_file.php {files: [{dirname, filename}], folders: [path]} (administrators only; folders must be empty).
+  // POST json-remove_file.php {files: [{dirname, filename}], folders: [path]} (anywhere for administrators, inside files/<username> for anyone else; folders must be empty).
   function removeItems(nodes) {
     const body = { files: nodes.filter((n) => !n.folder).map(asFile), folders: nodes.filter((n) => n.folder).map((n) => n.path) };
     return IPS.postForm("json/json-remove_file.php", body).then((r) => {
