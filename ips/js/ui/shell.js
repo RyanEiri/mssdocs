@@ -1,4 +1,4 @@
-/* IPS admin UI, shell: the app bar, modal and toast components and the shared Tailwind class sets, so every view
+/* IPS admin UI, shell: the app bar (with "View site", a way back to the site's public pages at cfg.site), modal and toast components and the shared Tailwind class sets, so every view
    uses the same buttons, inputs and cards. Layout and tokens follow the "Reading room" design handoff. */
 (function () {
   "use strict";
@@ -41,6 +41,7 @@
             :class="['px-2.5 py-1.5 rounded-md text-[13px] no-underline transition-colors', l.id === active ? 'bg-sidebar font-medium text-ink' : 'text-muted hover:bg-hover']">{{ l.label }}</a>
         </nav>
         <div class="ml-auto flex items-center gap-2.5 text-[13px]">
+          <a :href="cfg.site" class="inline-flex items-center gap-1.5 text-muted hover:text-ink no-underline"><ips-icon name="globe" :size="14"></ips-icon>View site</a>
           <span class="grid place-items-center w-[26px] h-[26px] rounded-full bg-accent-soft text-accent-hover text-[12px] font-semibold" aria-hidden="true">{{ initial }}</span>
           <span class="text-ink">{{ cfg.user }}</span>
           <span v-if="cfg.admin" class="font-mono text-[10px] uppercase tracking-[0.06em] border border-line rounded px-1.5 py-px text-muted">Admin</span>

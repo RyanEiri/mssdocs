@@ -15,6 +15,7 @@ $fe_logo = is_file(PROGRAM_BASE . 'img/logo/logo32.png') ? PROGRAM_WEB_BASE . 'i
 		<a href="<?php echo PROGRAM_WEB_BASE ?>file_editor/" aria-current="page">File editor</a>
 	</nav>
 	<div class="fe-user">
+		<a href="<?php echo $fe_h(dirname(rtrim(PROGRAM_WEB_BASE, '/')) . '/') ?>">View site</a>
 		<span class="fe-avatar" aria-hidden="true"><?php echo $fe_h(strtoupper(substr($fe_user, 0, 1))) ?></span>
 		<span><?php echo $fe_h($fe_user) ?></span>
 <?php if ($fe_admin) { ?>
