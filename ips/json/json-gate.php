@@ -3,13 +3,19 @@
 // Answers 204 (let nginx serve it) or 403; nginx maps any other status to a 500, so a path that does not exist is a 204 for a signed-in visitor (nginx then
 // answers 404) and a 403 for anyone else. A file is allowed when it is in a public folder (a folder with the marker file, or below one: see ips_dir_is_public)
 // or the visitor is signed in; the archives (uploaded zips) are never public, only for a signed-in visitor. It reads only the request's path and never writes. The answer carries X-Gate-Cache-Control, which nginx sends as the file's
-// Cache-Control: public files may be cached, anything else must not be, or a CDN would hand a private file to the next visitor.
+// Cache-Control: a public file may be cached anywhere; a file served to a signed-in visitor is `private` (no CDN or shared cache may keep it, or one would hand it
+// to the next visitor) but the visitor's own browser may keep it for a day, so the scan pane's page images are not fetched again on every visit; a refusal is
+// never stored.
 chdir('..');
 include getcwd().'/php/boot.php';
 
-function gate_answer($status, $public) {
+const GATE_PUBLIC = 'public, max-age=3600';
+const GATE_SIGNED_IN = 'private, max-age=86400';
+const GATE_REFUSED = 'private, no-store';
+
+function gate_answer($status, $cache) {
 	http_response_code($status);
-	header('X-Gate-Cache-Control: '.($public ? 'public, max-age=3600' : 'private, no-store'));
+	header('X-Gate-Cache-Control: '.$cache);
 	exit;
 }
 
@@ -41,23 +47,26 @@ function gate_requested_path() {
 $asked = gate_requested_path();
 $root = $asked === null ? false : realpath(ips_upload_base().$asked[0]);
 if ($asked === null || $root === false) {
-	gate_answer(403, false);
+	gate_answer(403, GATE_REFUSED);
 }
 $rel = $asked[1];
 // No hidden entry is ever served (the marker, .deleted/, backups), whatever the file system says.
 foreach (explode('/', $rel) as $part) {
 	if ($part !== '' && $part[0] === '.') {
-		gate_answer(403, false);
+		gate_answer(403, GATE_REFUSED);
 	}
 }
 $real = realpath($root.'/'.$rel);
 if ($real !== false && strpos($real.'/', $root.'/') !== 0) {
-	gate_answer(403, false); // a link out of upload/files/
+	gate_answer(403, GATE_REFUSED); // a link out of upload/files/
 }
 $folder = $real === false ? false : (is_dir($real) ? $real : dirname($real));
 if ($asked[0] === 'files' && $folder !== false && ips_dir_is_public($folder)) {
-	gate_answer(204, true);
+	gate_answer(204, GATE_PUBLIC);
 }
 // Peek(), not CheckIt(): CheckIt() redirects a visitor who is not signed in to the login page, and nginx cannot take a redirect as an answer.
 $login_cookie = new UserCookie();
-gate_answer($login_cookie->Peek() !== false ? 204 : 403, false);
+if ($login_cookie->Peek() !== false) {
+	gate_answer(204, GATE_SIGNED_IN);
+}
+gate_answer(403, GATE_REFUSED);
