@@ -18,15 +18,24 @@ function gate_answer($status, $public) {
 function gate_requested_path() {
 	$uri = $_SERVER['IPS_ORIGINAL_URI'] ?? '';
 	$path = is_string($uri) ? parse_url($uri, PHP_URL_PATH) : null;
-	foreach (['files', 'archives'] as $area) {
-		$marker = '/upload/'.$area.'/';
-		$at = is_string($path) ? strpos($path, $marker) : false;
-		if ($at !== false) {
-			$rel = rawurldecode(substr($path, $at + strlen($marker)));
-			return ($rel === '' || strpos($rel, "\0") !== false) ? null : [$area, $rel];
+	if (!is_string($path)) {
+		return null;
+	}
+	// The marker that starts the path decides the area: a name inside an archive path that merely contains another marker must not change it.
+	$found = null;
+	foreach (['files' => ['/upload/files/'], 'archives' => ['/upload/archives/']] as $area => $markers) {
+		foreach ($markers as $marker) {
+			$at = strpos($path, $marker);
+			if ($at !== false && ($found === null || $at < $found[0])) {
+				$found = [$at, $area, $marker];
+			}
 		}
 	}
-	return null;
+	if ($found === null) {
+		return null;
+	}
+	$rel = rawurldecode(substr($path, $found[0] + strlen($found[2])));
+	return ($rel === '' || strpos($rel, "\0") !== false) ? null : [$found[1], $rel];
 }
 
 $asked = gate_requested_path();
