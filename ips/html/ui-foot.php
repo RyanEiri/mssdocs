@@ -9,6 +9,7 @@ $ips_modules = [];
 foreach ([
 	'xml'         => ['XML editor', 'Edit and ingest the TEI / XML records.', 'code', 'xml/'],
 	'html_editor' => ['HTML editor', 'Edit the HTML pages kept in the file store.', 'edit-3', 'html_editor/'],
+	'file_editor' => ['File editor', 'Create, edit and delete files in your own folder.', 'edit-3', 'file_editor/'],
 	'catalogue'   => ['Catalogue', 'Browse the catalogue of items.', 'book-open', 'catalogue/'],
 	'contacts'    => ['Contacts', 'The contacts list.', 'users', 'contacts/'],
 ] as $dir => $info) {

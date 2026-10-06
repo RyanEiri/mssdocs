@@ -1,0 +1,99 @@
+/* The Files & templates module (index.php, edit.php): plain CSS on the admin UI's tokens (css/ips-theme.css, so a site's css/site-theme.css re-themes it too),
+   no Tailwind build needed. The class names are fe-*. */
+[hidden] { display: none !important; }
+[v-cloak] { display: none; }
+body.fe { margin: 0; min-height: 100vh; background: var(--ips-paper); color: var(--ips-ink); font-family: var(--ips-font-sans); -webkit-font-smoothing: antialiased; }
+.fe a { color: inherit; text-decoration: none; }
+.fe code { font-family: var(--ips-font-mono); font-size: .9em; }
+
+/* the app bar (the look of the base shell's) */
+.fe-header { display: flex; align-items: center; gap: 28px; height: 56px; padding: 0 20px; background: var(--ips-surface); border-bottom: 1px solid var(--ips-line); position: sticky; top: 0; z-index: 40; }
+.fe-brand { display: flex; align-items: center; gap: 10px; font-family: var(--ips-font-display); font-size: 19px; font-weight: 500; letter-spacing: -.01em; }
+.fe-brand img { width: 28px; height: 28px; border-radius: 6px; }
+.fe-nav { display: flex; align-items: center; gap: 4px; font-size: 13px; }
+.fe-nav a { padding: 6px 10px; border-radius: 6px; color: var(--ips-muted); }
+.fe-nav a:hover { background: var(--ips-hover); }
+.fe-nav a[aria-current="page"] { background: var(--ips-sidebar); color: var(--ips-ink); font-weight: 500; }
+.fe-user { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.fe-avatar { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--ips-accent-soft); color: var(--ips-accent-hover); font-size: 12px; font-weight: 600; }
+.fe-admin { font-family: var(--ips-font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; border: 1px solid var(--ips-line); border-radius: 4px; padding: 0 6px; color: var(--ips-muted); }
+.fe-user a { color: var(--ips-muted); }
+.fe-user a:hover { color: var(--ips-ink); }
+
+/* buttons, tags, notices */
+.fe-btn { display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 14px; border: 1px solid var(--ips-line-strong); border-radius: 8px; background: var(--ips-surface);
+	font: inherit; font-size: 13.5px; font-weight: 500; color: var(--ips-ink); cursor: pointer; white-space: nowrap; }
+.fe-btn:hover { background: var(--ips-hover); }
+.fe-btn-primary { background: var(--ips-accent); border-color: var(--ips-accent); color: #fff; padding: 0 20px; }
+.fe-btn-primary:hover { background: var(--ips-accent-hover); border-color: var(--ips-accent-hover); }
+.fe-btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+.fe-btn-danger { color: var(--ips-danger); border-color: var(--ips-line-strong); }
+.fe-btn-sm { height: 30px; padding: 0 10px; font-size: 13px; }
+.fe-tag { font-family: var(--ips-font-mono); font-size: 11px; font-weight: 500; padding: 2px 6px; border-radius: 4px; background: var(--ips-accent-soft); color: var(--ips-accent-hover); text-transform: lowercase; }
+.fe-tag[data-type="xml"] { background: #f1e3df; color: #8a3b2c; }
+.fe-notice { display: flex; gap: 12px; border-radius: 10px; border: 1px solid var(--ips-line); background: var(--ips-surface); padding: 12px 16px; font-size: 14px; line-height: 1.45; }
+.fe-notice strong { flex: none; }
+.fe-muted { color: var(--ips-muted); }
+
+/* the editor page */
+.fe-bar { background: var(--ips-surface); border-bottom: 1px solid var(--ips-line); }
+.fe-bar-in { max-width: 1400px; margin: 0 auto; padding: 14px 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.fe-bar-file { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.fe-bar-file h1 { margin: 0; font-family: var(--ips-font-display); font-size: 21px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fe-bar-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.fe-main { max-width: 1400px; margin: 0 auto; padding: 20px 32px 40px; display: flex; flex-direction: column; gap: 14px; }
+#fe-pane { display: flex; flex-direction: column; min-height: 560px; background: var(--ips-surface); border: 1px solid var(--ips-line); border-radius: 12px; overflow: hidden; }
+.fe-strip { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; padding: 8px 14px; border-bottom: 1px solid var(--ips-line); font-size: 13px; color: var(--ips-muted); }
+.fe-strip .fe-status { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.fe-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ips-success); }
+.fe-dot.bad { background: var(--ips-danger); }
+#fe-pane .cke { border: 0 !important; border-radius: 0 !important; box-shadow: none !important; flex: 1 1 auto; }
+#fe-pane .CodeMirror { font-family: var(--ips-font-mono); font-size: 13px; line-height: 21px; }
+#fe-pane .CodeMirror-gutters { background: transparent; border-right: 1px solid var(--ips-line); }
+#fe-pane .CodeMirror-linenumber { color: var(--ips-faint); }
+#fe-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 70; max-width: 560px; padding: 12px 18px; border-radius: 10px; background: var(--ips-ink); color: var(--ips-paper); font-size: 14px; box-shadow: 0 10px 30px rgba(31,29,26,.25); white-space: pre-line; }
+#fe-toast.err { background: var(--ips-danger); color: #fff; }
+@media (max-width: 720px) { .fe-bar-in, .fe-main { padding-left: 16px; padding-right: 16px; } .fe-header { gap: 14px; padding: 0 12px; } }
+
+/* the Files page */
+.fe-page { max-width: 1024px; margin: 0 auto; padding: 40px 32px 64px; display: flex; flex-direction: column; gap: 20px; }
+.fe-titlerow { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+.fe-titlerow h1 { margin: 0; font-family: var(--ips-font-display); font-size: 30px; font-weight: 500; letter-spacing: -.015em; }
+.fe-titlerow p { margin: 4px 0 0; font-size: 14px; color: var(--ips-muted); }
+.fe-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.fe-input { box-sizing: border-box; border: 1px solid var(--ips-line); border-radius: 8px; padding: 9px 12px; font: inherit; font-size: 14px; background: var(--ips-surface); color: var(--ips-ink); }
+.fe-input:focus { outline: none; border-color: var(--ips-accent); box-shadow: 0 0 0 3px var(--ips-accent-ring); }
+.fe-filter .fe-input { width: 100%; max-width: 420px; }
+.fe-seg { display: inline-flex; background: var(--ips-stripe); padding: 3px; border-radius: 8px; }
+.fe-seg button { border: 0; background: none; padding: 6px 14px; border-radius: 6px; font: inherit; font-size: 13px; font-weight: 500; color: var(--ips-muted); cursor: pointer; }
+.fe-seg button[aria-pressed="true"] { background: var(--ips-surface); color: var(--ips-ink); }
+.fe-table { background: var(--ips-surface); border: 1px solid var(--ips-line); border-radius: 12px; overflow: hidden; }
+.fe-group { padding: 8px 20px; background: var(--ips-sidebar); font-size: 12.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--ips-muted); border-top: 1px solid var(--ips-line); }
+.fe-group:first-child { border-top: 0; }
+.fe-group span { text-transform: none; letter-spacing: 0; margin-left: 8px; }
+.fe-file { display: grid; grid-template-columns: 56px minmax(0, 1fr) 220px 80px 64px; align-items: center; gap: 0 8px; padding: 12px 20px; border-top: 1px solid var(--ips-line); cursor: pointer; }
+.fe-file:hover { background: var(--ips-hover); }
+.fe-file .name { font-size: 15px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fe-file .dir { font-size: 13.5px; color: var(--ips-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fe-file .size { font-size: 13.5px; color: var(--ips-muted); text-align: right; }
+.fe-file .del { text-align: right; }
+.fe-del { border: 0; background: none; padding: 0; font: inherit; font-size: 13.5px; font-weight: 500; color: var(--ips-muted); cursor: pointer; }
+.fe-del:hover, .fe-del.armed { color: var(--ips-danger); }
+.fe-badge { display: inline-block; margin-left: 8px; padding: 0 8px; border: 1px solid var(--ips-line-strong); border-radius: 99px; font-size: 12px; font-weight: 500; color: var(--ips-muted); vertical-align: 1px; }
+.fe-empty { padding: 28px; text-align: center; color: var(--ips-muted); }
+@media (max-width: 720px) { .fe-file { grid-template-columns: 48px minmax(0, 1fr) 56px; } .fe-file .dir, .fe-file .size { display: none; } .fe-page { padding: 28px 16px 48px; } }
+
+/* the New file dialog */
+.fe-scrim { position: fixed; inset: 0; z-index: 80; background: rgba(42,38,34,.32); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.fe-dialog { width: 460px; max-width: 100%; background: var(--ips-surface); border-radius: 14px; padding: 24px; box-shadow: 0 20px 60px rgba(42,38,34,.25); }
+.fe-dialog h2 { margin: 0 0 16px; font-family: var(--ips-font-display); font-size: 23px; font-weight: 500; }
+.fe-dialog label.l { display: block; margin: 14px 0 6px; font-size: 13px; font-weight: 500; }
+.fe-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fe-tile { text-align: left; border: 1px solid var(--ips-line); border-radius: 8px; padding: 10px 12px; background: var(--ips-surface); font: inherit; cursor: pointer; }
+.fe-tile strong { display: block; font-size: 14.5px; } .fe-tile span { font-size: 12.5px; color: var(--ips-muted); }
+.fe-tile[aria-pressed="true"] { border-color: var(--ips-accent); background: var(--ips-accent-soft); }
+.fe-name { display: flex; } .fe-name .fe-input { flex: 1; border-radius: 8px 0 0 8px; min-width: 0; }
+.fe-name .suffix { display: flex; align-items: center; padding: 0 12px; border: 1px solid var(--ips-line); border-left: 0; border-radius: 0 8px 8px 0; background: var(--ips-sidebar); color: var(--ips-muted); font-family: var(--ips-font-mono); font-size: 13px; }
+.fe-hint { margin: 8px 0 0; font-size: 12.5px; color: var(--ips-muted); }
+.fe-error { margin: 10px 0 0; font-size: 13.5px; color: var(--ips-danger); }
+.fe-dialog .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
