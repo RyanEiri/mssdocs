@@ -51,6 +51,8 @@ if($login_cookie->CheckIt()) {
 							"type" => "folder",
 							"path" => $path . '/' . $f,
 							"modified" => filemtime($dir . '/' . $f),
+							"public" => ips_dir_is_public(realpath($dir . '/' . $f)),
+							"marked" => ips_dir_marked_public(realpath($dir . '/' . $f)),
 							"items" => scan($dir . '/' . $f, $recursive,$path . '/' . $f) // Recursively get the contents of the folder
 						);
 
@@ -66,6 +68,8 @@ if($login_cookie->CheckIt()) {
 							"type" => "folder",
 							"path" => $path . '/' . $f,
 							"modified" => filemtime($dir . '/' . $f),
+							"public" => ips_dir_is_public(realpath($dir . '/' . $f)),
+							"marked" => ips_dir_marked_public(realpath($dir . '/' . $f)),
 							"items" => count(scandir($dir . '/' . $f))-2
 						);
 
