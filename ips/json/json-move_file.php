@@ -149,15 +149,8 @@ if($login_cookie->CheckIt()) {
 
 			$change_object->changeFileSystemDB($file_id, $db_change_file, $file_url, $folder_id);
 
-			// Check for the thumbnail and move it along with.
-			// Create thumbnail dir if it does not exist.
-			$thumbnail = $dirname.'/thumbnail/'.$filename;
-			if(is_readable($thumbnail)){
-			  if(!file_exists($move_folder.'/thumbnail/') && !is_dir($move_folder.'/thumbnail/')){
-			    mkdir($move_folder.'/thumbnail/', 0755);
-			  }
-			  rename($thumbnail, $move_folder.'/thumbnail/'.$filename);
-			}
+			// The file's thumbnail and other version copies go along with it.
+			ips_move_versions($dirname, $filename, $move_folder, $filename);
 	  }
 	}
 

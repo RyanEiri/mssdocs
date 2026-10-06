@@ -12,6 +12,8 @@
   const parentOf = (p) => (p.indexOf("/") < 0 ? "" : p.slice(0, p.lastIndexOf("/")));
   const join = (dir, name) => dir + "/" + name;
   const within = (p, dir) => p === dir || p.startsWith(dir + "/");
+  // The smaller copies of a folder's images (thumbnail/, thumbnail-480/, ...: IPS_VERSION_DIR in files_table.php) are never listed.
+  const isVersionDir = (name) => /^thumbnail(-[0-9]+)?$/.test(name);
   // The classic page put "../upload/files/x" in the hash; take whatever follows the first "files" segment.
   function cleanPath(p) {
     const m = /(^|\/)files(\/.*)?$/i.exec(String(p || ""));
@@ -63,7 +65,7 @@
   const nodes = computed(() => {
     const map = {};
     (function walk(node, parent) {
-      if (!node || node.name === "thumbnail") return;
+      if (!node || isVersionDir(node.name)) return;
       map[node.path] = Object.assign({}, node, { parent, folder: node.type === "folder" });
       if (node.type === "folder") (node.items || []).forEach((c) => walk(c, node.path));
     })(store.tree, "");
@@ -71,7 +73,7 @@
   });
   const children = (path) => {
     const n = nodes.value[path];
-    return n && n.folder ? (n.items || []).filter((c) => c.name !== "thumbnail").map((c) => nodes.value[c.path]).filter(Boolean) : [];
+    return n && n.folder ? (n.items || []).filter((c) => !isVersionDir(c.name)).map((c) => nodes.value[c.path]).filter(Boolean) : [];
   };
   function stats(path) {
     let folders = 0, files = 0, size = 0;
