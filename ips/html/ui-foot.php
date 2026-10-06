@@ -3,8 +3,12 @@
  *
  * The page sets the view and the signed-in user; everything else the app needs to know about this site comes from
  * here: the base URLs, the site name and logo, and which optional modules are installed. A site may add
- * js/site-home.js to contribute panels to the home page (IPS.registerHomePanel, see js/ui/home.js).
+ * js/site-home.js to contribute panels to the home page (IPS.registerHomePanel, see js/ui/home.js), and choose which module cards
+ * the Home page shows with IPS_MODULES, a comma-separated list of module folders (php/site-config.php or config.php), for example
+ * define('IPS_MODULES', 'file_editor'); without it every installed module has a card. It only hides cards: a module's pages stay where they
+ * are, so a site that does not want a module should not install its folder.
  */
+$ips_shown = defined('IPS_MODULES') ? array_map('trim', explode(',', (string) IPS_MODULES)) : null;
 $ips_modules = [];
 foreach ([
 	'xml'         => ['XML editor', 'Edit and ingest the TEI / XML records.', 'code', 'xml/'],
@@ -13,7 +17,7 @@ foreach ([
 	'catalogue'   => ['Catalogue', 'Browse the catalogue of items.', 'book-open', 'catalogue/'],
 	'contacts'    => ['Contacts', 'The contacts list.', 'users', 'contacts/'],
 ] as $dir => $info) {
-	if (is_file(PROGRAM_BASE . $dir . '/index.php')) {
+	if (is_file(PROGRAM_BASE . $dir . '/index.php') && ($ips_shown === null || in_array($dir, $ips_shown, true))) {
 		$ips_modules[] = ['id' => $dir, 'title' => $info[0], 'text' => $info[1], 'icon' => $info[2], 'href' => PROGRAM_WEB_BASE . $info[3]];
 	}
 }
