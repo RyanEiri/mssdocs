@@ -56,15 +56,12 @@ if($login_cookie->CheckIt()) {
 			    $errors['files'] = 'Invalid folder:&nbsp;'.$folder;
 			  }
 			}
-			$scanned_dir = scandir($folder);
-			if (count($scanned_dir) != 2) {
-			  if ($scanned_dir[2] != 'thumbnail') {
+			if (!ips_dir_only_versions($folder)) {
 			    if (isset($errors['files'])) {
 			      $errors['files'] .= '<br />Unempty folder:&nbsp;'.$folder;
 			    } else {
 			      $errors['files'] = 'Unempty folder:&nbsp;'.$folder;
 			    }
-			  }
 			}
     }
   }
@@ -90,9 +87,7 @@ if($login_cookie->CheckIt()) {
 	if(isset($files)){
 	  foreach ($files as $key => $file) {
 		unlink(USER_FILES_BASE.$file['dirname'].'/'.$file['filename']);
-		if(is_readable(USER_FILES_BASE.$file['dirname'].'/thumbnail/'.$file['filename'])){
-			unlink(USER_FILES_BASE.$file['dirname'].'/thumbnail/'.$file['filename']);
-		}
+		ips_remove_versions(USER_FILES_BASE.$file['dirname'], $file['filename']);
 		if (($file['dirname'] === 'files') && ($file['dirname'] !== 'thumbnail')) {
 		  $show_file = $file['filename'];
 		} else {
@@ -111,12 +106,8 @@ if($login_cookie->CheckIt()) {
 	  foreach ($folders as $key => $folder) {
 	    $folder = USER_FILES_BASE.$folder;
 	    //$data['folder_message'] = 'folder: ' . $folder . '<br />';
-	    $scanned_dir = scandir($folder);
-	    //$data['scan_message'] .= 'scanned_dir: ' . $scanned_dir[2] . '<br />';
-	    if (count($scanned_dir) !== 2) {
-		if ($scanned_dir[2] === 'thumbnail') {
-		  rmdir($folder.'/thumbnail');
-		}
+	    foreach (ips_version_dirs($folder) as $version) {
+		rmdir($folder.'/'.$version);
 	    }
 	    rmdir($folder);
 //	    $db_folder_pattern = '/^.*files\/?/';

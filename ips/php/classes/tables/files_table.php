@@ -295,6 +295,56 @@ function ips_dir_is_public($real) {
 	return false;
 }
 
+// Version folders: the smaller copies of a folder's images, kept beside them under the same file name: thumbnail/ (the uploader's) and
+// thumbnail-<size>/ (made by tools, such as vesturheimsrit's gallery sizes). The File Browser never lists them; removing, renaming or moving a file
+// takes its copies along, so a removed photo never stays reachable as a copy.
+const IPS_VERSION_DIR = '/^thumbnail(-[0-9]+)?$/';
+
+// The version folders inside $dir (names).
+function ips_version_dirs($dir) {
+	$names = @scandir($dir);
+	return array_values(array_filter($names === false ? [] : $names, function ($n) use ($dir) {
+		return preg_match(IPS_VERSION_DIR, $n) && is_dir($dir . '/' . $n) && !is_link($dir . '/' . $n);
+	}));
+}
+
+// Removes the copies of $name from the version folders in $dir.
+function ips_remove_versions($dir, $name) {
+	foreach (ips_version_dirs($dir) as $v) {
+		if (is_file("$dir/$v/$name")) {
+			unlink("$dir/$v/$name");
+		}
+	}
+}
+
+// Moves the copies of $from_dir/$from_name to $to_dir/$to_name, making the version folders there when needed.
+function ips_move_versions($from_dir, $from_name, $to_dir, $to_name) {
+	foreach (ips_version_dirs($from_dir) as $v) {
+		if (!is_file("$from_dir/$v/$from_name")) {
+			continue;
+		}
+		if (!is_dir("$to_dir/$v")) {
+			mkdir("$to_dir/$v", 0755);
+		}
+		rename("$from_dir/$v/$from_name", "$to_dir/$v/$to_name");
+	}
+}
+
+// True when $dir holds nothing but empty version folders (it can then be removed, with them).
+function ips_dir_only_versions($dir) {
+	$names = @scandir($dir);
+	if ($names === false) {
+		return false;
+	}
+	$versions = ips_version_dirs($dir);
+	foreach (array_diff($names, ['.', '..']) as $n) {
+		if (!in_array($n, $versions, true) || count(scandir("$dir/$n")) !== 2) {
+			return false;
+		}
+	}
+	return true;
+}
+
 // True when the folder holds the marker itself (it is what the File Browser's switch changes; a folder below a public one is public without it).
 function ips_dir_marked_public($real) {
 	return is_string($real) && is_file($real . '/' . IPS_PUBLIC_MARKER);

@@ -165,13 +165,7 @@ if($login_cookie->CheckIt()) {
 				}
 			}
 
-		  $thumbnail = $previous_file_folder.'/thumbnail/'.$previous_file_name;
-		  if(is_readable($thumbnail)){
-		    if(!file_exists($fs_dir_name.'/thumbnail/') && !is_dir($fs_dir_name.'/thumbnail/')){
-					mkdir($fs_dir_name.'/thumbnail/');
-		    }
-		    rename($thumbnail, $fs_dir_name.'/thumbnail/'.$file_name);
-		  }
+		  ips_move_versions($previous_file_folder, $previous_file_name, $fs_dir_name, $file_name);
 		  if(!empty($data['message'])){
 		    $data['message'] .= '<br />Filesystem and database changed.';
 		  } else {
