@@ -12,4 +12,4 @@ if ($login_cookie->Peek() === false) {
 	exit;
 }
 $scope = ips_fe_scope($login_cookie->username);
-echo json_encode(['success' => true, 'name' => 'files', 'type' => 'folder', 'items' => ips_fe_tree($scope), 'types' => ips_fe_types()]);
+echo json_encode(['success' => true, 'name' => 'files', 'type' => 'folder', 'items' => ips_fe_tree($scope), 'types' => ips_fe_public_types()]);

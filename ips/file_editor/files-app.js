@@ -19,26 +19,32 @@
       (function walk(items, folder) {
         items.forEach(function (d) {
           if (d.type === 'file') {
-            files.push({ name: d.name, path: d.path, ext: d.kind, dir: folder, sizeText: sizeText(d.size), writable: d.writable === true, deletable: d.deletable === true });
+            files.push({ name: d.name, path: d.path, kind: d.kind, ext: d.name.split('.').pop().toLowerCase(), dir: folder, sizeText: sizeText(d.size), writable: d.writable === true, deletable: d.deletable === true });
           } else if (d.type === 'folder') { walk(d.items || [], d.name); }
         });
       }(top.items || [], 'shared'));
-      return { name: top.kind === 'xml' ? 'XML files' : 'HTML pages', note: top.name, files: files };
+      return { name: top.label || top.name, note: top.name, files: files };
     });
   }
 
   Vue.createApp({
     data: function () {
-      var types = [{ id: 'all', label: 'All' }].concat((cfg.types || []).map(function (t) { return { id: t, label: t.toUpperCase() }; }));
-      return { dirs: cfg.dirs, armed: null, deleteError: '', tree: [], query: '', type: 'all', types: types,
-               isNew: false, newName: '', newType: (cfg.types || ['html'])[0], newError: '', busy: false };
+      var kinds = cfg.types || [];
+      var types = [{ id: 'all', label: 'All' }].concat(kinds.map(function (t) { return { id: t.id, label: t.label }; }));
+      return { dirs: cfg.dirs, kinds: kinds, armed: null, deleteError: '', tree: [], query: '', type: 'all', types: types,
+               isNew: false, newName: '', newType: kinds.length ? kinds[0].id : '', newError: '', busy: false };
     },
     computed: {
+      // the extension a new file of the chosen type gets (the type's first)
+      suffix: function () {
+        var t = this.kinds.filter(function (k) { return k.id === this.newType; }.bind(this))[0];
+        return t ? t.ext[0] : '';
+      },
       shown: function () {
         var q = this.query.trim().toLowerCase(), t = this.type;
         return this.tree.map(function (g) {
           return Object.assign({}, g, { files: g.files.filter(function (f) {
-            return (t === 'all' || f.ext === t) && (!q || f.name.toLowerCase().indexOf(q) >= 0 || f.dir.toLowerCase().indexOf(q) >= 0);
+            return (t === 'all' || f.kind === t) && (!q || f.name.toLowerCase().indexOf(q) >= 0 || f.dir.toLowerCase().indexOf(q) >= 0);
           }) });
         }).filter(function (g) { return g.files.length; });
       }
@@ -66,7 +72,7 @@
           .catch(function () { self.deleteError = 'The server could not be reached.'; });
       },
       openNew: function () {
-        this.isNew = true; this.newName = ''; this.newError = ''; this.newType = (cfg.types || ['html'])[0];
+        this.isNew = true; this.newName = ''; this.newError = ''; this.newType = this.kinds.length ? this.kinds[0].id : '';
         this.$nextTick(function () { var el = this.$refs.nameEl; if (el) { el.focus(); } }.bind(this));
       },
       create: function () {

@@ -25,7 +25,7 @@ if ($real === false) {
 	ips_fe_refuse(404, 'That file was not found.');
 }
 if (!ips_fe_may_write($real, $scope)) {
-	ips_fe_refuse(403, 'You can only delete files inside your own folder (html_templates/' . $login_cookie->username . ' or xml_templates/' . $login_cookie->username . ').');
+	ips_fe_refuse(403, 'You can only delete files inside your own folder (' . ips_fe_own_folders_text($login_cookie->username) . ').');
 }
 if (!ips_fe_trash($real)) {
 	ips_fe_refuse(500, 'The file could not be deleted.');

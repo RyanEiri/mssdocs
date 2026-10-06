@@ -12,7 +12,7 @@ $fe_logo = is_file(PROGRAM_BASE . 'img/logo/logo32.png') ? PROGRAM_WEB_BASE . 'i
 <?php if ($fe_admin) { ?>
 		<a href="<?php echo PROGRAM_WEB_BASE ?>users.php">Users</a>
 <?php } ?>
-		<a href="<?php echo PROGRAM_WEB_BASE ?>file_editor/" aria-current="page">Pages</a>
+		<a href="<?php echo PROGRAM_WEB_BASE ?>file_editor/" aria-current="page">File editor</a>
 	</nav>
 	<div class="fe-user">
 		<span class="fe-avatar" aria-hidden="true"><?php echo $fe_h(strtoupper(substr($fe_user, 0, 1))) ?></span>

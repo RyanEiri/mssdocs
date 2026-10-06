@@ -2,24 +2,79 @@
 /* The file editor module (ips/file_editor/): which files the editor may list, open, create, save and delete, and for whom. Every request's path becomes a file
  * here, through ips_fe_resolve(), and nowhere else.
  *
- * Two kinds of file, each in its own templates folder under upload/files/: *.html in html_templates/ and *.xml in xml_templates/ (a site may offer only one of the
- * kinds: IPS_FILE_EDITOR_TYPES, a comma-separated list, default "html,xml"). A folder holds one kind: XML is not opened from html_templates, nor HTML from xml_templates.
+ * File types are modules. Each file in types/ (html.php, xml.php, ...) describes one type of file (types/html.php says what a descriptor holds) and the editor offers
+ * the types that are loaded: a site adds a type by dropping a file in, removes one by deleting its file, and may narrow the list with IPS_FILE_EDITOR_TYPES (a
+ * comma-separated list of type ids). Each type has its own templates folder under upload/files/ (html_templates/, xml_templates/, ...) and a folder holds one type.
  *
  * Who may do what ($scope, from ips_fe_scope()): an administrator anything; a regular user works in their own folder of each templates folder
- * (html_templates/<username>/, xml_templates/<username>/: made on first use) and READS the files at the top of the folder (the shared ones) but not another
- * user's folder, which is not even listed. A site whose editors all share the pages (a bibliography kept by a team) sets IPS_FILE_EDITOR_SHARED_WRITE to true
- * in php/site-config.php: then every signed-in user may also save and delete the files at the top of the folder. Nothing under a dot-folder (.deleted/) is
- * ever listed or opened. The web server serves these pages sandboxed (no script), see the nginx notes in the module's README.
+ * (html_templates/<username>/, ...: made on first use) and READS the files at the top of the folder (the shared ones) but not another user's folder, which is not even
+ * listed. A site whose editors all share the pages (a bibliography kept by a team) sets IPS_FILE_EDITOR_SHARED_WRITE to true in php/site-config.php: then every
+ * signed-in user may also save and delete the files at the top of the folder. Nothing under a dot-folder (.deleted/) is ever listed or opened. The web server serves
+ * these files sandboxed (no script), see the nginx notes in the module's README.
  */
 
-const IPS_FE_HTML_ROOT = 'upload/files/html_templates';
-const IPS_FE_XML_ROOT = 'upload/files/xml_templates';
+// The loaded file types: [id => descriptor], read from types/*.php (sorted by file name). A descriptor that is malformed, or that claims an id, extension or folder
+// another has already taken, is ignored, so one bad module cannot take the others down.
+function ips_fe_registry() {
+	static $registry = null;
+	if ($registry !== null) {
+		return $registry;
+	}
+	$registry = [];
+	$extensions = [];
+	$folders = [];
+	$files = glob(__DIR__ . '/types/*.php') ?: [];
+	sort($files);
+	foreach ($files as $file) {
+		$d = require $file;
+		if (!is_array($d) || !isset($d['id'], $d['label'], $d['ext'], $d['folder'], $d['skeleton']) || !is_callable($d['skeleton'])) {
+			continue;
+		}
+		$ext = array_values(array_filter((array) $d['ext'], function ($e) { return is_string($e) && preg_match('/^[a-z0-9]+$/', $e); }));
+		if (!preg_match('/^[a-z][a-z0-9]*$/', (string) $d['id']) || !preg_match('/^[A-Za-z0-9_-]+$/', (string) $d['folder']) || !$ext
+			|| isset($registry[$d['id']]) || isset($folders[$d['folder']]) || array_intersect($ext, array_keys($extensions))) {
+			continue;
+		}
+		$d['ext'] = $ext;
+		$d += ['group' => $d['label'] . ' files', 'blurb' => '', 'mode' => 'htmlmixed', 'validate' => null, 'js' => null];
+		$registry[$d['id']] = $d;
+		$folders[$d['folder']] = $d['id'];
+		foreach ($ext as $e) {
+			$extensions[$e] = $d['id'];
+		}
+	}
+	return $registry;
+}
 
-// The kinds of file this site offers: ['html', 'xml'] by default.
+// The ids of the file types this site offers: the loaded ones, narrowed by IPS_FILE_EDITOR_TYPES when the site defines it.
 function ips_fe_types() {
-	$wanted = defined('IPS_FILE_EDITOR_TYPES') ? IPS_FILE_EDITOR_TYPES : 'html,xml';
-	$types = array_values(array_intersect(['html', 'xml'], array_map('trim', explode(',', strtolower($wanted)))));
-	return $types ?: ['html', 'xml'];
+	$ids = array_keys(ips_fe_registry());
+	if (defined('IPS_FILE_EDITOR_TYPES')) {
+		$wanted = array_map('trim', explode(',', strtolower((string) IPS_FILE_EDITOR_TYPES)));
+		$ids = array_values(array_intersect($ids, $wanted));
+	}
+	return $ids;
+}
+
+// The descriptor of an offered type, or null.
+function ips_fe_type($id) {
+	return is_string($id) && in_array($id, ips_fe_types(), true) ? ips_fe_registry()[$id] : null;
+}
+
+// What the pages and scripts need to know about each offered type (no functions): id, label, group, ext, blurb, mode, and the URL (relative to the module) of its script.
+function ips_fe_public_types() {
+	$out = [];
+	foreach (ips_fe_types() as $id) {
+		$d = ips_fe_registry()[$id];
+		$out[] = ['id' => $id, 'label' => $d['label'], 'group' => $d['group'], 'ext' => $d['ext'], 'blurb' => $d['blurb'], 'mode' => $d['mode'],
+			'js' => $d['js'] && is_file(__DIR__ . '/types/' . basename($d['js'])) ? 'types/' . basename($d['js']) : null];
+	}
+	return $out;
+}
+
+// "html_templates/ann or xml_templates/ann": where this user's own folders are, for the messages.
+function ips_fe_own_folders_text($username) {
+	return implode(' or ', array_map(function ($rel) use ($username) { return basename($rel) . '/' . $username; }, ips_fe_kinds())) ?: 'your own folder';
 }
 
 // Whether every signed-in user may change the shared files at the top of a templates folder (the site's choice, see above).
@@ -42,13 +97,16 @@ function ips_fe_scope($username) {
 	return preg_match('/^[^.\/\\\\\0][^\/\\\\\0]{0,99}$/', $username) ? $username : null;
 }
 
-// ['html'|'xml' => path of its templates folder under ips/] for the kinds this site offers.
+// [type id => path of its templates folder under ips/] for the offered types.
 function ips_fe_kinds() {
-	$all = ['html' => IPS_FE_HTML_ROOT, 'xml' => IPS_FE_XML_ROOT];
-	return array_intersect_key($all, array_flip(ips_fe_types()));
+	$out = [];
+	foreach (ips_fe_types() as $id) {
+		$out[$id] = 'upload/files/' . ips_fe_registry()[$id]['folder'];
+	}
+	return $out;
 }
 
-// ['html'|'xml' => real directory] of the templates folders that exist.
+// [type id => real directory] of the templates folders that exist.
 function ips_fe_roots() {
 	$roots = [];
 	foreach (ips_fe_kinds() as $kind => $rel) {
@@ -60,10 +118,15 @@ function ips_fe_roots() {
 	return $roots;
 }
 
-// The folder's kind by the file's extension, or null.
+// The offered type that owns the file's extension, or null.
 function ips_fe_kind_of($path) {
 	$ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-	return in_array($ext, ips_fe_types(), true) ? $ext : null;
+	foreach (ips_fe_types() as $id) {
+		if (in_array($ext, ips_fe_registry()[$id]['ext'], true)) {
+			return $id;
+		}
+	}
+	return null;
 }
 
 // Whether the user with $scope may see $real inside the templates folder $root: nothing under a dot-folder; a regular user sees the top of the folder and
@@ -139,7 +202,8 @@ function ips_fe_name($real) {
 function ips_fe_tree($scope) {
 	$tree = [];
 	foreach (ips_fe_roots() as $kind => $root) {
-		$scan = function ($dir, $top) use (&$scan, $kind, $root, $scope) {
+		$exts = ips_fe_registry()[$kind]['ext'];
+		$scan = function ($dir, $top) use (&$scan, $kind, $exts, $scope) {
 			$items = [];
 			$names = scandir($dir);
 			natcasesort($names);
@@ -151,7 +215,7 @@ function ips_fe_tree($scope) {
 					if ($f !== 'thumbnail' && !($top && $scope !== '' && $f !== $scope)) {
 						$items[] = ['name' => $f, 'type' => 'folder', 'items' => $scan("$dir/$f", false)];
 					}
-				} elseif (strtolower(pathinfo($f, PATHINFO_EXTENSION)) === $kind) {
+				} elseif (in_array(strtolower(pathinfo($f, PATHINFO_EXTENSION)), $exts, true)) {
 					$real = realpath("$dir/$f");
 					$may = ips_fe_may_write($real, $scope);
 					$items[] = [
@@ -163,7 +227,7 @@ function ips_fe_tree($scope) {
 			}
 			return $items;
 		};
-		$tree[] = ['name' => basename($root), 'kind' => $kind, 'items' => $scan($root, true)];
+		$tree[] = ['name' => basename($root), 'kind' => $kind, 'label' => ips_fe_registry()[$kind]['group'], 'items' => $scan($root, true)];
 	}
 	return $tree;
 }
@@ -187,27 +251,37 @@ function ips_fe_new_dir($kind, $scope) {
 	return $real;
 }
 
-// "My page", "my page.html" -> "My page.html"; false for a name that is empty, too long, or has anything but letters, digits, spaces, "_" and "-".
+// "My page", "my page.html" -> "My page.html" (the type's first extension); false for a name that is empty, too long, or has anything but letters, digits, spaces,
+// "_" and "-", or for a type this site does not offer.
 function ips_fe_new_filename($given, $kind) {
-	if (!is_string($given) || !in_array($kind, ['html', 'xml'], true)) {
+	$type = ips_fe_type($kind);
+	if (!is_string($given) || $type === null) {
 		return false;
 	}
-	$base = trim(preg_replace('/\.' . $kind . '$/i', '', trim($given)));
+	$base = trim($given);
+	foreach ($type['ext'] as $ext) {
+		$base = preg_replace('/\.' . preg_quote($ext, '/') . '$/i', '', $base);
+	}
+	$base = trim($base);
 	if (!preg_match('/^[\p{L}\p{N}][\p{L}\p{N} _-]{0,99}$/u', $base)) {
 		return false;
 	}
-	return $base . '.' . $kind;
+	return $base . '.' . $type['ext'][0];
 }
 
+// The text a new file of the type starts with.
 function ips_fe_skeleton($kind, $title) {
-	if ($kind === 'html') {
-		$title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
-		return "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>$title</title>\n</head>\n<body>\n  <p></p>\n</body>\n</html>\n";
+	$type = ips_fe_type($kind);
+	return $type === null ? '' : (string) call_user_func($type['skeleton'], $title);
+}
+
+// null when the text may be saved as a file of the type, else the reason it may not (a type without a validator accepts anything).
+function ips_fe_validate($kind, $text) {
+	$type = ips_fe_type($kind);
+	if ($type === null) {
+		return 'that kind of file is not offered here';
 	}
-	$title = htmlspecialchars($title, ENT_XML1 | ENT_QUOTES, 'UTF-8');
-	return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<TEI xmlns=\"http://www.tei-c.org/ns/1.0\">\n  <teiHeader>\n    <fileDesc>\n      <titleStmt>\n        <title>$title</title>\n"
-		. "      </titleStmt>\n      <publicationStmt>\n        <p>Unpublished</p>\n      </publicationStmt>\n      <sourceDesc>\n        <p>Created in the file editor</p>\n"
-		. "      </sourceDesc>\n    </fileDesc>\n  </teiHeader>\n  <text>\n    <body>\n      <p/>\n    </body>\n  </text>\n</TEI>\n";
+	return is_callable($type['validate']) ? call_user_func($type['validate'], $text) : null;
 }
 
 // Deletes nothing for good: moves the file into <templates folder>/.deleted/ under a name with the time. True when it moved.

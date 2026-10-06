@@ -1,6 +1,7 @@
 /* The editor page of the file editor module (file_editor/edit.php): CKEditor in Source mode with its CodeMirror view (or a plain text box when CKEditor is not
-   installed), a status strip (lines, whether XML is well-formed), an "Unsaved changes" flag, Ctrl/Cmd+S, a toast, Save and a two-click Delete.
-   Configuration comes from window.IPS_FE_EDIT ({csrf, kind, writable, delete, ckeditor}). The text is saved exactly as it is in the editor. */
+   installed), a status strip (lines, and the file type's own live check if its module has one: window.IPS_FE_TYPES[kind].check(text) -> {ok, text}), an "Unsaved
+   changes" flag, Ctrl/Cmd+S, a toast, Save and a two-click Delete.
+   Configuration comes from window.IPS_FE_EDIT ({csrf, kind, label, mode, writable, delete, ckeditor}). The text is saved exactly as it is in the editor. */
 (function () {
   'use strict';
   var cfg = window.IPS_FE_EDIT;
@@ -19,7 +20,7 @@
       codemirror: {
         theme: 'default', lineNumbers: true, lineWrapping: true, matchBrackets: true, autoCloseTags: true, autoCloseBrackets: true, enableSearchTools: true,
         enableCodeFolding: false, enableCodeFormatting: false, autoFormatOnStart: false, autoFormatOnModeChange: false, autoFormatOnUncomment: false,
-        mode: 'htmlmixed', showSearchButton: true, showTrailingSpace: true, highlightMatches: true, showFormatButton: false, showCommentButton: true,
+        mode: cfg.mode || 'htmlmixed', showSearchButton: true, showTrailingSpace: true, highlightMatches: true, showFormatButton: false, showCommentButton: true,
         showUncommentButton: true, showAutoCompleteButton: true, styleActiveLine: true, useBeautifyOnStart: false
       }
     });
@@ -48,10 +49,11 @@
   // ---- status strip and the unsaved flag --------------------------------------------------------------------------------------
   function lines() { $('line-count').textContent = cm ? cm.lineCount() : value().split('\n').length; }
   function check() {
-    if (cfg.kind !== 'xml') { return; }
-    var ok = !new DOMParser().parseFromString(value(), 'application/xml').getElementsByTagName('parsererror').length;
-    $('wf-dot').classList.toggle('bad', !ok);
-    $('wf-text').textContent = ok ? 'Well-formed' : 'Not well-formed';
+    var type = (window.IPS_FE_TYPES || {})[cfg.kind];
+    if (!type || typeof type.check !== 'function') { return; }
+    var result = type.check(value());
+    $('wf-dot').classList.toggle('bad', !result.ok);
+    $('wf-text').textContent = result.text;
   }
   function touched() { if (!dirty) { dirty = true; $('dirty-flag').hidden = false; } }
   function changed() { touched(); lines(); clearTimeout(checkTimer); checkTimer = setTimeout(check, 400); }

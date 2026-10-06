@@ -13,7 +13,7 @@ if (!$login_cookie->CheckIt()) {
 $fe_user = $login_cookie->username;
 $fe_admin = ips_fe_is_admin($fe_user);
 $fe_scope = ips_fe_scope($fe_user);
-$fe_types = ips_fe_types();
+$fe_types = ips_fe_public_types();
 // where a new file of each kind goes for this user, for the dialog's hint (null: the user has no folder)
 $fe_dirs = null;
 if ($fe_scope !== null) {
@@ -27,7 +27,7 @@ $fe_css = 'file-editor.css?v=' . filemtime(__DIR__ . '/file-editor.css');
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Pages · <?php echo htmlspecialchars(SITE_NAME) ?></title>
+<title>File editor · <?php echo htmlspecialchars(SITE_NAME) ?></title>
 <?php include HTML_TEMPLATES.'ui-head.php'; ?>
 <link rel="stylesheet" href="<?php echo $fe_css ?>">
 </head>
@@ -38,8 +38,8 @@ $fe_css = 'file-editor.css?v=' . filemtime(__DIR__ . '/file-editor.css');
 		<main class="fe-page">
 			<div class="fe-titlerow">
 				<div>
-					<h1>Pages</h1>
-					<p><?php echo implode(' and ', array_map(function ($t) { return strtoupper($t); }, $fe_types)) === 'HTML AND XML' ? 'HTML and XML' : strtoupper(implode('', $fe_types)) ?> files kept in the file store. Open one to edit it in place.</p>
+					<h1>File editor</h1>
+					<p><?php echo htmlspecialchars(implode(', ', array_map(function ($t) { return $t['label']; }, $fe_types))) ?> files kept in the file store. Open one to edit it in place.</p>
 				</div>
 				<button type="button" id="new-file-open" class="fe-btn fe-btn-primary" @click="openNew">New file</button>
 			</div>
@@ -57,7 +57,7 @@ $fe_css = 'file-editor.css?v=' . filemtime(__DIR__ . '/file-editor.css');
 				<template v-for="g in shown" :key="g.name">
 					<div class="fe-group">{{ g.name }}<span v-if="g.note">{{ g.note }}</span></div>
 					<div class="fe-file files" v-for="f in g.files" :key="f.path" role="link" tabindex="0" @click="open(f)" @keydown.enter="open(f)">
-						<span><span class="fe-tag" :class="{ 'fe-tag-xml': f.ext === 'xml' }">{{ f.ext }}</span></span>
+						<span><span class="fe-tag" :data-type="f.kind">{{ f.ext }}</span></span>
 						<span class="name"><a :href="editUrl(f)" :title="f.path" @click.stop>{{ f.name }}</a><span v-if="!f.writable" class="fe-badge">Read-only</span></span>
 						<span class="dir">{{ f.dir }}</span>
 						<span class="size">{{ f.sizeText }}</span>
@@ -75,14 +75,13 @@ $fe_css = 'file-editor.css?v=' . filemtime(__DIR__ . '/file-editor.css');
 <?php if (count($fe_types) > 1) { ?>
 				<label class="l">Type</label>
 				<div class="fe-tiles">
-					<button type="button" class="fe-tile" :aria-pressed="newType === 'html' ? 'true' : 'false'" @click="newType = 'html'"><strong>HTML</strong><span>Blank page</span></button>
-					<button type="button" class="fe-tile" :aria-pressed="newType === 'xml' ? 'true' : 'false'" @click="newType = 'xml'"><strong>XML</strong><span>TEI skeleton</span></button>
+					<button type="button" class="fe-tile" v-for="t in kinds" :key="t.id" :aria-pressed="newType === t.id ? 'true' : 'false'" @click="newType = t.id"><strong>{{ t.label }}</strong><span>{{ t.blurb }}</span></button>
 				</div>
 <?php } ?>
 				<label class="l" for="new-file-name">File name</label>
 				<div class="fe-name">
 					<input type="text" class="fe-input" id="new-file-name" ref="nameEl" v-model="newName" maxlength="100" required>
-					<span class="suffix">.{{ newType }}</span>
+					<span class="suffix">.{{ suffix }}</span>
 				</div>
 				<p class="fe-hint">Created in <code>{{ dirs ? dirs[newType] : '' }}</code> and opened in the editor.</p>
 				<p class="fe-error" v-if="newError" role="alert">{{ newError }}</p>

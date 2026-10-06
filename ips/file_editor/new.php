@@ -1,5 +1,5 @@
 <?php
-// Creates a new file for the Files page's "New file": type=html (a blank page) or type=xml (a TEI skeleton), in the user's own folder of the templates folder
+// Creates a new file for the Files page's "New file": type=<an offered file type> (html: a blank page, xml: a TEI skeleton, ...: lib.php), in the user's own folder of the templates folder
 // (an administrator's at the top). Needs a signed-in user and a same-origin POST with that user's CSRF token; an existing file is never replaced.
 chdir('..');
 require_once(getcwd().'/php/start_sess.php');
@@ -19,9 +19,9 @@ if ($login_cookie->Peek() === false) {
 }
 $login_cookie->RequireCsrf();
 
-$kind = $_POST['type'] ?? 'html';
-if (!is_string($kind) || !in_array($kind, ips_fe_types(), true)) {
-	ips_fe_refuse(422, 'The type must be ' . implode(' or ', ips_fe_types()) . '.');
+$kind = $_POST['type'] ?? (ips_fe_types()[0] ?? '');
+if (!is_string($kind) || ips_fe_type($kind) === null) {
+	ips_fe_refuse(422, 'The type must be ' . (implode(' or ', ips_fe_types()) ?: 'one this site offers') . '.');
 }
 $scope = ips_fe_scope($login_cookie->username);
 if ($scope === null) {
@@ -40,7 +40,7 @@ $handle = @fopen("$dir/$filename", 'x');
 if ($handle === false) {
 	ips_fe_refuse(file_exists("$dir/$filename") ? 409 : 500, file_exists("$dir/$filename") ? 'A file called ' . $filename . ' already exists.' : 'The file could not be created.');
 }
-fwrite($handle, ips_fe_skeleton($kind, substr($filename, 0, -strlen($kind) - 1)));
+fwrite($handle, ips_fe_skeleton($kind, pathinfo($filename, PATHINFO_FILENAME)));
 fclose($handle);
 @chmod("$dir/$filename", 0664);
 $name = ips_fe_name("$dir/$filename");
