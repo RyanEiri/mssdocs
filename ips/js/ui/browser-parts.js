@@ -84,6 +84,7 @@
           </button>
           <ips-icon :name="depth ? 'folder' : 'hard-drive'" :size="15" :class="['mx-1.5', st.cwd === path ? 'text-accent' : 'text-muted']"></ips-icon>
           <span class="truncate">{{ depth ? node.name : 'All files' }}</span>
+          <span v-if="node.public" class="ml-1.5 text-accent shrink-0" title="Public: anyone can see the files in this folder"><ips-icon name="globe" :size="12"></ips-icon></span>
         </div>
         <ul v-if="kids.length && st.expanded[path]" role="group">
           <ips-tree-node v-for="k in kids" :key="k.path" :path="k.path" :depth="depth + 1" @go="$emit('go', $event)"></ips-tree-node>
@@ -124,6 +125,7 @@
               <span class="block truncate text-[12px] text-muted">{{ meta(n) }}</span>
               <span v-if="searching" class="block truncate font-mono text-[11px] text-faint">{{ where(n) }}</span>
             </span>
+            <span v-if="n.public" class="text-accent shrink-0" title="Public: anyone can see the files in this folder"><ips-icon name="globe" :size="14"></ips-icon></span>
             <ips-check :on="isOn(n)" :label="'Select ' + n.name" @toggle="$emit('check', n)"></ips-check>
           </div>
         </div>
@@ -144,6 +146,7 @@
             <span class="flex items-center gap-2.5 min-w-0 py-1.5">
               <ips-icon v-if="n.folder" name="folder" :size="16" class="text-accent"></ips-icon><ips-badge v-else :name="n.name" class="!w-[18px] !h-[22px]"></ips-badge>
               <span class="min-w-0"><span class="block truncate font-medium">{{ n.name }}</span><span v-if="searching" class="block truncate font-mono text-[11.5px] text-faint">{{ where(n) }}</span></span>
+              <span v-if="n.public" class="text-accent shrink-0" title="Public: anyone can see the files in this folder"><ips-icon name="globe" :size="13"></ips-icon></span>
             </span>
             <span class="truncate text-muted pr-3">{{ n.folder ? '' : titles[n.path] || '' }}</span>
             <span class="font-mono text-[12px] text-muted">{{ n.folder ? 'folder' : U.extOf(n.name) || '—' }}</span>
@@ -159,6 +162,7 @@
             @click.stop="$emit('pick', n, $event)" @dblclick="$emit('open', n)" @keydown.enter="$emit('open', n)" @contextmenu.prevent.stop="$emit('context', n, $event)">
             <div class="relative grid place-items-center aspect-[4/3] bg-sidebar border-b border-line" :style="isImage(n) ? STRIPES : null">
               <ips-icon v-if="n.folder" name="folder" :size="44" class="text-accent"></ips-icon>
+              <span v-if="n.public" class="absolute top-2 right-2 text-accent" title="Public: anyone can see the files in this folder"><ips-icon name="globe" :size="16"></ips-icon></span>
               <img v-else-if="isImage(n)" :src="thumb(n)" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'">
               <ips-badge v-else :name="n.name" large></ips-badge>
             </div>

@@ -20,6 +20,24 @@
       const folders = computed(() => Object.values(B.nodes.value).filter((n) => n.folder && B.canWrite(n.path)).sort((a, b) => a.path.localeCompare(b.path, undefined, { numeric: true })));
       const folderLabel = (p) => (p === B.ROOT ? "All files" : p.replace(/^files\//, "").split("/").join(" / "));
 
+      // Public access (folders only): the switch is an administrator's; everyone sees the state.
+      const pub = reactive({ busy: false, msg: "" });
+      watch(() => (node.value ? node.value.path : null), () => (pub.msg = ""));
+      function setPublic(on) {
+        if (pub.busy || !node.value) return;
+        const name = node.value.name;
+        pub.busy = true;
+        pub.msg = "";
+        IPS.postForm("json/json-folder_public.php", { dir: node.value.path, public: on ? "1" : "0" })
+          .then((r) => {
+            if (!r || r.success === false) { pub.msg = (r && r.error) || "The change wasn’t saved."; return null; }
+            IPS.toast("“" + name + "” is now " + (on ? "public" : "private"));
+            return B.load();
+          })
+          .catch((e) => { pub.msg = "The change wasn’t saved (" + e.message + ")."; })
+          .finally(() => (pub.busy = false));
+      }
+
       const form = reactive({ title: "", description: "", name: "", folder: "" });
       const errors = reactive({ msg: "" });
       const saving = Vue.ref(false);
@@ -58,7 +76,7 @@
       const bytes = (n) => U.bytesToSize(n) + (n >= 1024 ? " (" + Number(n).toLocaleString("en") + " bytes)" : "");
       const when = (sec) => { if (!sec) return "—"; const d = new Date(sec * 1000); return U.fmtEpoch(sec) + ", " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); };
 
-      return { S, B, st, CFG, U, sel, node, mode, label, detail, isImage, writable, folders, folderLabel, form, errors, saving, dirty, save, fill, multi, folderInfo, bytes, when, emit };
+      return { S, B, st, CFG, U, pub, setPublic, sel, node, mode, label, detail, isImage, writable, folders, folderLabel, form, errors, saving, dirty, save, fill, multi, folderInfo, bytes, when, emit };
     },
     template: `
       <aside class="flex flex-col min-h-0 bg-surface border-l border-line" aria-label="Details">
@@ -142,6 +160,14 @@
               <button type="button" @click="B.openDialog('zip', [node])" data-act="zip" :class="S.btnSecondary" class="!h-[30px] !rounded-[7px] !text-[12.5px]"><ips-icon name="download" :size="14"></ips-icon>Download as zip</button>
               <button v-if="CFG.admin" type="button" @click="B.openDialog('batch', [node])" data-act="batch" :class="S.btnSecondary" class="!h-[30px] !rounded-[7px] !text-[12.5px]"><ips-icon name="edit-3" :size="14"></ips-icon>Edit files…</button>
             </div>
+            <section v-if="node.path !== B.ROOT" class="grid gap-2" data-public>
+              <h3 :class="S.eyebrow">Public access</h3>
+              <p v-if="node.public" class="rounded-lg bg-accent-soft px-3 py-2.5 text-[12.5px] text-accent">{{ node.marked ? 'Public. Anyone can see the files in this folder and the folders below it, without signing in.' : 'Public, through a folder above it. Anyone can see its files without signing in.' }}</p>
+              <p v-else class="rounded-lg bg-sidebar px-3 py-2.5 text-[12.5px] text-muted">Private. Only signed-in users can see the files in this folder.</p>
+              <div v-if="CFG.admin && (node.marked || !node.public)"><button type="button" :disabled="pub.busy" @click="setPublic(!node.marked)" data-act="public" :class="S.btnSecondary" class="!h-[30px] !rounded-[7px] !text-[12.5px]"><ips-icon name="globe" :size="14"></ips-icon>{{ node.marked ? 'Make private' : 'Make public' }}</button></div>
+              <p v-else-if="CFG.admin" class="text-[12px] text-muted">To make it private, change the folder above.</p>
+              <p v-if="pub.msg" role="alert" class="rounded-lg bg-danger-soft px-3 py-2 text-[12.5px] text-danger">{{ pub.msg }}</p>
+            </section>
             <dl class="grid grid-cols-[110px_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-[12.5px]">
               <dt class="text-muted">Last modified</dt><dd>{{ when(node.modified) }}</dd>
             </dl>

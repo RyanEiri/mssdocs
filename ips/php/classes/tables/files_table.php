@@ -40,9 +40,9 @@ function ips_files_base() {
 	return basename(getcwd()) === 'json' ? getcwd() . '/' : ips_upload_base();
 }
 
-// A single path component: no slashes, not '.' or '..', no NUL.
+// A single path component: no slashes, not '.' or '..', not the public-folder marker, no NUL.
 function ips_safe_name($name) {
-	return is_string($name) && $name !== '' && $name !== '.' && $name !== '..' && strpbrk($name, "/\\\0") === false;
+	return is_string($name) && $name !== '' && $name !== '.' && $name !== '..' && $name !== IPS_PUBLIC_MARKER && strpbrk($name, "/\\\0") === false;
 }
 
 // $base overrides how the path is resolved for the endpoints that always resolve it against upload/
@@ -269,6 +269,48 @@ function ips_require_confined_dir($path) {
 		ips_refuse_path('dir');
 	}
 	return $path;
+}
+
+// Public folders. A folder is public when it, or a folder above it inside upload/files/, holds a marker file named IPS_PUBLIC_MARKER: everything below it can be
+// fetched without signing in (nginx asks json/json-gate.php about every request under /ips/upload/files/), and every other file needs a signed-in user. The marker
+// is a plain empty file, so it travels with the files (snapshots, backups, a copy of the folder) and needs no database column. The files root is never public.
+const IPS_PUBLIC_MARKER = '.public';
+
+// True when the real directory $real (inside upload/files/) is public: it or a folder above it, up to but not including the files root, holds the marker.
+function ips_dir_is_public($real) {
+	$root = ips_files_root();
+	if ($root === false || !is_string($real)) {
+		return false;
+	}
+	while ($real !== $root && strpos($real . '/', $root . '/') === 0) {
+		if (is_file($real . '/' . IPS_PUBLIC_MARKER)) {
+			return true;
+		}
+		$parent = dirname($real);
+		if ($parent === $real) {
+			break;
+		}
+		$real = $parent;
+	}
+	return false;
+}
+
+// True when the folder holds the marker itself (it is what the File Browser's switch changes; a folder below a public one is public without it).
+function ips_dir_marked_public($real) {
+	return is_string($real) && is_file($real . '/' . IPS_PUBLIC_MARKER);
+}
+
+// Marks or unmarks the real directory $real as public. False when it is not a folder inside upload/files/ (the files root included) or the marker cannot be written.
+function ips_set_dir_public($real, $public) {
+	$root = ips_files_root();
+	if ($root === false || !is_string($real) || $real === $root || strpos($real . '/', $root . '/') !== 0 || !is_dir($real)) {
+		return false;
+	}
+	$marker = $real . '/' . IPS_PUBLIC_MARKER;
+	if ($public) {
+		return is_file($marker) || file_put_contents($marker, '') !== false;
+	}
+	return !is_file($marker) || unlink($marker);
 }
 
 // Classes for acting on files table
