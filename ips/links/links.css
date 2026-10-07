@@ -1,0 +1,16 @@
+/* The Links page (links/index.php): what it adds to the file editor module's stylesheet (file_editor/file-editor.css: app bar, buttons, table, dialog). */
+.ln-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 12px 20px; border-top: 1px solid var(--ips-line); }
+.ln-row:hover { background: var(--ips-hover); }
+.ln-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ln-name { font-size: 15px; font-weight: 500; }
+.ln-name:hover { text-decoration: underline !important; }
+.ln-desc { font-size: 13.5px; color: var(--ips-ink); }
+.ln-url { font-family: var(--ips-font-mono); font-size: 12px; color: var(--ips-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ln-actions { display: flex; flex: none; align-items: center; gap: 14px; }
+.ln-move:disabled { opacity: .3; cursor: default; }
+.ln-dialog { width: 560px; max-height: calc(100vh - 32px); overflow-y: auto; }
+.ln-wide { width: 100%; }
+.ln-dialog textarea.fe-input { resize: vertical; }
+.ln-also { display: grid; grid-template-columns: 1fr 1.4fr auto; gap: 8px; align-items: center; margin-bottom: 8px; }
+.ln-check { display: flex; align-items: center; gap: 8px; margin-top: 16px; font-size: 13.5px; }
+@media (max-width: 720px) { .ln-row { flex-direction: column; } .ln-also { grid-template-columns: 1fr; } }
