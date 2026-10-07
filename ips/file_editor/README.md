@@ -28,6 +28,7 @@ A descriptor (`types/html.php` documents it):
 | `ext` | The extensions it owns (lowercase, no dot); the first is given to a new file. |
 | `folder` | Its templates folder under `upload/files/`: its files are listed, opened, created, saved and deleted there and nowhere else (one type per folder). |
 | `mode` | The CodeMirror mode of the Source view (default `htmlmixed`). |
+| `view` | How its files open: `source` (the default: CodeMirror only) or `wysiwyg` (CKEditor's visual editor, with a Source button). A file that holds script, a form, a frame or a whole HTML document still opens in Source, so the visual editor never removes anything unseen (`ips_fe_view()` in `lib.php`). |
 | `skeleton` | `function ($title)`: the text of a new file. |
 | `validate` | Optional `function ($text)`: `null` when the text may be saved, else the reason it may not (XML: it must be well-formed). |
 | `js` | Optional script in `types/`, loaded by the editor page, registering `window.IPS_FE_TYPES[id] = { check: function (text) { return {ok, text}; } }`, the live status beside the line count (XML: "Well-formed"). |

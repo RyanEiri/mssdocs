@@ -1,6 +1,7 @@
 <?php
-// The editor page of the file editor module: one file in CKEditor's Source view (CodeMirror: highlighting, search and replace, tag completion, comment buttons).
-// Without CKEditor installed (README) it falls back to a plain text box that saves the same way. A file outside the user's own folder is shown read-only.
+// The editor page of the file editor module: one file in CKEditor, in its Source view (CodeMirror: highlighting, search and replace, tag completion, comment
+// buttons) or, for a type whose view is 'wysiwyg' (HTML), its visual editor (ips_fe_view() in lib.php). Without CKEditor installed (README) it falls back to a
+// plain text box that saves the same way. A file outside the user's own folder is shown read-only.
 chdir('..');
 require_once(getcwd().'/php/start_sess.php');
 require_once(getcwd().'/php/boot.php');
@@ -27,6 +28,8 @@ $may = ips_fe_may_write($real, $fe_scope);
 $writable = $may && is_writable($real);
 $can_delete = $may && is_writable(dirname($real));
 $has_ckeditor = is_file(__DIR__ . '/ckeditor/ckeditor.js');
+$content = file_get_contents($real);
+[$view, $view_why] = ips_fe_view($type, $content);
 $folder = dirname(substr($real, strlen(ips_fe_roots()[$kind]) + 1));
 $folder = $folder === '.' ? 'shared' : $folder;
 $fe_css = 'file-editor.css?v=' . filemtime(__DIR__ . '/file-editor.css');
@@ -74,6 +77,9 @@ $fe_css = 'file-editor.css?v=' . filemtime(__DIR__ . '/file-editor.css');
 <?php } elseif (!$writable) { ?>
 			<div id="fe-readonly" role="alert" class="fe-notice"><strong>Read-only</strong><span class="fe-muted">The web server cannot write this file.</span></div>
 <?php } ?>
+<?php if ($has_ckeditor && $view_why !== null) { ?>
+			<div id="fe-source-only" role="note" class="fe-notice"><strong>Source</strong><span class="fe-muted"><?php echo $h($view_why) ?></span></div>
+<?php } ?>
 <?php if (!$has_ckeditor) { ?>
 			<div id="fe-no-ckeditor" role="note" class="fe-notice"><strong>Plain editor</strong><span class="fe-muted">CKEditor is not installed, so this is a plain text box (see the module's README); saving works the same.</span></div>
 <?php } ?>
@@ -83,13 +89,13 @@ $fe_css = 'file-editor.css?v=' . filemtime(__DIR__ . '/file-editor.css');
 					<span class="fe-status"><span id="wf-dot" class="fe-dot"></span><span id="wf-text"><?php echo $h($type['label']) ?></span></span>
 				</div>
 <?php // The file's text goes in escaped: the editor holds exactly what the file holds and it is saved as posted. Printed raw, a file containing </textarea><script> would run script here for whoever opens it. ?>
-				<textarea name="editor1" id="editor1" rows="30" cols="100" spellcheck="false"<?php if (!$writable) echo ' readonly' ?> style="flex:1;border:0;padding:14px;font:13px/21px var(--ips-font-mono);resize:none"><?php echo $h(file_get_contents($real)) ?></textarea>
+				<textarea name="editor1" id="editor1" rows="30" cols="100" spellcheck="false"<?php if (!$writable) echo ' readonly' ?> style="flex:1;border:0;padding:14px;font:13px/21px var(--ips-font-mono);resize:none"><?php echo $h($content) ?></textarea>
 			</div>
 		</main>
 	</form>
 
 	<div id="fe-toast" role="status" aria-live="polite" hidden></div>
-	<script>window.IPS_FE_EDIT = <?php echo json_encode(['csrf' => $login_cookie->CsrfToken(), 'kind' => $kind, 'label' => $type['label'], 'mode' => $type['mode'], 'writable' => $writable, 'delete' => $can_delete, 'ckeditor' => $has_ckeditor], JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
+	<script>window.IPS_FE_EDIT = <?php echo json_encode(['csrf' => $login_cookie->CsrfToken(), 'kind' => $kind, 'label' => $type['label'], 'mode' => $type['mode'], 'view' => $view, 'writable' => $writable, 'delete' => $can_delete, 'ckeditor' => $has_ckeditor], JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
 	<script src="edit-page.js?v=<?php echo filemtime(__DIR__.'/edit-page.js') ?>"></script>
 </body>
 </html>
