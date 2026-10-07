@@ -36,7 +36,8 @@ function ips_fe_registry() {
 			continue;
 		}
 		$d['ext'] = $ext;
-		$d += ['group' => $d['label'] . ' files', 'blurb' => '', 'mode' => 'htmlmixed', 'validate' => null, 'js' => null];
+		$d += ['group' => $d['label'] . ' files', 'blurb' => '', 'mode' => 'htmlmixed', 'view' => 'source', 'validate' => null, 'js' => null];
+		$d['view'] = $d['view'] === 'wysiwyg' ? 'wysiwyg' : 'source';
 		$registry[$d['id']] = $d;
 		$folders[$d['folder']] = $d['id'];
 		foreach ($ext as $e) {
@@ -61,12 +62,28 @@ function ips_fe_type($id) {
 	return is_string($id) && in_array($id, ips_fe_types(), true) ? ips_fe_registry()[$id] : null;
 }
 
-// What the pages and scripts need to know about each offered type (no functions): id, label, group, ext, blurb, mode, and the URL (relative to the module) of its script.
+// Markup the visual (WYSIWYG) editor would remove or that it must not render: script and the places script hides (event attributes, javascript: links,
+// frames, plugins, forms, style sheets), and a whole document (CKEditor's full-page mode has an open advisory in the last open-source CKEditor 4).
+const IPS_FE_NOT_VISUAL = '/<\\s*(html|head|body|script|style|link|meta|base|iframe|frame|object|embed|applet|form|input|button|textarea|select)\\b|<[^>]*\\son[a-z]+\\s*=|<[^>]*javascript\\s*:/i';
+
+// How a file opens: its type's view ('source' or 'wysiwyg', the visual editor), except that a file holding what the visual editor would remove opens in Source,
+// so nothing is stripped without anyone seeing it. Returns [view, reason or null].
+function ips_fe_view($type, $text) {
+	if ($type['view'] !== 'wysiwyg') {
+		return ['source', null];
+	}
+	if (preg_match(IPS_FE_NOT_VISUAL, $text)) {
+		return ['source', 'This page holds script, a form, an embedded frame or a whole HTML document, which the visual editor would remove, so it opens in Source.'];
+	}
+	return ['wysiwyg', null];
+}
+
+// What the pages and scripts need to know about each offered type (no functions): id, label, group, ext, blurb, mode, view, and the URL (relative to the module) of its script.
 function ips_fe_public_types() {
 	$out = [];
 	foreach (ips_fe_types() as $id) {
 		$d = ips_fe_registry()[$id];
-		$out[] = ['id' => $id, 'label' => $d['label'], 'group' => $d['group'], 'ext' => $d['ext'], 'blurb' => $d['blurb'], 'mode' => $d['mode'],
+		$out[] = ['id' => $id, 'label' => $d['label'], 'group' => $d['group'], 'ext' => $d['ext'], 'blurb' => $d['blurb'], 'mode' => $d['mode'], 'view' => $d['view'],
 			'js' => $d['js'] && is_file(__DIR__ . '/types/' . basename($d['js'])) ? 'types/' . basename($d['js']) : null];
 	}
 	return $out;

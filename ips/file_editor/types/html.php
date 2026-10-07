@@ -1,5 +1,6 @@
 <?php
-/* A file type of the file editor (see lib.php and the README): HTML pages. A file type is a module: one file in types/ that returns this array, and the editor
+/* A file type of the file editor (see lib.php and the README): HTML pages, the content that a site's pages include (a fragment, not a whole document),
+ * edited in the visual editor. A file type is a module: one file in types/ that returns this array, and the editor
  * offers the types whose files are there (remove a file to turn its type off; IPS_FILE_EDITOR_TYPES, a comma-separated list of ids, can also narrow them).
  *
  *   id        letters and digits, unique: the type's name in requests and in the New file dialog
@@ -9,6 +10,8 @@
  *   folder    its templates folder under upload/files/: files of this type are listed, opened, created, saved and deleted there and nowhere else
  *   blurb     one line under the label in the New file dialog
  *   mode      the CodeMirror mode of its Source view (default htmlmixed)
+ *   view      how its files open: 'source' (the default; CodeMirror only, no switching) or 'wysiwyg' (CKEditor's visual editor, with a Source button), see
+ *             ips_fe_view() in lib.php for the files that still open in Source
  *   skeleton  function ($title): the text of a new file
  *   validate  optional function ($text): null when the text may be saved, else the reason it may not
  *   js        optional script in types/, loaded by the editor page: registers window.IPS_FE_TYPES[id] = { check: function (text) { return {ok, text} } }, the live
@@ -22,8 +25,9 @@ return [
 	'folder' => 'html_templates',
 	'blurb' => 'Blank page',
 	'mode' => 'htmlmixed',
+	'view' => 'wysiwyg',
 	'skeleton' => function ($title) {
 		$title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
-		return "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>$title</title>\n</head>\n<body>\n  <p></p>\n</body>\n</html>\n";
+		return "<h2>$title</h2>\n\n<p></p>\n";
 	},
 ];
