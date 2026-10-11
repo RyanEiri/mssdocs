@@ -29,6 +29,16 @@ $ips_config = array_merge([
 	'logo'    => is_file(PROGRAM_BASE . 'img/logo/logo32.png') ? PROGRAM_WEB_BASE . 'img/logo/logo32.png' : null,
 	'modules' => $ips_modules,
 ], $ips_config);
+// A site may draw its own header on every page instead of the app bar below: html/site-header.php is run here and its HTML handed to the shell as `headerHtml`. It is
+// given $ips_active (the page: home | users | browser), $ips_user and $ips_admin, and should be self-contained (its own CSS; a <script> in it would not run, inline handlers do).
+if (is_file(HTML_TEMPLATES . 'site-header.php') && empty($ips_config['headerHtml'])) {
+	$ips_active = $ips_config['view'] ?? '';
+	$ips_user = $ips_config['user'] ?? '';
+	$ips_admin = !empty($ips_config['admin']);
+	ob_start();
+	include HTML_TEMPLATES . 'site-header.php';
+	$ips_config['headerHtml'] = ob_get_clean();
+}
 $ips_js = function ($path) {
 	return PROGRAM_WEB_BASE . $path . '?v=' . (is_file(PROGRAM_BASE . $path) ? filemtime(PROGRAM_BASE . $path) : 0);
 };
