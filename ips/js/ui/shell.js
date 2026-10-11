@@ -28,10 +28,12 @@
         { id: "files", label: "Files", href: CFG.base + "browser.php" },
       ];
       if (CFG.admin) links.push({ id: "users", label: "Users", href: CFG.base + "users.php" });
-      return { cfg: CFG, S, links, signOut: CFG.base + "index.php?header=cookieDel", initial: (CFG.user || "?").charAt(0).toUpperCase() };
+      // a site's own header (html/site-header.php, built in html/ui-foot.php) is drawn instead of this bar
+      return { cfg: CFG, S, links, headerHtml: CFG.headerHtml || "", signOut: CFG.base + "index.php?header=cookieDel", initial: (CFG.user || "?").charAt(0).toUpperCase() };
     },
     template: `
-      <header class="flex items-center gap-7 h-14 px-5 shrink-0 bg-surface border-b border-line">
+      <div v-if="headerHtml" class="shrink-0" v-html="headerHtml"></div>
+      <header v-else class="flex items-center gap-7 h-14 px-5 shrink-0 bg-surface border-b border-line">
         <a :href="cfg.base + 'index.php'" class="flex items-center gap-2.5 font-display text-[19px] font-medium tracking-[-0.01em] text-ink no-underline">
           <img v-if="cfg.logo" :src="cfg.logo" alt="" class="w-7 h-7 rounded-md">
           <span>{{ cfg.name }}</span>
