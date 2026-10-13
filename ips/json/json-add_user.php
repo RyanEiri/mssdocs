@@ -96,7 +96,10 @@ if(ADMIN_STATUS){
 				$errors['database'] = $user_object->mysqlError;
 			}
 			if($user_object->duplicateError){
-		  	$errors['duplicate'] = 'Username unavailable! Please choose another';
+		  	$errors['duplicate'] = $user_object->duplicateMessage ?: 'Username unavailable! Please choose another';
+			}
+			if($user_object->emailError){
+				$errors['email'] = $user_object->emailError;
 			}
 		  $data['success'] = false;
 		  $data['errors'] = $errors;
