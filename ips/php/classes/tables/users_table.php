@@ -43,6 +43,11 @@ class UserGrab {
 		$entered_username,
 		$entered_password
 		) {
+		// No such user (the hash was never set) or an account without one: refuse here. password_verify() with a null hash is deprecated in PHP 8.1 and the
+		// notice, printed before login.php's redirect, broke the redirect wherever errors are displayed.
+		if (!is_string($this->hashed_password) || $this->hashed_password === '') {
+			return false;
+		}
 		if (password_verify($entered_password, $this->hashed_password)) {
 			return $this->secretword;
 		} else {
