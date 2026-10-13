@@ -8,7 +8,8 @@ class UserGrab {
 		$entered_password,
 		$password,
 		$hashed_password,
-		$secretword
+		$secretword,
+		$resolved
 		;
 	public	$admin;
 
@@ -25,6 +26,17 @@ class UserGrab {
 		$params = [['type' => 's', 'value' => $this->username]];
 		$this->result = $db->query($sql, $params);
 		$query = $this->result->fetchArray();
+		$this->resolved = $this->username;
+		if(!is_array($query) && is_string($this->username) && strpos($this->username, '@') !== false) {
+			// Not a username: an email address signs in the one account that has it (compared without regard to case). Two accounts with the same address
+			// (from before the address had to be unique) match nobody, rather than whichever came first.
+			$result = $db->query("SELECT username, password, admin, secretword FROM users WHERE email <> '' AND LOWER(email) = LOWER(?) LIMIT 2", $params);
+			$rows = $result->fetchArray();
+			if(is_array($rows) && count($rows) === 1) {
+				$query = $rows;
+				$this->resolved = $rows[0]['username'];
+			}
+		}
 		if(is_array($query)) {
 			extract($query[0]);
 		}
@@ -37,6 +49,11 @@ class UserGrab {
 		if(isset($secretword)){
 			$this->secretword = $secretword;
 		}
+	}
+
+	// The username the sign-in is for: what was typed, or the account whose email address it was. The cookie is made for this name.
+	function loginName() {
+		return $this->resolved;
 	}
 
 	function validateUser(
@@ -237,6 +254,8 @@ class ActOnSingleUser {
 		$email,
 		$mysqlError,
 		$duplicateError,
+		$duplicateMessage,
+		$emailError,
 		$removeError,
 		$username,
 		$admin,
@@ -280,10 +299,42 @@ class ActOnSingleUser {
 		}
 	}
 
+	// Why this username and email cannot be used for the account with this id (0 for a new one), or null. An email address is unique among accounts (without regard
+	// to case) because it signs in; so that an address never means two accounts, a username cannot be another account's address, nor an address another's username.
+	private function identityProblem($id) {
+		global $db;
+		$taken = function ($sql, $value) use ($db, $id) {
+			if ($value === '' || $value === null) {
+				return false;
+			}
+			$rows = $db->query($sql, [['type' => 's', 'value' => $value], ['type' => 'i', 'value' => (int) $id]])->fetchArray();
+			return is_array($rows) && count($rows) > 0;
+		};
+		if ($taken("SELECT id FROM users WHERE email <> '' AND LOWER(email) = LOWER(?) AND id <> ? LIMIT 1", $this->email)) {
+			return ['email', 'That email address is already registered to another account.'];
+		}
+		if ($taken("SELECT id FROM users WHERE email <> '' AND LOWER(email) = LOWER(?) AND id <> ? LIMIT 1", $this->username)) {
+			return ['username', 'That is the email address of another account: choose a different username.'];
+		}
+		if ($taken("SELECT id FROM users WHERE LOWER(username) = LOWER(?) AND id <> ? LIMIT 1", $this->email)) {
+			return ['email', 'That is the username of another account: use a different email address.'];
+		}
+		return null;
+	}
+
 	function addUser(){
 		global $db;
 		$this->username = $_SESSION['username'];
 		$this->email = $_SESSION['email'];
+		if (($problem = $this->identityProblem(0)) !== null) {
+			if ($problem[0] === 'email') {
+				$this->emailError = $problem[1];
+			} else {
+				$this->duplicateError = true;
+				$this->duplicateMessage = $problem[1];
+			}
+			return false;
+		}
 		if(!isset($this->duplicate)){
 		  $this->duplicateSQL = "SELECT username FROM users WHERE username=?";
 		  $dup_param = [['type' => 's', 'value' => $this->username]];
@@ -323,6 +374,15 @@ class ActOnSingleUser {
 		global $db;
 		$this->username = $_SESSION['username'];
 		$this->email = $_SESSION['email'];
+		if (($problem = $this->identityProblem($this->id)) !== null) {
+			if ($problem[0] === 'email') {
+				$this->emailError = $problem[1];
+			} else {
+				$this->duplicateError = true;
+				$this->duplicateMessage = $problem[1];
+			}
+			return false;
+		}
 		// Empty password = keep the stored hash and secretword (loaded in the constructor),
 		// so editing a user's email/role doesn't sign them out.
 		if ($_SESSION['password'] !== '') {

@@ -21,11 +21,11 @@
           </div>
           <form method="post" :action="cfg.base + 'login.php'" :class="S.card" class="p-6 grid gap-4 shadow-tree-active">
             <h1 :class="S.eyebrow">Sign in</h1>
-            <label class="grid gap-1.5"><span :class="S.label">Username</span>
+            <label class="grid gap-1.5"><span :class="S.label">Username or email</span>
               <input ref="username" name="username" required autocomplete="username" autocapitalize="off" spellcheck="false" :class="S.input"></label>
             <label class="grid gap-1.5"><span :class="S.label">Password</span>
               <input name="password" type="password" required autocomplete="current-password" :class="S.input"></label>
-            <p v-if="cfg.loginError" role="alert" class="rounded-lg bg-danger-soft px-3 py-2 text-[12.5px] text-danger">That username and password didn’t match. Try again.</p>
+            <p v-if="cfg.loginError" role="alert" class="rounded-lg bg-danger-soft px-3 py-2 text-[12.5px] text-danger">That username or email and password didn’t match. Try again.</p>
             <button type="submit" :class="S.btnPrimary" class="w-full">Sign in</button>
           </form>
         </div>

@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$secretword = $userval->validateUser($_REQUEST['username'],$_REQUEST['password']);
 	if($secretword) {
 		$login_cookie = new UserCookie();
-		$login_cookie->CreateIt($_REQUEST['username'],$secretword);
+		$login_cookie->CreateIt($userval->loginName(),$secretword);
 	} else {
 		header('Location: ./login.php?1');
 		exit;
