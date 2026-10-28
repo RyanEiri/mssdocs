@@ -135,14 +135,21 @@ class UserCookie {
 			// would otherwise leave a page load blank. Send page loads to the login form;
 			// POST endpoints still get false so they can answer in JSON.
 			if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-				header('Location: ./login.php');
+				header('Location: ' . $this->loginUrl());
 				exit;
 			}
 			return false;
 	  } else {
-			header('Location: ./login.php');
+			header('Location: ' . $this->loginUrl());
 			exit;
 		}
+	}
+
+	// The sign-in page of the IPS. A page in a module folder (links/, file_editor/, projects/) sent ./login.php, which is that folder's own address and does not
+	// exist there, so a signed-out visitor got a 404; the address is the IPS root's wherever the page is. An older variant that does not define
+	// PROGRAM_WEB_BASE keeps the relative address.
+	private function loginUrl(){
+		return defined('PROGRAM_WEB_BASE') ? PROGRAM_WEB_BASE . 'login.php' : './login.php';
 	}
 
 	// Non-redirecting counterpart to CheckIt(), for endpoints that also serve anonymous
