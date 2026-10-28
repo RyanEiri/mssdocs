@@ -9,6 +9,7 @@ only when this folder exists.
 | `index.php`, `files-app.js` | The list: the files the user may open, filter, New file, two-click Delete. |
 | `edit.php`, `edit-page.js` | One file: status strip (lines and the file type's own check), unsaved flag, Ctrl/Cmd+S, Save, two-click Delete. |
 | `list.php`, `new.php`, `save.php`, `delete.php` | The JSON endpoints behind them. |
+| `artefact.php`, `artefact-pane.js` | **The artefact pane**: the page images or PDF a document describes, beside the editor (below). |
 | `lib.php` | The one place a request's path becomes a file, the file-type registry, and who may do what. |
 | `types/*.php` (and `types/*.js`) | **The file types**: one module per type of file (below). |
 | `header.php`, `file-editor.css` | The app bar and the styles (on the admin UI's `--ips-*` tokens, so `css/site-theme.css` re-themes them). |
@@ -35,6 +36,18 @@ A descriptor (`types/html.php` documents it):
 
 A descriptor that is malformed, or that claims an id, extension or folder another has already taken, is ignored, so one bad module cannot take the others down (`tests/test_file_editor_types.py`
 in webserversAC). Security of a new type is the site's call: the save path, the folder rules and the escaped output are the module's, but a type that holds script needs the nginx rule below.
+
+## The artefact beside a document
+
+An XML or HTML file can have an **artefact** shown beside it: page images (one at a time, with zoom) or a PDF in a frame, from the file store. `artefact.php` looks in this order and stops at the first that has something:
+
+1. **The Projects module** (if installed): the document is linked to a project; the project's files with the role *Artefact page* (images, in the project's order, each with its label such as `fol. 12r`) or *Artefact PDF*. A document in several projects has a source for each, with a switcher; archived projects are left out.
+2. **The TEI's own facsimile** (XML only): `<graphic url>` (inside a `<surface n>`) and `<pb n facs>`, for an address that names a file inside the store (a path relative to the document, or a full address containing `/upload/files/`). Any other address is ignored.
+3. **A folder `<xml:id>-pages`** anywhere in the store (to depth 4) holding images, in natural order; the id is the `<msDesc>`'s `xml:id`, else the file's name.
+4. **A PDF `<xml:id>.pdf`**, found the same way.
+
+With no artefact there is no pane; the strip says "No artefact linked". The pane has a page list, previous and next, zoom (`Fit`, 125 to 300%), a PDF link, width steps and Hide (the strip's *Artefact* button brings it back); width, visibility, zoom and Follow cursor are remembered in the browser.
+**Follow cursor** (Source view): the nearest `<pb n="...">` or `<locus from="...">` before the cursor names a page, and the page whose label or file name is the same is shown (`fol. 12r`, `12r` and `0012r` are one label; a PDF with no page list takes a number). Nothing needs an XML extension: the TEI is read with regular expressions, since not every host has `dom`. Tests: `tests/test_artefact_pane.py`, `tests/test_ui_artefact_pane.py` (on the vesturheimsrit base dev stack, with the Projects tables).
 
 ## Where the files are, and who may do what
 
