@@ -6,7 +6,7 @@ The module is optional: its card on the Home page, and everything it adds to the
 
 | File | What it does |
 |---|---|
-| `schema.sql` | The two tables: `projects` and `project_files` (project, file, role, position, label, note, who linked it). Run it once, after the base schema. Deleting a project or a catalogue row removes only the links (cascading keys); no file is ever deleted. |
+| `schema.sql` | The two tables: `projects` and `project_files` (project, file, role, position, label, note, who linked it). Run it once, after the base schema. Deleting a project removes its links (a cascading key); no file is ever deleted. There is no key to `files` (its `id` is signed in the base schema and unsigned in some site dumps, and MariaDB refuses a key between the two): a link whose file left the catalogue is not listed or counted and is cleared by the next write. |
 | `index.php`, `projects-app.js`, `projects.css`, `header.php` | The Projects page: the list, the open project's details, its files with role, label and note, order, removal. Borrows the file editor module's stylesheet (`file_editor/file-editor.css`). |
 | `list.php`, `files.php`, `for_file.php` | Read: every project with its file count and the kinds and roles to offer; one project with its files in order; the projects a file is in. |
 | `save.php`, `delete.php`, `link.php`, `update_link.php`, `move.php`, `unlink.php` | Write (a same-origin POST with the user's CSRF token in `X-CSRF`, bound parameters only). `link.php` takes `project_id`, `role` and `paths[]` (`files/A/b.png`). |

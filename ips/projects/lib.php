@@ -46,12 +46,22 @@ function ips_projects_user($write) {
 	if (!ips_projects_ready()) {
 		ips_projects_refuse(503, 'The projects tables have not been created yet (run projects/schema.sql).');
 	}
+	if ($write) {
+		ips_projects_purge_orphans();
+	}
 	return ips_current_user();
 }
 
 function ips_projects_ready() {
 	global $db;
 	return $db->query("SHOW TABLES LIKE 'projects'")->size() > 0 && $db->query("SHOW TABLES LIKE 'project_files'")->size() > 0;
+}
+
+// Links whose file has gone from the catalogue (removed in the browser, which deletes the row; the tables have no key to `files`, see schema.sql). Listings and counts
+// leave them out already; a write clears them. The ids of `files` are never reused, so a stale link cannot attach itself to another file.
+function ips_projects_purge_orphans() {
+	global $db;
+	$db->query("DELETE l FROM project_files l LEFT JOIN files f ON f.id = l.file_id WHERE f.id IS NULL");
 }
 
 // Text from a form field: one line of plain text, whitespace collapsed, at most $max characters, or null when it is not a string or too long.
@@ -80,7 +90,7 @@ function ips_projects_row($r) {
 
 function ips_projects_get($id) {
 	global $db;
-	$rows = $db->query("SELECT p.*, (SELECT COUNT(*) FROM project_files f WHERE f.project_id = p.id) AS files FROM projects p WHERE p.id=? LIMIT 1", [['type' => 'i', 'value' => $id]])->fetchArray();
+	$rows = $db->query("SELECT p.*, (SELECT COUNT(*) FROM project_files f JOIN files x ON x.id = f.file_id WHERE f.project_id = p.id) AS files FROM projects p WHERE p.id=? LIMIT 1", [['type' => 'i', 'value' => $id]])->fetchArray();
 	return $rows ? ips_projects_row($rows[0]) : null;
 }
 
@@ -88,7 +98,7 @@ function ips_projects_get($id) {
 function ips_projects_all() {
 	global $db;
 	$out = [];
-	$result = $db->query("SELECT p.*, (SELECT COUNT(*) FROM project_files f WHERE f.project_id = p.id) AS files FROM projects p ORDER BY p.status = 'archived', p.title, p.id");
+	$result = $db->query("SELECT p.*, (SELECT COUNT(*) FROM project_files f JOIN files x ON x.id = f.file_id WHERE f.project_id = p.id) AS files FROM projects p ORDER BY p.status = 'archived', p.title, p.id");
 	while ($r = $result->fetch()) {
 		$out[] = ips_projects_row($r);
 	}
