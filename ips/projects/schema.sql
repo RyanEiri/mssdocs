@@ -1,6 +1,8 @@
 -- The Projects module (ips/projects/): a project groups files of the file store (the pages of a manuscript, its description, a PDF) under a title, with a role,
 -- a position and a label for each file. Run once against the site's database (after the base schema: project_files points at its `files` table).
--- Deleting a project, or a file from the catalogue, removes only the links, never a file.
+-- Deleting a project removes its links (a cascading key), never a file. There is no key to `files`: a site's `files.id` may be signed (the base schema) or unsigned (a
+-- site's own dump), and MariaDB refuses a key between columns of different signedness. A link whose file has gone from the catalogue is left out of every listing and
+-- count (they join `files`) and is cleared by the next write (ips_projects_purge_orphans()); the ids of `files` are never reused.
 
 CREATE TABLE IF NOT EXISTS `projects` (
   `id`         INT(11)      NOT NULL AUTO_INCREMENT,
@@ -28,6 +30,5 @@ CREATE TABLE IF NOT EXISTS `project_files` (
   PRIMARY KEY (`project_id`, `file_id`),
   KEY `file_id` (`file_id`),
   KEY `project_position` (`project_id`, `position`),
-  CONSTRAINT `project_files_project` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `project_files_file` FOREIGN KEY (`file_id`) REFERENCES `files` (`id`) ON DELETE CASCADE
+  CONSTRAINT `project_files_project` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
