@@ -141,6 +141,7 @@
                 <dt class="text-muted">Modified</dt><dd>{{ when(node.modified) }}</dd>
               </dl>
             </template>
+            <ips-file-projects v-if="B.projects.ready && detail && !detail.loading" :node="node"></ips-file-projects>
           </template>
 
           <!-- a folder -->

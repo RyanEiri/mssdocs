@@ -12,6 +12,7 @@ A web-based internal proofing system for organizing, uploading, and browsing man
 - Zip a folder with a progress bar; administrators can edit the names, titles and descriptions of a folder's files together
 - Image viewer with next/previous and rotate (for looking only)
 - Optional modules: the HTML editor (`ips/html_editor/`), the TEI/XML editor, backup download
+- Optional **Projects** module (`ips/projects/`): group files of the file store into projects (role, order, label, note), from the upload dialog, the details panel or a selection, and filter the browser to one project
 
 ### The admin UI
 
