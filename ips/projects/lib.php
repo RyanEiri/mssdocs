@@ -64,13 +64,24 @@ function ips_projects_purge_orphans() {
 	$db->query("DELETE l FROM project_files l LEFT JOIN files f ON f.id = l.file_id WHERE f.id IS NULL");
 }
 
-// Text from a form field: one line of plain text, whitespace collapsed, at most $max characters, or null when it is not a string or too long.
+// The number of characters in a UTF-8 string, or null when it is not valid UTF-8. Without mbstring: not every host has it (vesturheimsrit's PHP does not).
+function ips_projects_length($value) {
+	$n = preg_match_all('/./us', $value);
+	return $n === false ? null : $n;
+}
+
+// Text from a form field: one line of plain text, whitespace collapsed, at most $max characters, or null when it is not a string, not valid UTF-8 or too long.
 function ips_projects_text($value, $max) {
 	if (!is_string($value)) {
 		return null;
 	}
-	$value = trim(preg_replace('/\s+/u', ' ', str_replace("\xc2\xa0", ' ', $value)));
-	return $value === '' || mb_strlen($value, 'UTF-8') <= $max ? $value : null;
+	$value = preg_replace('/\s+/u', ' ', str_replace("\xc2\xa0", ' ', $value));
+	if ($value === null) {
+		return null;
+	}
+	$value = trim($value);
+	$length = ips_projects_length($value);
+	return $length !== null && $length <= $max ? $value : null;
 }
 
 // Notes: several lines allowed (line endings made "\n", trailing space trimmed), at most $max characters, or null.
@@ -79,7 +90,8 @@ function ips_projects_long_text($value, $max) {
 		return null;
 	}
 	$value = trim(preg_replace("/[ \t]+\n/", "\n", str_replace(["\r\n", "\r"], "\n", $value)));
-	return mb_strlen($value, 'UTF-8') <= $max ? $value : null;
+	$length = ips_projects_length($value);
+	return $length !== null && $length <= $max ? $value : null;
 }
 
 function ips_projects_row($r) {
