@@ -56,6 +56,7 @@
     expanded: { [ROOT]: true },
     selection: [], anchor: null,
     view: saved("view", "grid"), sortKey: "name", sortDir: 1, filter: "all", query: "",
+    project: 0, projectPaths: [], // the Projects module's filter: one project's files (paths), in the project's order
     panelOpen: saved("panel", "1") === "1",
   });
 
@@ -88,10 +89,15 @@
     return q ? Object.values(nodes.value).filter((n) => n.path !== ROOT && n.name.toLowerCase().includes(q)) : [];
   });
   const typeOf = (n) => (n.folder ? "folder" : U.typeOf(n.name));
+  // The files of the chosen project, in its order, wherever they are (null when no project is chosen).
+  const inProject = computed(() => (store.project ? store.projectPaths.map((p) => nodes.value[p]).filter(Boolean) : null));
   const FILTERS = { all: null, folder: "folder", image: "image", doc: "doc", xml: "xml", audio: "audio", archive: "archive" };
   const visible = computed(() => {
     const want = FILTERS[store.filter];
-    const list = (searching.value ? matches.value : inFolder.value).filter((n) => !want || typeOf(n) === want);
+    const q = store.query.trim().toLowerCase();
+    const base = inProject.value ? (q ? inProject.value.filter((n) => n.name.toLowerCase().includes(q)) : inProject.value) : searching.value ? matches.value : inFolder.value;
+    const list = base.filter((n) => !want || typeOf(n) === want);
+    if (inProject.value) return list; // a project shows its files in its own order
     const key = store.sortKey, dir = store.sortDir;
     const val = (n) => (key === "size" ? (n.folder ? stats(n.path).files : n.size || 0) : key === "modified" ? n.modified || 0 : key === "type" ? (n.folder ? "" : U.extOf(n.name)) : n.name);
     return list.slice().sort((a, b) => {
@@ -117,6 +123,7 @@
   }
   function apply(path) {
     if (store.cwd !== path) { store.selection = []; store.anchor = null; }
+    store.project = 0; store.projectPaths = []; // choosing a folder ends the project filter
     store.cwd = path;
     store.query = "";
     for (let p = path; p; p = parentOf(p)) store.expanded[p] = true; // the tree opens down to the current folder
@@ -152,11 +159,11 @@
   const thumbUrl = (n) => CFG.base + "upload/" + join(join(parentOf(n.path), "thumbnail"), n.name);
   const fileUrl = (n) => CFG.base + "upload/" + n.path;
 
-  const visibleClear = () => { store.query = ""; store.filter = "all"; };
+  const visibleClear = () => { store.query = ""; store.filter = "all"; store.project = 0; store.projectPaths = []; };
 
   IPS.browser = Object.assign(IPS.browser || {}, {
     ROOT, store, load, loadTitles, go, apply, select, toggle, selectAll, clearSelection, setSort, setView, togglePanel, isSelected, visibleClear,
-    nodes, children, stats, visible, inFolder, searching, matches, crumbs, typeOf, canWrite, thumbUrl, fileUrl,
+    nodes, children, stats, visible, inFolder, inProject, searching, matches, crumbs, typeOf, canWrite, thumbUrl, fileUrl,
     byName, path: { nameOf, parentOf, join, within, cleanPath },
   });
 })();

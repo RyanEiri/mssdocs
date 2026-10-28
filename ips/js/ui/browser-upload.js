@@ -30,7 +30,7 @@
         let d = null;
         try { d = JSON.parse(xhr.responseText.slice(xhr.responseText.indexOf("{"))); } catch (e) { /* not JSON */ }
         const f = d && d.files && d.files[0];
-        if (f && !f.error && xhr.status < 300) resolve({ ok: true, name: f.name.split("/").pop() });
+        if (f && !f.error && xhr.status < 300) resolve({ ok: true, name: f.name.split("/").pop(), path: "files/" + f.name });
         else resolve({ ok: false, message: (f && f.error) || "The upload didn’t go through (" + xhr.status + ")." });
       };
       xhr.send(form);
@@ -41,8 +41,29 @@
     const dir = st.cwd, files = Array.from(fileList || []).filter((f) => f.name);
     if (!files.length) return;
     if (!can()) { IPS.toast(why(), { icon: "alert-circle" }); return; }
-    files.forEach((file) => queue.items.push(reactive({ id: ++seq, file, name: file.name, size: file.size, dir, state: "queued", pct: 0, message: "" })));
-    if (!queue.running) run();
+    const go = (link) => {
+      files.forEach((file) => queue.items.push(reactive({ id: ++seq, file, name: file.name, size: file.size, dir, state: "queued", pct: 0, message: "", link, path: "" })));
+      if (!queue.running) run();
+    };
+    // With the Projects module on, the user may link what they are about to upload to a project first (the dialog answers null when they cancel).
+    if (B.projects && B.projects.ready) B.projects.chooseForUpload(files.length, dir).then((choice) => { if (choice) go(choice.project_id ? choice : null); });
+    else go(null);
+  }
+
+  // The files of a finished run that were to join a project: one request per project and role, in the order they were sent.
+  async function linkSent() {
+    const groups = {};
+    queue.items.filter((i) => i.state === "done" && i.link && !i.linked && i.path).forEach((i) => {
+      const key = i.link.project_id + "|" + i.link.role;
+      (groups[key] = groups[key] || { link: i.link, items: [] }).items.push(i);
+    });
+    for (const g of Object.values(groups)) {
+      g.items.forEach((i) => { i.linked = true; });
+      const r = await B.projects.link(g.link.project_id, g.link.role, g.items.map((i) => i.path));
+      const name = B.projects.title(g.link.project_id);
+      if (r.linked) IPS.toast("Added " + U.plural(r.linked, "file") + " to “" + name + "”", r.failed.length ? { icon: "alert-circle", ms: 10000 } : undefined);
+      if (!r.ok) IPS.toast((r.linked ? "Some files" : "The files") + " didn’t join “" + name + "”: " + r.message + " Add them from the details panel.", { icon: "alert-circle", ms: 10000 });
+    }
   }
 
   async function run() {
@@ -54,13 +75,14 @@
       if (!item) break;
       item.state = "sending";
       const r = await send(item);
-      if (r.ok) { item.state = "done"; item.pct = 100; item.name = r.name; sent++; dirs.add(item.dir); } else { item.state = "error"; item.message = r.message; }
+      if (r.ok) { item.state = "done"; item.pct = 100; item.name = r.name; item.path = r.path; sent++; dirs.add(item.dir); } else { item.state = "error"; item.message = r.message; }
     }
     queue.running = false;
     if (sent) {
       await B.load();
       here = [...dirs].filter((d) => d === st.cwd).length;
       IPS.toast("Uploaded " + U.plural(sent, "file") + (here ? "" : " to " + [...dirs].map((d) => d.replace(/^files\//, "")).join(", ")));
+      await linkSent();
     }
   }
 

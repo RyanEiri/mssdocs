@@ -1,0 +1,24 @@
+/* The Projects page (projects/index.php): what it adds to the file editor module's stylesheet (file_editor/file-editor.css: app bar, buttons, table, dialog). */
+.pj-layout { display: grid; grid-template-columns: minmax(240px, 340px) minmax(0, 1fr); gap: 24px; align-items: start; }
+.pj-item { display: flex; flex-direction: column; gap: 2px; width: 100%; padding: 12px 20px; border: 0; border-top: 1px solid var(--ips-line); background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.pj-item:first-child { border-top: 0; }
+.pj-item:hover { background: var(--ips-hover); }
+.pj-item.current { background: var(--ips-hover); box-shadow: inset 3px 0 0 var(--ips-accent); }
+.pj-title { font-size: 15px; font-weight: 500; overflow-wrap: anywhere; }
+.pj-meta { font-size: 12.5px; color: var(--ips-muted); }
+.pj-check { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 13px; }
+.pj-detail { min-width: 0; }
+.pj-wide { width: 100%; }
+.pj-detail textarea.fe-input { resize: vertical; }
+.pj-two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.pj-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 16px; }
+.pj-delete { margin-left: auto; }
+.pj-files { margin-top: 28px; }
+.pj-files h2 { font-size: 17px; margin: 0 0 8px; }
+.pj-file { display: grid; grid-template-columns: minmax(0, 1.6fr) 150px minmax(0, 1fr) minmax(0, 1.2fr) auto; gap: 8px; align-items: center; padding: 10px 0; border-top: 1px solid var(--ips-line); }
+.pj-file-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pj-file-name { font-weight: 500; overflow-wrap: anywhere; }
+.pj-file-path { font-family: var(--ips-font-mono); font-size: 12px; color: var(--ips-muted); overflow-wrap: anywhere; }
+.pj-file-actions { display: flex; align-items: center; gap: 12px; }
+.pj-move:disabled { opacity: .3; cursor: default; }
+@media (max-width: 900px) { .pj-layout { grid-template-columns: 1fr; } .pj-file { grid-template-columns: 1fr; } .pj-two { grid-template-columns: 1fr; } }

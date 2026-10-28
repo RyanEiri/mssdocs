@@ -12,9 +12,10 @@
   const Browser = {
     name: "ips-browser",
     setup() {
-      const title = Vue.computed(() => (B.searching.value ? "Search results" : st.cwd === B.ROOT ? "All files" : B.path.nameOf(st.cwd)));
+      const title = Vue.computed(() => (B.searching.value ? "Search results" : st.project ? B.projects.title(st.project) : st.cwd === B.ROOT ? "All files" : B.path.nameOf(st.cwd)));
       const subtitle = Vue.computed(() => {
-        if (B.searching.value) return U.plural(B.matches.value.length, "match", "matches") + " for “" + st.query.trim() + "”";
+        if (B.searching.value) return U.plural(st.project ? B.visible.value.length : B.matches.value.length, "match", "matches") + " for “" + st.query.trim() + "”";
+        if (st.project) return U.plural(B.inProject.value.length, "file") + " in this project, in its order";
         const c = B.stats(st.cwd), n = B.inFolder.value.length;
         return n ? U.plural(n, "item") + " · " + U.bytesToSize(c.size) : "Empty folder";
       });
@@ -25,7 +26,8 @@
       const empty = Vue.computed(() => {
         if (B.visible.value.length) return null;
         if (B.searching.value) return "search";
-        if (st.filter !== "all" && B.inFolder.value.length) return "filter";
+        if (st.project && st.filter === "all") return "project";
+        if (st.filter !== "all" && (st.project ? B.inProject.value.length : B.inFolder.value.length)) return "filter";
         return "folder";
       });
       function pick(n, ev) { B.select(n.path, ev); }
@@ -90,6 +92,7 @@
               <div v-if="st.selection.length" class="flex items-center gap-1 h-9 pl-3.5 pr-1.5 rounded-lg bg-ink text-paper text-[13px] shrink-0 whitespace-nowrap">
                 <span class="font-medium mr-1.5">{{ st.selection.length }} selected</span>
                 <button type="button" @click="B.openDialog('move', B.selected())" :disabled="!B.can.move(B.selected())" data-act="move" class="inline-flex items-center gap-1.5 h-[26px] px-2 rounded-md hover:bg-ink-hover cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"><ips-icon name="move" :size="14"></ips-icon>Move</button>
+                <button v-if="B.projects.ready" type="button" @click="B.projects.openLink(B.selected())" :disabled="!B.projects.canLink(B.selected())" data-act="project" title="Add the selected files to a project" class="inline-flex items-center gap-1.5 h-[26px] px-2 rounded-md hover:bg-ink-hover cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"><ips-icon name="layers" :size="14"></ips-icon>Add to project…</button>
                 <button v-if="B.can.remove(B.selected())" type="button" @click="B.openDialog('remove', B.selected())" data-act="remove" class="inline-flex items-center gap-1.5 h-[26px] px-2 rounded-md hover:bg-ink-hover cursor-pointer"><ips-icon name="trash-2" :size="14"></ips-icon>Remove</button>
                 <button type="button" @click="B.clearSelection()" class="grid place-items-center h-[26px] px-2 rounded-md hover:bg-ink-hover cursor-pointer" aria-label="Clear selection"><ips-icon name="x" :size="14"></ips-icon></button>
               </div>
@@ -97,6 +100,12 @@
                 <button v-for="f in FILTERS" :key="f[0]" type="button" @click="st.filter = f[0]" :aria-pressed="st.filter === f[0]"
                   :class="['h-7 px-[11px] rounded-[14px] border text-[12.5px] font-medium cursor-pointer transition-colors shrink-0', st.filter === f[0] ? 'bg-ink border-ink text-paper' : 'bg-surface border-line hover:border-line-strong']">{{ f[1] }}</button>
               </div>
+              <label v-if="B.projects.ready" class="flex items-center gap-2 text-[12.5px] text-muted shrink-0">Project
+                <select :value="st.project" @change="B.projects.setFilter(Number($event.target.value))" data-filter="project" aria-label="Show one project's files"
+                  class="h-[30px] w-[200px] rounded-[7px] border border-line bg-surface px-2 text-[12.5px] text-ink outline-none focus:border-accent">
+                  <option :value="0">All files</option>
+                  <option v-for="p in B.projects.list" :key="p.id" :value="p.id">{{ p.title }}</option>
+                </select></label>
               <div class="ml-auto flex items-center gap-2 shrink-0">
                 <label class="flex items-center gap-2 text-[12.5px] text-muted">Sort
                   <select v-model="st.sortKey" class="h-[30px] rounded-[7px] border border-line bg-surface px-2 text-[12.5px] text-ink outline-none focus:border-accent">
@@ -115,10 +124,11 @@
               <div v-else-if="!st.ready" class="grid gap-2.5 grid-cols-[repeat(auto-fill,minmax(232px,1fr))]"><div v-for="n in 6" :key="n" class="h-[68px] rounded-[10px] bg-sidebar animate-pulse"></div></div>
               <div v-else-if="empty" class="mx-auto max-w-[420px] pt-[72px] text-center">
                 <span class="mx-auto grid place-items-center w-16 h-16 rounded-2xl bg-sidebar text-muted"><ips-icon :name="empty === 'search' ? 'search' : empty === 'filter' ? 'filter' : 'inbox'" :size="26"></ips-icon></span>
-                <h2 class="mt-4 font-display text-[22px] font-medium">{{ empty === 'search' ? 'No matches for “' + st.query.trim() + '”' : empty === 'filter' ? 'Nothing of that type here' : 'This folder is empty' }}</h2>
-                <p class="mt-1.5 text-[13.5px] text-muted">{{ empty === 'folder' ? 'Nothing has been added to this folder yet.' : empty === 'search' ? 'Names are searched in every folder. Try a shorter word.' : 'Try another type, or show everything in this folder.' }}</p>
+                <h2 class="mt-4 font-display text-[22px] font-medium">{{ empty === 'search' ? 'No matches for “' + st.query.trim() + '”' : empty === 'project' ? 'No files in this project yet' : empty === 'filter' ? 'Nothing of that type here' : 'This folder is empty' }}</h2>
+                <p class="mt-1.5 text-[13.5px] text-muted">{{ empty === 'project' ? 'Select files and choose “Add to project…”, or pick this project when you upload.' : empty === 'folder' ? 'Nothing has been added to this folder yet.' : empty === 'search' ? 'Names are searched in every folder. Try a shorter word.' : 'Try another type, or show everything in this folder.' }}</p>
                 <button v-if="empty === 'search'" type="button" @click="st.query = ''" :class="S.btnSecondary" class="mt-4">Clear search</button>
                 <button v-if="empty === 'filter'" type="button" @click="st.filter = 'all'" :class="S.btnSecondary" class="mt-4">Show everything</button>
+                <button v-if="empty === 'project'" type="button" @click="B.projects.setFilter(0)" :class="S.btnSecondary" class="mt-4">Show all files</button>
               </div>
               <ips-items v-else :items="B.visible.value" :view="st.view" :selection="st.selection" :titles="st.titles" :sort-key="st.sortKey" :sort-dir="st.sortDir" :searching="B.searching.value"
                 @pick="pick" @open="open" @context="context" @check="(n) => B.toggle(n.path)" @sort="B.setSort" @check-all="st.selection.length === B.visible.value.length ? B.clearSelection() : B.selectAll()"></ips-items>
@@ -132,6 +142,7 @@
           <ips-panel v-if="st.panelOpen" @close="B.togglePanel()"></ips-panel>
         </div>
         <ips-dialogs></ips-dialogs>
+        <ips-project-dialog></ips-project-dialog>
         <ips-viewer></ips-viewer>
         <ips-context-menu></ips-context-menu>
         <ips-upload-tray></ips-upload-tray>
