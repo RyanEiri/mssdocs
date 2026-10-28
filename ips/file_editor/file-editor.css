@@ -51,6 +51,26 @@ body.fe { margin: 0; min-height: 100vh; background: var(--ips-paper); color: var
 #fe-pane .CodeMirror { font-family: var(--ips-font-mono); font-size: 13px; line-height: 21px; }
 #fe-pane .CodeMirror-gutters { background: transparent; border-right: 1px solid var(--ips-line); }
 #fe-pane .CodeMirror-linenumber { color: var(--ips-faint); }
+/* the artefact pane (artefact-pane.js): the object a document describes, beside the editor */
+.fe-main.fe-wide { max-width: none; }
+#fe-split { display: flex; gap: 14px; align-items: flex-start; }
+#fe-split #fe-pane { flex: 1 1 0; min-width: 0; }
+#fe-artefact { display: flex; flex-direction: column; min-width: 0; min-height: 560px; background: var(--ips-surface); border: 1px solid var(--ips-line); border-radius: 12px; overflow: hidden; }
+.fe-art-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 8px 12px; border-bottom: 1px solid var(--ips-line); font-size: 13px; }
+.fe-art-bar [hidden] { display: none !important; }
+.fe-art-group { display: inline-flex; gap: 4px; }
+.fe-art-right { margin-left: auto; }
+.fe-art-bar button, .fe-art-bar select, .fe-strip-btn { font: inherit; font-size: 13px; color: var(--ips-ink); background: var(--ips-surface); border: 1px solid var(--ips-line-strong); border-radius: 6px; padding: 3px 9px; cursor: pointer; }
+.fe-art-bar button:hover:not(:disabled), .fe-strip-btn:hover { background: var(--ips-hover); }
+.fe-art-bar button:disabled { opacity: .4; cursor: default; }
+.fe-art-bar select { max-width: 14rem; }
+.fe-strip-btn[aria-pressed="true"] { background: var(--ips-accent-soft); border-color: var(--ips-accent); }
+#fe-art-view { flex: 1 1 auto; min-height: 0; overflow: auto; background: var(--ips-paper); }
+#fe-art-view[hidden], #fe-art-frame[hidden] { display: none; }
+#fe-art-img { display: block; width: 100%; height: auto; }
+#fe-art-error { padding: 16px; margin: 0; }
+#fe-art-frame { flex: 1 1 auto; width: 100%; border: 0; background: var(--ips-paper); }
+@media (max-width: 991px) { #fe-split { flex-direction: column; } #fe-artefact { flex: 0 0 auto !important; width: 100%; height: 60vh !important; } }
 #fe-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 70; max-width: 560px; padding: 12px 18px; border-radius: 10px; background: var(--ips-ink); color: var(--ips-paper); font-size: 14px; box-shadow: 0 10px 30px rgba(31,29,26,.25); white-space: pre-line; }
 #fe-toast.err { background: var(--ips-danger); color: #fff; }
 @media (max-width: 720px) { .fe-bar-in, .fe-main { padding-left: 16px; padding-right: 16px; } .fe-header { gap: 14px; padding: 0 12px; } }

@@ -2,7 +2,9 @@
    whose view is 'wysiwyg' (or a plain text box when CKEditor is not installed), a status strip (lines, and the file type's own live check if its module has one: window.IPS_FE_TYPES[kind].check(text) -> {ok, text}), an "Unsaved
    changes" flag, Ctrl/Cmd+S, a toast, Save and a two-click Delete.
    Configuration comes from window.IPS_FE_EDIT ({csrf, kind, label, mode, view, writable, delete, ckeditor}). The text is saved exactly as it is in the editor
-   (in the visual editor, as CKEditor writes the page out). */
+   (in the visual editor, as CKEditor writes the page out).
+   For the artefact pane (artefact-pane.js) it exports window.IPS_FE_FIT (size the page again after the pane is shown, hidden or resized) and, while the Source view is
+   open, sends 'ipsfe:cursor' on window ({text, index}: the text and the cursor's offset, a quarter of a second after the cursor stops). */
 (function () {
   'use strict';
   var cfg = window.IPS_FE_EDIT;
@@ -54,6 +56,8 @@
     var top = pane.getBoundingClientRect().top + window.pageYOffset;
     var height = Math.max(560, window.innerHeight - top - 24);
     pane.style.height = height + 'px';
+    var artefact = $('fe-artefact');
+    if (artefact) { artefact.style.height = height + 'px'; }
     if (!editor) { text.style.height = Math.max(300, height - strip.offsetHeight) + 'px'; return; }
     try {
       // CKEditor sizes its contents area (where the CodeMirror view sits) from the height it is given there, and the toolbar and status bar come on top of it
@@ -64,6 +68,7 @@
     } catch (e) { /* the editor is still starting */ }
   }
   window.addEventListener('resize', fit);
+  window.IPS_FE_FIT = fit;
   if (editor) { editor.on('instanceReady', fit); }
   fit();
 
@@ -78,6 +83,15 @@
   }
   function touched() { if (!dirty) { dirty = true; $('dirty-flag').hidden = false; } }
   function changed() { touched(); lines(); clearTimeout(checkTimer); checkTimer = setTimeout(check, 400); }
+  // where the cursor is, for the artefact pane: sent once it has stopped moving, and only in the Source view (the visual editor has no offset in the text)
+  var cursorTimer = null;
+  function cursorSoon() {
+    clearTimeout(cursorTimer);
+    cursorTimer = setTimeout(function () {
+      if (!cm || inVisual()) { return; }
+      window.dispatchEvent(new CustomEvent('ipsfe:cursor', { detail: { text: cm.getValue(), index: cm.indexFromPos(cm.getCursor()) } }));
+    }, 250);
+  }
   // CodeMirror exists while CKEditor is in Source mode (a new one each time the mode is switched), as window.codemirror_<CKEditor's id>
   function attach() {
     var next = editor ? window['codemirror_' + editor.id] : null;
@@ -85,6 +99,7 @@
     cm = next;
     lines(); check();
     cm.on('change', function (instance, change) { if (change.origin !== 'setValue') { changed(); } else { lines(); } });
+    cm.on('cursorActivity', cursorSoon);
     fit();
   }
   if (editor) {
