@@ -29,3 +29,6 @@ ips/contacts/cardfile/*.parsed.bkp
 
 # A site's own PHP settings (see ips/php/boot.php)
 ips/php/site-config.php
+
+# Python bytecode (the file editor's validate_xml.py is imported by tests)
+__pycache__/

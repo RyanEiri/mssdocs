@@ -13,6 +13,7 @@ A web-based internal proofing system for organizing, uploading, and browsing man
 - Image viewer with next/previous and rotate (for looking only)
 - Optional modules: the HTML editor (`ips/html_editor/`), the TEI/XML editor, backup download
 - The file editor shows the **artefact** a document describes (page images or a PDF) beside it, found through a project, the TEI's facsimile, a `<id>-pages` folder or `<id>.pdf`, and follows the cursor by folio label
+- The file editor can check XML against the **Menota schema**, line by line (`file_editor/validate_xml.py`: a command-line tool, and the editor's Validate button on a host with a fast enough lxml; the schema is fetched by `tools/fetch-menota-schema.sh`, not kept here)
 - Optional **Projects** module (`ips/projects/`): group files of the file store into projects (role, order, label, note), from the upload dialog, the details panel or a selection, and filter the browser to one project
 
 ### The admin UI

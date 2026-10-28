@@ -17,6 +17,10 @@ return [
 			. "      </sourceDesc>\n    </fileDesc>\n  </teiHeader>\n  <text>\n    <body>\n      <p/>\n    </body>\n  </text>\n</TEI>\n";
 	},
 	'validate' => function ($text) {
+		// Menota text uses named character entities (&ae; ...) that need a DTD to be well-formed; the ones in menota-entities.txt (schemas/) are replaced by their characters first
+		// (nothing external is loaded), so such a document can be saved. An entity in no list is still refused.
+		require_once __DIR__ . '/../schema.php';
+		$text = ips_fe_substitute_entities($text, ips_fe_entities());
 		$previous = libxml_use_internal_errors(true);
 		libxml_clear_errors();
 		$ok = simplexml_load_string($text) !== false;
