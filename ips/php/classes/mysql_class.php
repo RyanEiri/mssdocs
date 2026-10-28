@@ -104,7 +104,8 @@ class SQL {
 			trigger_error('Could not connect to server');
 			$this->connectError = true;
 		} else {
-			@mysqli_set_charset($this->dbConn, 'utf8');
+			// utf8mb4, not MariaDB's 3-byte "utf8": a 4-byte character in a utf8mb4 column is stored and read back whole instead of being refused or turned into "?".
+			@mysqli_set_charset($this->dbConn, 'utf8mb4');
 		}
 	}
 
