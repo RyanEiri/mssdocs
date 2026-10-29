@@ -46,3 +46,4 @@
 .pj-preview .rad-head { font-weight: 600; }
 .pj-preview .rad-label { color: var(--ips-muted); }
 .pj-preview .rad-part-of { color: var(--ips-muted); }
+.pj-inline { display: inline-flex; margin: 0 0 0 12px; }

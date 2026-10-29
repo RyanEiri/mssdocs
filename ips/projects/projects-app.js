@@ -26,7 +26,7 @@
     data: function () {
       return { projects: [], kinds: [], statuses: [], roles: [], loaded: false, listError: '', query: '', showArchived: false,
                current: null, form: null, formError: '', busy: false, files: [], filesLoaded: false, filesError: '', armed: null,
-               admin: !!cfg.admin, units: !!cfg.units, view: 'projects', tree: [], levels: [], visibilities: [], unit: null, info: null, unitError: '', unitBusy: false, previewKind: '', previewNote: '' };
+               admin: !!cfg.admin, units: !!cfg.units, view: 'projects', tree: [], levels: [], visibilities: [], unit: null, info: null, unitError: '', unitBusy: false, previewKind: '', previewNote: '', exportPublished: false };
     },
     computed: {
       shown: function () {
@@ -48,6 +48,7 @@
         (function mark(nodes, inside) { nodes.forEach(function (n) { var now = inside || n.project_id === id; if (now) { below[n.project_id] = true; } mark(n.children, now); }); }(this.tree, false));
         return this.flat.filter(function (n) { return !below[n.project_id] && allowed.indexOf(n.level) >= 0; });
       },
+      exportHref: function () { return this.form ? 'unit_export.php?id=' + encodeURIComponent(this.form.id) + (this.exportPublished ? '&published=1' : '') : '#'; },
       canRemoveUnit: function () { return !!this.form && (cfg.admin || this.form.created_by === cfg.user); },
       canDelete: function () { return !!this.form && (cfg.admin || this.form.created_by === cfg.user); }
     },

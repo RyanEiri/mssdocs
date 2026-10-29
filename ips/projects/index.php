@@ -177,6 +177,12 @@ $pj_css = ['file_editor/file-editor.css', 'projects/projects.css'];
 									<p v-if="previewNote" class="fe-muted" id="preview-note">{{ previewNote }}</p>
 									<div ref="previewBody" id="preview-body" class="pj-preview" v-show="previewKind"></div>
 								</div>
+								<div v-if="info" class="pj-parts" id="unit-export">
+									<h3>Export</h3>
+									<a class="fe-btn fe-btn-sm" id="export-atom" :href="exportHref" download>AtoM CSV</a>
+									<label class="pj-check pj-inline"><input type="checkbox" id="export-published" v-model="exportPublished"> only what is published</label>
+									<p class="fe-muted pj-hint">This unit, the units below it and their TEI items, in the column layout of AtoM’s RAD CSV import.</p>
+								</div>
 								<div v-if="info && info.items.length" class="pj-parts" id="unit-items">
 									<h3>Items <span class="fe-muted">({{ info.items.length }})</span></h3>
 									<p class="pj-part-file" v-for="i in info.items" :key="i.file_id">{{ i.title || i.name }} <span class="fe-muted">{{ i.path }}</span></p>
