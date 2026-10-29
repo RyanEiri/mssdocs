@@ -5,7 +5,7 @@
 chdir('..');
 require_once(getcwd().'/php/start_sess.php');
 require_once(getcwd().'/php/boot.php');
-require_once __DIR__.'/lib.php';
+require_once __DIR__.'/unit_lib.php';
 $login_cookie = new UserCookie();
 $login_cookie->DeleteIt();
 if (!$login_cookie->CheckIt()) {
@@ -15,6 +15,7 @@ if (!$login_cookie->CheckIt()) {
 $pj_user = $login_cookie->username;
 $result = $db->query("SELECT admin FROM users WHERE username=? LIMIT 1", [['type' => 's', 'value' => $pj_user]])->fetchArray();
 $pj_admin = $result && (int) $result[0]['admin'] === 1;
+$pj_units = ips_units_ready(); // units of description (units.sql): the Description section and the Hierarchy list
 $pj_css = ['file_editor/file-editor.css', 'projects/projects.css'];
 ?>
 <!DOCTYPE html>
@@ -41,17 +42,30 @@ $pj_css = ['file_editor/file-editor.css', 'projects/projects.css'];
 
 			<div class="pj-layout">
 				<section class="pj-list" aria-label="Projects">
-					<div class="fe-filter">
+<?php if ($pj_units) { ?>
+					<div class="pj-views" role="tablist" aria-label="List">
+						<button type="button" role="tab" id="view-projects" class="pj-view" :class="{ on: view === 'projects' }" :aria-selected="view === 'projects' ? 'true' : 'false'" @click="view = 'projects'">Projects</button>
+						<button type="button" role="tab" id="view-hierarchy" class="pj-view" :class="{ on: view === 'hierarchy' }" :aria-selected="view === 'hierarchy' ? 'true' : 'false'" @click="view = 'hierarchy'">Hierarchy</button>
+					</div>
+					<div v-if="view === 'hierarchy'" class="fe-table" id="all-units">
+						<button type="button" class="pj-item pj-node" v-for="n in flat" :key="n.project_id" :class="{ current: current && current.id === n.project_id }" :data-id="n.project_id" :style="{ paddingLeft: (20 + n.depth * 18) + 'px' }" @click="open(n.project_id)">
+							<span class="pj-title">{{ n.title }}</span>
+							<span class="pj-meta">{{ levelLabel(n.level) }}<template v-if="n.reference_code"> · {{ n.reference_code }}</template> · <span class="pj-vis" :class="n.effective_visibility">{{ visLabel(n.effective_visibility) }}</span><template v-if="n.items"> · {{ n.items }} {{ n.items === 1 ? 'item' : 'items' }}</template></span>
+						</button>
+						<div v-if="!flat.length" class="fe-empty" id="no-units">No units yet. Open a project and choose “Describe as a unit…”.</div>
+					</div>
+<?php } ?>
+					<div class="fe-filter" v-show="view === 'projects'">
 						<input type="search" class="fe-input" id="project-filter" v-model="query" placeholder="Filter by title" aria-label="Filter the projects" autocomplete="off" spellcheck="false">
 					</div>
-					<div class="fe-table" id="all-projects">
+					<div class="fe-table" id="all-projects" v-show="view === 'projects'">
 						<button type="button" class="pj-item" v-for="p in shown" :key="p.id" :class="{ current: current && current.id === p.id }" :data-id="p.id" @click="open(p.id)">
 							<span class="pj-title">{{ p.title }}</span>
-							<span class="pj-meta">{{ kindLabel(p.kind) }} · {{ p.files }} {{ p.files === 1 ? 'file' : 'files' }}<span v-if="p.status === 'archived'" class="fe-badge">Archived</span></span>
+							<span class="pj-meta"><template v-if="unitOf(p.id)">{{ levelLabel(unitOf(p.id).level) }} · </template>{{ kindLabel(p.kind) }} · {{ p.files }} {{ p.files === 1 ? 'file' : 'files' }}<span v-if="p.status === 'archived'" class="fe-badge">Archived</span></span>
 						</button>
 						<div v-if="!shown.length" class="fe-empty">{{ loaded ? (projects.length ? 'No projects match.' : 'No projects yet.') : 'Loading…' }}</div>
 					</div>
-					<label class="pj-check"><input type="checkbox" id="project-archived" v-model="showArchived"> Show archived projects</label>
+					<label class="pj-check" v-show="view === 'projects'"><input type="checkbox" id="project-archived" v-model="showArchived"> Show archived projects</label>
 					<p v-if="listError" class="fe-error" role="alert">{{ listError }}</p>
 				</section>
 
@@ -82,6 +96,87 @@ $pj_css = ['file_editor/file-editor.css', 'projects/projects.css'];
 							</div>
 						</form>
 
+<?php if ($pj_units) { ?>
+						<section v-if="form.id" class="pj-unit" id="unit-section" aria-label="Archival description">
+							<h2>Archival description</h2>
+							<template v-if="!unit">
+								<p class="fe-muted">Describe this project as a unit of an archival description (RAD): a fonds, collection, series or file. The files linked to it with the role “Description” are its items.</p>
+								<div class="pj-actions"><button type="button" class="fe-btn" id="unit-describe" @click="describe">Describe as a unit…</button></div>
+							</template>
+							<form v-else id="unit-form" @submit.prevent="saveUnit" autocomplete="off">
+								<p v-if="info" class="pj-unit-line" id="unit-line">
+									<template v-if="info.chain.length > 1"><span id="unit-chain"><template v-for="(c, i) in info.chain.slice(0, -1)"><a href="#" @click.prevent="open(c.project_id)">{{ c.title }}</a> › </template></span></template>
+									Reference code <code id="unit-code">{{ info.reference_code || '—' }}</code> ·
+									<span class="pj-vis" :class="info.effective_visibility" id="unit-effective">{{ info.effective_visibility === 'published' ? 'Public' : 'Not shown in public zones' }}</span>
+									<template v-if="info.effective_visibility !== unit.visibility"> (a unit above it is {{ visLabel(info.effective_visibility).toLowerCase() }})</template>
+								</p>
+								<div class="pj-two">
+									<div>
+										<label class="l" for="unit-level">Level</label>
+										<select class="fe-input pj-wide" id="unit-level" v-model="unit.level"><option v-for="l in levels" :key="l.id" :value="l.id">{{ l.label }}</option></select>
+									</div>
+									<div>
+										<label class="l" for="unit-parent">Parent</label>
+										<select class="fe-input pj-wide" id="unit-parent" v-model="unit.parent_id">
+											<option :value="null" :disabled="needsParent">{{ needsParent ? 'Choose a parent' : 'None (a top level)' }}</option>
+											<option v-for="o in parentOptions" :key="o.project_id" :value="o.project_id">{{ o.title }} ({{ levelLabel(o.level) }})</option>
+										</select>
+									</div>
+								</div>
+								<div class="pj-two">
+									<div><label class="l" for="unit-segment">Reference-code segment</label><input type="text" class="fe-input pj-wide" id="unit-segment" v-model="unit.ref_segment" maxlength="60" placeholder="F1"></div>
+									<div><label class="l" for="unit-title">Title</label><input type="text" class="fe-input pj-wide" id="unit-title" v-model="unit.title" maxlength="255" :placeholder="form.title"></div>
+								</div>
+								<div class="pj-two">
+									<div><label class="l" for="unit-start">Dates: from (ISO 8601)</label><input type="text" class="fe-input pj-wide" id="unit-start" v-model="unit.date_start" maxlength="10" placeholder="1884 or 1884-03-04"></div>
+									<div><label class="l" for="unit-end">to (empty while the unit is open)</label><input type="text" class="fe-input pj-wide" id="unit-end" v-model="unit.date_end" maxlength="10" placeholder="1950"></div>
+								</div>
+								<div class="pj-two">
+									<div><label class="l" for="unit-extent">Extent</label><input type="text" class="fe-input pj-wide" id="unit-extent" v-model="unit.extent" maxlength="255" placeholder="0.3 m of textual records"></div>
+									<div><label class="l" for="unit-accruals">Accruals</label><input type="text" class="fe-input pj-wide" id="unit-accruals" v-model="unit.accruals" maxlength="255" placeholder="Further accruals are expected"></div>
+								</div>
+								<div class="pj-two">
+									<div><label class="l" for="unit-language">Language</label><input type="text" class="fe-input pj-wide" id="unit-language" v-model="unit.language" maxlength="255" :placeholder="hint('language')"></div>
+									<div><label class="l" for="unit-repository">Repository</label><input type="text" class="fe-input pj-wide" id="unit-repository" v-model="unit.repository" maxlength="255" :placeholder="hint('repository')"></div>
+								</div>
+								<label class="l" for="unit-admin">Administrative history / biographical sketch</label>
+								<textarea class="fe-input pj-wide" id="unit-admin" v-model="unit.admin_history" rows="3"></textarea>
+								<label class="l" for="unit-custodial">Custodial history</label>
+								<textarea class="fe-input pj-wide" id="unit-custodial" v-model="unit.custodial_history" rows="2" :placeholder="hint('custodial_history')"></textarea>
+								<label class="l" for="unit-scope">Scope and content</label>
+								<textarea class="fe-input pj-wide" id="unit-scope" v-model="unit.scope_content" rows="4"></textarea>
+								<div class="pj-two">
+									<div><label class="l" for="unit-access">Restrictions on access</label><textarea class="fe-input pj-wide" id="unit-access" v-model="unit.access_note" rows="2" :placeholder="hint('access_note')"></textarea></div>
+									<div><label class="l" for="unit-terms">Terms governing use</label><textarea class="fe-input pj-wide" id="unit-terms" v-model="unit.terms_note" rows="2" :placeholder="hint('terms_note')"></textarea></div>
+								</div>
+								<label class="l" for="unit-note">General note</label>
+								<textarea class="fe-input pj-wide" id="unit-note" v-model="unit.general_note" rows="2"></textarea>
+								<div class="pj-two">
+									<div>
+										<label class="l" for="unit-visibility">Visibility</label>
+										<select class="fe-input pj-wide" id="unit-visibility" v-model="unit.visibility" :disabled="!admin"><option v-for="v in visibilities" :key="v.id" :value="v.id">{{ v.label }}</option></select>
+										<p v-if="!admin" class="fe-muted pj-hint" id="unit-visibility-hint">Only an administrator can publish a unit or make it private.</p>
+									</div>
+								</div>
+								<ul v-if="info && info.warnings.length" class="pj-warnings" id="unit-warnings"><li v-for="w in info.warnings" :key="w">{{ w }}</li></ul>
+								<p class="fe-error" v-if="unitError" role="alert" id="unit-error">{{ unitError }}</p>
+								<div class="pj-actions">
+									<button type="submit" class="fe-btn fe-btn-primary" id="unit-save" :disabled="unitBusy">{{ info ? 'Save description' : 'Create description' }}</button>
+									<button type="button" class="fe-btn" v-if="!info" @click="unit = null">Cancel</button>
+									<button v-if="info && canRemoveUnit" type="button" class="fe-del pj-delete" :class="{ armed: armed === 'unit' }" id="unit-remove" @click="removeUnit">{{ armed === 'unit' ? 'Sure? The project stays.' : 'Remove description' }}</button>
+								</div>
+								<div v-if="info && info.children.length" class="pj-parts" id="unit-children">
+									<h3>Units below</h3>
+									<button type="button" class="pj-part" v-for="c in info.children" :key="c.project_id" @click="open(c.project_id)">{{ c.title }} <span class="fe-muted">({{ levelLabel(c.level) }}<template v-if="c.ref_segment">, {{ c.ref_segment }}</template>)</span></button>
+								</div>
+								<div v-if="info && info.items.length" class="pj-parts" id="unit-items">
+									<h3>Items <span class="fe-muted">({{ info.items.length }})</span></h3>
+									<p class="pj-part-file" v-for="i in info.items" :key="i.file_id">{{ i.title || i.name }} <span class="fe-muted">{{ i.path }}</span></p>
+								</div>
+							</form>
+						</section>
+<?php } ?>
+
 						<div v-if="form.id" class="pj-files">
 							<h2>Files <span class="fe-muted">({{ files.length }})</span></h2>
 							<p v-if="filesLoaded && !files.length" class="fe-empty" id="project-no-files">No files yet. In the Files page, select files and choose “Add to project…”.</p>
@@ -107,7 +202,7 @@ $pj_css = ['file_editor/file-editor.css', 'projects/projects.css'];
 		</main>
 	</div>
 
-	<script>window.IPS_PROJECTS = <?php echo json_encode(['csrf' => $login_cookie->CsrfToken(), 'user' => $pj_user, 'admin' => $pj_admin], JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
+	<script>window.IPS_PROJECTS = <?php echo json_encode(['csrf' => $login_cookie->CsrfToken(), 'user' => $pj_user, 'admin' => $pj_admin, 'units' => $pj_units], JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
 	<script src="projects-app.js?v=<?php echo filemtime(__DIR__.'/projects-app.js') ?>"></script>
 </body>
 </html>
