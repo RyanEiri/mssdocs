@@ -128,3 +128,23 @@ body.fe { margin: 0; min-height: 100vh; background: var(--ips-paper); color: var
 .fe-hint { margin: 8px 0 0; font-size: 12.5px; color: var(--ips-muted); }
 .fe-error { margin: 10px 0 0; font-size: 13.5px; color: var(--ips-danger); }
 .fe-dialog .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+/* the Metadata panel (metadata-panel.js): Dublin Core, RAD and the gaps for the record in the editor, in the pane above the text */
+#fe-meta { border-bottom: 1px solid var(--ips-line); background: var(--ips-surface); max-height: 42vh; display: flex; flex-direction: column; }
+.fe-meta-head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; padding: 8px 14px; font-size: 13px; border-bottom: 1px solid var(--ips-line); }
+.fe-meta-status { color: var(--ips-muted); }
+.fe-meta-status.draft, .fe-meta-status.private { color: var(--ips-danger); }
+.fe-meta-status.published { color: var(--ips-success); }
+.fe-meta-status.stale { font-style: italic; }
+.fe-meta-tabs { display: flex; gap: 4px; margin-left: auto; }
+.fe-meta-tabs [aria-selected="true"] { background: var(--ips-accent-soft); color: var(--ips-accent-hover); }
+.fe-meta-actions { display: flex; gap: 4px; }
+#fe-meta-body { overflow: auto; padding: 10px 14px 14px; font-size: 13px; line-height: 1.5; }
+.fe-meta-table { border-collapse: collapse; width: 100%; }
+.fe-meta-table th { text-align: left; font: 12px var(--ips-font-mono); color: var(--ips-muted); padding: 2px 12px 2px 0; white-space: nowrap; vertical-align: top; width: 1%; }
+.fe-meta-table td { padding: 2px 0; overflow-wrap: anywhere; }
+.fe-meta-gaps { margin: 0; padding-left: 18px; }
+.fe-meta-rad p { margin: 0 0 8px; }
+.fe-meta-rad .rad-head { font-weight: 600; }
+.fe-meta-rad .rad-label { color: var(--ips-muted); }
+.fe-meta-rad .rad-notes, .fe-meta-rad .rad-access { margin-top: 10px; }

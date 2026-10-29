@@ -35,8 +35,10 @@ if (is_file(__DIR__ . '/../projects/lib.php')) {
 }
 require_once __DIR__ . '/artefact.php';
 require_once __DIR__ . '/schema.php';
+require_once __DIR__ . '/metadata/lib.php';
 $artefact = ips_fe_artefact($real, $content, $kind);
 $can_validate = $kind === 'xml' && ips_fe_schema_available(); // the Validate button: PHP has dom and the Menota schema is installed (schema.php)
+$can_metadata = $kind === 'xml' && ips_fe_metadata_available(); // the Metadata button: PHP has dom and xsl (metadata/lib.php)
 $has_artefact = (bool) $artefact['sources'];
 [$view, $view_why] = ips_fe_view($type, $content);
 $folder = dirname(substr($real, strlen(ips_fe_roots()[$kind]) + 1));
@@ -118,6 +120,9 @@ $fe_css = 'file-editor.css?v=' . filemtime(__DIR__ . '/file-editor.css');
 					<button type="button" id="fe-val-btn" class="fe-strip-btn" title="Check the text against the <?php echo $h(ips_fe_schema_info()['label']) ?>">Validate</button>
 					<button type="button" id="fe-val-status" class="fe-val-status" hidden></button>
 <?php } ?>
+<?php if ($can_metadata) { ?>
+					<button type="button" id="fe-meta-btn" class="fe-strip-btn" aria-expanded="false" title="Dublin Core, RAD and what is missing, generated from this record's TEI header">Metadata</button>
+<?php } ?>
 <?php if ($has_artefact) { ?>
 					<button type="button" id="fe-art-toggle" class="fe-strip-btn" aria-pressed="true" title="Show or hide the artefact beside the editor">Artefact</button>
 <?php } else { ?>
@@ -125,6 +130,21 @@ $fe_css = 'file-editor.css?v=' . filemtime(__DIR__ . '/file-editor.css');
 <?php } ?>
 					<span class="fe-status"><span id="wf-dot" class="fe-dot"></span><span id="wf-text"><?php echo $h($type['label']) ?></span></span>
 				</div>
+<?php if ($can_metadata) { ?>
+				<div id="fe-meta" role="region" aria-label="Metadata" hidden>
+					<div class="fe-meta-head">
+						<strong>Metadata</strong>
+						<span id="fe-meta-status" class="fe-meta-status"></span>
+						<span class="fe-meta-tabs" role="tablist" aria-label="Metadata views">
+							<button type="button" role="tab" id="fe-meta-tab-dc" data-view="dc" class="fe-strip-btn" aria-selected="true">Dublin Core</button>
+							<button type="button" role="tab" id="fe-meta-tab-rad" data-view="rad" class="fe-strip-btn" aria-selected="false">RAD</button>
+							<button type="button" role="tab" id="fe-meta-tab-gaps" data-view="gaps" class="fe-strip-btn" aria-selected="false">Gaps</button>
+						</span>
+						<span class="fe-meta-actions"><button type="button" id="fe-meta-refresh" class="fe-strip-btn">Refresh</button><button type="button" id="fe-meta-close" class="fe-strip-btn">Close</button></span>
+					</div>
+					<div id="fe-meta-body" role="tabpanel" tabindex="0"></div>
+				</div>
+<?php } ?>
 <?php // The file's text goes in escaped: the editor holds exactly what the file holds and it is saved as posted. Printed raw, a file containing </textarea><script> would run script here for whoever opens it. ?>
 <?php if ($can_validate) { ?>
 				<div id="fe-val" role="region" aria-label="Validation" hidden>
@@ -139,8 +159,11 @@ $fe_css = 'file-editor.css?v=' . filemtime(__DIR__ . '/file-editor.css');
 	</form>
 
 	<div id="fe-toast" role="status" aria-live="polite" hidden></div>
-	<script>window.IPS_FE_EDIT = <?php echo json_encode(['csrf' => $login_cookie->CsrfToken(), 'kind' => $kind, 'label' => $type['label'], 'mode' => $type['mode'], 'view' => $view, 'writable' => $writable, 'delete' => $can_delete, 'ckeditor' => $has_ckeditor, 'validate' => $can_validate], JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
+	<script>window.IPS_FE_EDIT = <?php echo json_encode(['csrf' => $login_cookie->CsrfToken(), 'kind' => $kind, 'label' => $type['label'], 'mode' => $type['mode'], 'view' => $view, 'writable' => $writable, 'delete' => $can_delete, 'ckeditor' => $has_ckeditor, 'validate' => $can_validate, 'metadata' => $can_metadata], JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
 	<script src="edit-page.js?v=<?php echo filemtime(__DIR__.'/edit-page.js') ?>"></script>
+<?php if ($can_metadata) { ?>
+	<script src="metadata-panel.js?v=<?php echo filemtime(__DIR__.'/metadata-panel.js') ?>"></script>
+<?php } ?>
 <?php if ($has_artefact) { ?>
 	<script>window.IPS_FE_ARTEFACT = <?php echo json_encode(['sources' => $artefact['sources'], 'kind' => $kind], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;</script>
 	<script src="artefact-pane.js?v=<?php echo filemtime(__DIR__.'/artefact-pane.js') ?>"></script>

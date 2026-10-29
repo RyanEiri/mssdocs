@@ -10,6 +10,7 @@ only when this folder exists.
 | `edit.php`, `edit-page.js` | One file: status strip (lines and the file type's own check), unsaved flag, Ctrl/Cmd+S, Save, two-click Delete. |
 | `list.php`, `new.php`, `save.php`, `delete.php` | The JSON endpoints behind them. |
 | `schema.php`, `validate.php`, `validate_xml.py`, `schemas/` | **The XML validator** (below): the Validate button's server side, the checker, and where the Menota schema goes. |
+| `metadata.php`, `metadata-panel.js`, `metadata/` | **The Metadata panel** (below): Dublin Core, a RAD description and the gaps for the XML in the editor, from stylesheets in `metadata/`. |
 | `artefact.php`, `artefact-pane.js` | **The artefact pane**: the page images or PDF a document describes, beside the editor (below). |
 | `lib.php` | The one place a request's path becomes a file, the file-type registry, and who may do what. |
 | `types/*.php` (and `types/*.js`) | **The file types**: one module per type of file (below). |
@@ -60,6 +61,12 @@ that has set one up. The button (XML only) lists the problems (a click on a line
 - **Named entities** (`&aelig; &mdash; ...`, the list in `menota-entities.txt`) are understood: replaced with their characters before parsing, nothing external is ever loaded. This also lets a Menota document with such entities be saved (`types/xml.php`).
 - **Why not PHP's own validator, and why no button on the fleet yet.** PHP's `relaxNGValidate` recompiles the 800 KB schema on every call. Measured: **libxml2 2.15 or newer takes about 4 seconds; 2.14.6 (the PyPI wheels of lxml), 2.9.14 (Debian 12) and Debian 13's packaged lxml take minutes.** So the checker needs an lxml built on libxml2 2.15+ and refuses an older one, and a site names the interpreter with `IPS_FE_PYTHON` in `php/site-config.php`; without it there is no button. PHP runs the checker as a fixed command (no shell), feeds it the text on stdin, stops it after `IPS_FE_VALIDATE_TIMEOUT` seconds (60), and lets at most `IPS_FE_VALIDATE_SLOTS` (2) run at once. The button appears by itself once a host has such an interpreter.
 - Tests: `tests/test_menota_validation.py` (the checker with this computer's lxml; the PHP side with fake and real interpreters; the endpoint on the dev stack) and `tests/test_ui_menota_validation.py` (the button, on the dev stack, with a clearly fake checker) in webserversAC.
+
+## Metadata from the TEI header
+
+For an XML file the strip has a **Metadata** button (when PHP has the `dom` and `xsl` extensions: `php8.2-xml` on every host). It opens a panel above the text with three views of the record's `msDesc`, made from the text in the editor, unsaved changes included, and made again after every save: **Dublin Core** (a table of terms), **RAD** (a description of the manuscript as a discrete item, with each paragraph's rule in its tooltip) and **Gaps** (what the record lacks that the views want). A badge shows the record's status (`revisionDesc/@status`: `draft`, `published` or `private`; none is a draft) and whether it may be shown in public zones; only `published` may. The panel is a tool for the cataloguer and does not publish anything.
+
+`metadata.php` takes the text as a same-origin POST with the user's CSRF token (a signed-in user, nothing more), reads no file, and answers JSON; `metadata/lib.php` parses the text with no network, no DTD and no entity expansion and runs the stylesheets of `metadata/` (see its README) with file and network access denied. The RAD view comes back as XHTML from the stylesheet, and the panel copies it node by node, keeping only `div`, `p` and `span` with their class and rule, so no markup from a record reaches the page. Tests: `tests/test_metadata_*.py` in the fleet repository.
 
 ## Where the files are, and who may do what
 
