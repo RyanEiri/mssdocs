@@ -39,3 +39,10 @@
 .pj-part { display: block; border: 0; background: none; padding: 4px 0; font: inherit; color: inherit; text-align: left; text-decoration: underline; cursor: pointer; }
 .pj-part-file { margin: 2px 0; font-size: 13px; overflow-wrap: anywhere; }
 @media (max-width: 900px) { .pj-layout { grid-template-columns: 1fr; } .pj-file { grid-template-columns: 1fr; } .pj-two { grid-template-columns: 1fr; } }
+
+.pj-parts .fe-btn.on { background: var(--ips-accent-soft); color: var(--ips-accent-hover); }
+.pj-preview { margin-top: 10px; padding: 12px 14px; border: 1px solid var(--ips-line); border-radius: 10px; font-size: 13px; line-height: 1.5; }
+.pj-preview p { margin: 0 0 8px; }
+.pj-preview .rad-head { font-weight: 600; }
+.pj-preview .rad-label { color: var(--ips-muted); }
+.pj-preview .rad-part-of { color: var(--ips-muted); }

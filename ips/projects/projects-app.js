@@ -26,7 +26,7 @@
     data: function () {
       return { projects: [], kinds: [], statuses: [], roles: [], loaded: false, listError: '', query: '', showArchived: false,
                current: null, form: null, formError: '', busy: false, files: [], filesLoaded: false, filesError: '', armed: null,
-               admin: !!cfg.admin, units: !!cfg.units, view: 'projects', tree: [], levels: [], visibilities: [], unit: null, info: null, unitError: '', unitBusy: false };
+               admin: !!cfg.admin, units: !!cfg.units, view: 'projects', tree: [], levels: [], visibilities: [], unit: null, info: null, unitError: '', unitBusy: false, previewKind: '', previewNote: '' };
     },
     computed: {
       shown: function () {
@@ -73,7 +73,7 @@
       // the open project's description, if it has one
       loadUnit: function (id) {
         var self = this;
-        self.unit = null; self.info = null; self.unitError = '';
+        self.unit = null; self.info = null; self.unitError = ''; self.previewKind = ''; self.previewNote = '';
         if (!self.units || !self.unitIndex[id]) { return; } // the tree says which projects are units, so a plain project makes no request that would answer 404
         get('unit_get.php?id=' + encodeURIComponent(id)).then(function (d) {
           if (!d.success || !self.current || self.current.id !== id) { return; }
@@ -85,6 +85,39 @@
         UNIT_FIELDS.forEach(function (f) { u[f] = d.unit[f]; });
         u.title = d.unit.own_title;
         this.unit = u; this.info = d;
+      },
+      // the unit's Dublin Core or RAD description, made by the stylesheets on the server; the RAD XHTML is copied node by node (div, p, span only), never put in as markup
+      preview: function (kind) {
+        var self = this, body = self.$refs.previewBody;
+        self.previewKind = kind; self.previewNote = '';
+        if (body) { body.textContent = ''; }
+        if (!kind || !self.form) { return; }
+        get('unit_views.php?id=' + encodeURIComponent(self.form.id)).then(function (d) {
+          if (self.previewKind !== kind || !body) { return; }
+          if (!d.success) { self.previewNote = d.error || 'The preview could not be made.'; return; }
+          if (!d.available) { self.previewNote = 'The preview needs the file editor module and PHP’s dom and xsl extensions.'; return; }
+          body.textContent = '';
+          if (kind === 'dc') {
+            var table = document.createElement('table'); table.className = 'fe-meta-table';
+            d.dc.forEach(function (row) {
+              var tr = document.createElement('tr'), th = document.createElement('th'), td = document.createElement('td');
+              th.textContent = row[0]; td.textContent = row[1]; tr.appendChild(th); tr.appendChild(td); table.appendChild(tr);
+            });
+            body.appendChild(table);
+            return;
+          }
+          var xml = new DOMParser().parseFromString(d.rad || '<div/>', 'application/xml');
+          (function copy(node, into) {
+            for (var c = node.firstChild; c; c = c.nextSibling) {
+              if (c.nodeType === 3) { into.appendChild(document.createTextNode(c.nodeValue)); continue; }
+              if (c.nodeType !== 1 || ['div', 'p', 'span'].indexOf(c.localName.toLowerCase()) < 0) { continue; }
+              var made = document.createElement(c.localName.toLowerCase()), cls = c.getAttribute('class'), rule = c.getAttribute('data-rule');
+              if (cls && /^[a-z0-9 -]+$/.test(cls)) { made.className = cls; }
+              if (rule && /^[0-9A-Za-z.]+$/.test(rule)) { made.setAttribute('data-rule', rule); made.title = 'RAD ' + rule; }
+              copy(c, made); into.appendChild(made);
+            }
+          }(xml.documentElement, body));
+        });
       },
       describe: function () {
         var u = { level: 'fonds', parent_id: null, title: '', visibility: 'draft' };
@@ -100,6 +133,7 @@
           if (!d.success) { self.unitError = d.error || 'The description was not saved.'; return; }
           self.setUnit(d);
           self.loadUnits();
+          if (self.previewKind) { self.preview(self.previewKind); }
         });
       },
       removeUnit: function () {

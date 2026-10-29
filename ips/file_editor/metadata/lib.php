@@ -90,3 +90,34 @@ function ips_fe_metadata_run($text) {
 	}
 	return $out;
 }
+
+/* The views of a unit of description (a fonds, collection, series or file), from the unit XML of projects/unit_lib.php (ips_units_xml): ['available' => bool, 'record' => {id, status},
+ * 'dc' => [[term, value], ...], 'rad' => XHTML string]. $repeat prints the values the unit inherits as well (IPS_RAD_REPEAT_INHERITED, RAD footnote 1a). */
+function ips_fe_metadata_unit_views($xml, $repeat = false) {
+	$out = ['available' => ips_fe_metadata_available(), 'record' => null, 'dc' => [], 'rad' => null];
+	if (!$out['available']) {
+		return $out;
+	}
+	$document = new DOMDocument();
+	if (!@$document->loadXML($xml, LIBXML_NONET)) {
+		return $out;
+	}
+	$dc = ips_fe_metadata_processor('unit-to-dc.xsl');
+	$rad = ips_fe_metadata_processor('unit-to-rad.xsl');
+	if ($dc === null || $rad === null) {
+		return $out;
+	}
+	$record = $dc->transformToDoc($document);
+	if ($record && $record->documentElement) {
+		$out['record'] = ['id' => $record->documentElement->getAttribute('id'), 'status' => $record->documentElement->getAttribute('status')];
+		foreach ($record->documentElement->childNodes as $node) {
+			if ($node instanceof DOMElement) {
+				$out['dc'][] = [$node->prefix . ':' . $node->localName, $node->textContent];
+			}
+		}
+	}
+	$rad->setParameter('', 'repeat', $repeat ? 'yes' : 'no');
+	$view = $rad->transformToDoc($document);
+	$out['rad'] = $view && $view->documentElement ? $view->saveXML($view->documentElement) : null;
+	return $out;
+}

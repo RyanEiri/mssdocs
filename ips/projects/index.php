@@ -169,6 +169,14 @@ $pj_css = ['file_editor/file-editor.css', 'projects/projects.css'];
 									<h3>Units below</h3>
 									<button type="button" class="pj-part" v-for="c in info.children" :key="c.project_id" @click="open(c.project_id)">{{ c.title }} <span class="fe-muted">({{ levelLabel(c.level) }}<template v-if="c.ref_segment">, {{ c.ref_segment }}</template>)</span></button>
 								</div>
+								<div v-if="info" class="pj-parts" id="unit-preview">
+									<h3>Preview</h3>
+									<button type="button" class="fe-btn fe-btn-sm" id="preview-rad" :class="{ on: previewKind === 'rad' }" @click="preview('rad')">RAD description</button>
+									<button type="button" class="fe-btn fe-btn-sm" id="preview-dc" :class="{ on: previewKind === 'dc' }" @click="preview('dc')">Dublin Core</button>
+									<button type="button" class="fe-btn fe-btn-sm" v-if="previewKind" @click="preview('')">Close</button>
+									<p v-if="previewNote" class="fe-muted" id="preview-note">{{ previewNote }}</p>
+									<div ref="previewBody" id="preview-body" class="pj-preview" v-show="previewKind"></div>
+								</div>
 								<div v-if="info && info.items.length" class="pj-parts" id="unit-items">
 									<h3>Items <span class="fe-muted">({{ info.items.length }})</span></h3>
 									<p class="pj-part-file" v-for="i in info.items" :key="i.file_id">{{ i.title || i.name }} <span class="fe-muted">{{ i.path }}</span></p>
