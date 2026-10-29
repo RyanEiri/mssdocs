@@ -7,6 +7,8 @@ A manuscript is described once, in TEI (`msDesc`). The other metadata is generat
 | `tei-to-dc.xsl` | Dublin Core (qualified, `dcterms`) as `<record id status lang>` holding `dc:` and `dcterms:` elements |
 | `tei-to-rad.xsl` | A RAD description (*Rules for Archival Description*, 2008, chapter 13) as an XHTML fragment; every paragraph carries its rule in `data-rule` |
 | `tei-completeness.xsl` | `<completeness>` listing what the record lacks that the two views want (creator, date, extent, dimensions, language, identifier); it reports and never blocks |
+| `unit-to-rad.xsl` | A RAD description of a **unit of description** (fonds, collection, series or file) at RAD's first level of detail (1.0D1, 1.0D2), from the unit XML of `projects/unit_lib.php` (`ips_units_xml`); `repeat=yes` prints the values inherited from above too (RAD footnote 1a) |
+| `unit-to-dc.xsl` | Dublin Core for a unit: `dc:type` Collection, `dcterms:isPartOf` / `hasPart`, and the unit's effective visibility as its status |
 | `tei-common.xsl` | Parts the others include: the title order, the extent and size, the labels of coded values |
 
 XSLT 1.0, so PHP's `XSLTProcessor` (`php8.2-xml` includes `xsl`) and lxml both run it. A stylesheet must be loaded from a file so its `xsl:include` resolves. `record/@status` (Dublin Core) and `@data-status` (RAD) are `revisionDesc/@status` (`draft`, `published` or `private`; a record with none is a draft): the stylesheets do not decide who may see a record, the caller shows public zones only `published` ones.

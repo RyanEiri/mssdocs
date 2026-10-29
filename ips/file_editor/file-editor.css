@@ -148,3 +148,7 @@ body.fe { margin: 0; min-height: 100vh; background: var(--ips-paper); color: var
 .fe-meta-rad .rad-head { font-weight: 600; }
 .fe-meta-rad .rad-label { color: var(--ips-muted); }
 .fe-meta-rad .rad-notes, .fe-meta-rad .rad-access { margin-top: 10px; }
+.fe-meta-part { margin: 0 0 10px; color: var(--ips-muted); }
+.fe-meta-part a { color: inherit; text-decoration: underline; }
+.fe-meta-inherited { margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--ips-line); }
+.fe-meta-inherited h4 { margin: 0 0 6px; font-size: 13px; color: var(--ips-muted); font-weight: 500; }

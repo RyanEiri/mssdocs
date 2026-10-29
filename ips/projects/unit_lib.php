@@ -293,3 +293,58 @@ function ips_units_write($id, $v, $user) {
 	$updates = implode(', ', array_map(function ($c) { return "$c = VALUES($c)"; }, array_merge($columns, ['updated_by'])));
 	$db->query("INSERT INTO unit_descriptions (project_id, $names, updated_by) VALUES (?, $marks, ?) ON DUPLICATE KEY UPDATE $updates", $params);
 }
+
+// ---- views ------------------------------------------------------------------------------------------------------------------------------------
+
+// The XML the unit stylesheets (file_editor/metadata/unit-to-rad.xsl, unit-to-dc.xsl) read: the unit's own description, its chain, its children and the values it inherits. Needs dom.
+// <unit id level visibility effective> <reference-code/> <title/> <dates start end/> <extent/> <accruals/> <admin-history/> <custodial-history/> <scope-content/> <language/>
+// <repository/> <access/> <terms/> <general-note/> <inherited field from from-title>value</inherited>* <chain><unit id level title/>*</chain> <children><unit .../>*</children>
+function ips_units_xml($id, $all) {
+	if (!isset($all[$id])) {
+		return null;
+	}
+	$u = $all[$id];
+	$doc = new DOMDocument('1.0', 'UTF-8');
+	$root = $doc->createElement('unit');
+	$doc->appendChild($root);
+	foreach (['id' => $id, 'level' => $u['level'], 'visibility' => $u['visibility'], 'effective' => ips_units_effective_visibility($id, $all)] as $name => $value) {
+		$root->setAttribute($name, (string) $value);
+	}
+	$text = function ($name, $value) use ($doc, $root) {
+		$root->appendChild($doc->createElement($name))->appendChild($doc->createTextNode((string) $value));
+	};
+	$text('reference-code', ips_units_reference_code($id, $all));
+	$text('title', $u['title']);
+	$dates = $root->appendChild($doc->createElement('dates'));
+	$dates->setAttribute('start', $u['date_start']);
+	$dates->setAttribute('end', $u['date_end']);
+	foreach (['extent' => 'extent', 'accruals' => 'accruals', 'admin-history' => 'admin_history', 'custodial-history' => 'custodial_history', 'scope-content' => 'scope_content',
+		'language' => 'language', 'repository' => 'repository', 'access' => 'access_note', 'terms' => 'terms_note', 'general-note' => 'general_note'] as $element => $field) {
+		$text($element, $u[$field]);
+	}
+	$names = ['custodial_history' => 'custodial-history', 'language' => 'language', 'repository' => 'repository', 'access_note' => 'access', 'terms_note' => 'terms'];
+	foreach (ips_units_inherited($id, $all) as $field => $found) {
+		if ($found['from'] === null) {
+			continue;
+		}
+		$e = $root->appendChild($doc->createElement('inherited'));
+		$e->setAttribute('field', $names[$field]);
+		$e->setAttribute('from', (string) $found['from']);
+		$e->setAttribute('from-title', $all[$found['from']]['title']);
+		$e->appendChild($doc->createTextNode($found['value']));
+	}
+	$list = function ($name, $units) use ($doc, $root) {
+		$box = $root->appendChild($doc->createElement($name));
+		foreach ($units as $unit) {
+			$e = $box->appendChild($doc->createElement('unit'));
+			$e->setAttribute('id', (string) $unit['project_id']);
+			$e->setAttribute('level', $unit['level']);
+			$e->setAttribute('title', $unit['title']);
+		}
+	};
+	$chain = ips_units_chain($id, $all);
+	array_pop($chain);
+	$list('chain', $chain);
+	$list('children', ips_units_children($id, $all));
+	return $doc->saveXML();
+}
