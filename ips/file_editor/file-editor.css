@@ -71,6 +71,17 @@ body.fe { margin: 0; min-height: 100vh; background: var(--ips-paper); color: var
 #fe-art-error { padding: 16px; margin: 0; }
 #fe-art-frame { flex: 1 1 auto; width: 100%; border: 0; background: var(--ips-paper); }
 @media (max-width: 991px) { #fe-split { flex-direction: column; } #fe-artefact { flex: 0 0 auto !important; width: 100%; height: 60vh !important; } }
+/* the XML validator (edit-page.js, validate.php): the strip's button and verdict, and the list of problems */
+.fe-val-status { font: inherit; font-size: 13px; padding: 0; border: 0; background: none; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; color: var(--ips-muted); }
+.fe-val-status.ok { color: var(--ips-success); }
+.fe-val-status.bad { color: var(--ips-danger); font-weight: 500; }
+.fe-val-status.stale { color: var(--ips-muted); font-style: italic; }
+#fe-val[hidden] { display: none; }
+#fe-val { max-height: 30%; overflow: auto; padding: 8px 14px; border-bottom: 1px solid var(--ips-line); background: var(--ips-paper); font-size: 13px; }
+.fe-val-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+#fe-val ol { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 3px; }
+.fe-val-line { font: inherit; font-size: 12.5px; font-family: var(--ips-font-mono); padding: 0 6px; border: 1px solid var(--ips-line-strong); border-radius: 5px; background: var(--ips-surface); cursor: pointer; }
+.fe-val-line:disabled { cursor: default; opacity: .6; }
 #fe-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 70; max-width: 560px; padding: 12px 18px; border-radius: 10px; background: var(--ips-ink); color: var(--ips-paper); font-size: 14px; box-shadow: 0 10px 30px rgba(31,29,26,.25); white-space: pre-line; }
 #fe-toast.err { background: var(--ips-danger); color: #fff; }
 @media (max-width: 720px) { .fe-bar-in, .fe-main { padding-left: 16px; padding-right: 16px; } .fe-header { gap: 14px; padding: 0 12px; } }

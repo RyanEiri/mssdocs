@@ -9,6 +9,7 @@ only when this folder exists.
 | `index.php`, `files-app.js` | The list: the files the user may open, filter, New file, two-click Delete. |
 | `edit.php`, `edit-page.js` | One file: status strip (lines and the file type's own check), unsaved flag, Ctrl/Cmd+S, Save, two-click Delete. |
 | `list.php`, `new.php`, `save.php`, `delete.php` | The JSON endpoints behind them. |
+| `schema.php`, `validate.php`, `validate_xml.py`, `schemas/` | **The XML validator** (below): the Validate button's server side, the checker, and where the Menota schema goes. |
 | `artefact.php`, `artefact-pane.js` | **The artefact pane**: the page images or PDF a document describes, beside the editor (below). |
 | `lib.php` | The one place a request's path becomes a file, the file-type registry, and who may do what. |
 | `types/*.php` (and `types/*.js`) | **The file types**: one module per type of file (below). |
@@ -48,6 +49,17 @@ An XML or HTML file can have an **artefact** shown beside it: page images (one a
 
 With no artefact there is no pane; the strip says "No artefact linked". The pane has a page list, previous and next, zoom (`Fit`, 125 to 300%), a PDF link, width steps and Hide (the strip's *Artefact* button brings it back); width, visibility, zoom and Follow cursor are remembered in the browser.
 **Follow cursor** (Source view): the nearest `<pb n="...">` or `<locus from="...">` before the cursor names a page, and the page whose label or file name is the same is shown (`fol. 12r`, `12r` and `0012r` are one label; a PDF with no page list takes a number). Nothing needs an XML extension: the TEI is read with regular expressions, since not every host has `dom`. Tests: `tests/test_artefact_pane.py`, `tests/test_ui_artefact_pane.py` (on the vesturheimsrit base dev stack, with the Projects tables).
+
+## Validating XML against the Menota schema
+
+`validate_xml.py` checks a document against the Menota schema (RELAX NG, Menota Handbook 3.0, a customisation of TEI P5) and lists every problem with its line. It is a **command-line tool**:
+`python3 validate_xml.py --schema menotaP5.rng --file record.xml` (the fleet's `tools/validate-tei.py` in webserversAC wraps it for files and folders), and what **the editor's Validate button** runs on a host
+that has set one up. The button (XML only) lists the problems (a click on a line goes there), and after each save a note says Valid or how many problems; it is advice and never stops a save.
+
+- **The schema is not in the repository** (menota.org states no licence): `tools/fetch-menota-schema.sh <folder>` downloads it with its source, date and checksums; see `schemas/README.md`.
+- **Named entities** (`&aelig; &mdash; ...`, the list in `menota-entities.txt`) are understood: replaced with their characters before parsing, nothing external is ever loaded. This also lets a Menota document with such entities be saved (`types/xml.php`).
+- **Why not PHP's own validator, and why no button on the fleet yet.** PHP's `relaxNGValidate` recompiles the 800 KB schema on every call. Measured: **libxml2 2.15 or newer takes about 4 seconds; 2.14.6 (the PyPI wheels of lxml), 2.9.14 (Debian 12) and Debian 13's packaged lxml take minutes.** So the checker needs an lxml built on libxml2 2.15+ and refuses an older one, and a site names the interpreter with `IPS_FE_PYTHON` in `php/site-config.php`; without it there is no button. PHP runs the checker as a fixed command (no shell), feeds it the text on stdin, stops it after `IPS_FE_VALIDATE_TIMEOUT` seconds (60), and lets at most `IPS_FE_VALIDATE_SLOTS` (2) run at once. The button appears by itself once a host has such an interpreter.
+- Tests: `tests/test_menota_validation.py` (the checker with this computer's lxml; the PHP side with fake and real interpreters; the endpoint on the dev stack) and `tests/test_ui_menota_validation.py` (the button, on the dev stack, with a clearly fake checker) in webserversAC.
 
 ## Where the files are, and who may do what
 

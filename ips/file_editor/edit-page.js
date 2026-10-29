@@ -3,6 +3,8 @@
    changes" flag, Ctrl/Cmd+S, a toast, Save and a two-click Delete.
    Configuration comes from window.IPS_FE_EDIT ({csrf, kind, label, mode, view, writable, delete, ckeditor}). The text is saved exactly as it is in the editor
    (in the visual editor, as CKEditor writes the page out).
+   An XML document can also be checked against the Menota schema (cfg.validate, from schema.php): the Validate button, and after every save, post the text to validate.php and list each
+   problem with its line (a click on the line goes there); it is advice and never stops a save.
    For the artefact pane (artefact-pane.js) it exports window.IPS_FE_FIT (size the page again after the pane is shown, hidden or resized) and, while the Source view is
    open, sends 'ipsfe:cursor' on window ({text, index}: the text and the cursor's offset, a quarter of a second after the cursor stops). */
 (function () {
@@ -58,11 +60,12 @@
     pane.style.height = height + 'px';
     var artefact = $('fe-artefact');
     if (artefact) { artefact.style.height = height + 'px'; }
-    if (!editor) { text.style.height = Math.max(300, height - strip.offsetHeight) + 'px'; return; }
+    var problems = $('fe-val'), taken = strip.offsetHeight + (problems && !problems.hidden ? problems.offsetHeight : 0); // the strip and the validation list sit above the editor
+    if (!editor) { text.style.height = Math.max(300, height - taken) + 'px'; return; }
     try {
       // CKEditor sizes its contents area (where the CodeMirror view sits) from the height it is given there, and the toolbar and status bar come on top of it
       var space = function (name) { var el = editor.ui.space(name); return el ? el.$.offsetHeight : 0; };
-      var inner = Math.max(200, height - strip.offsetHeight - space('top') - space('bottom') - 2);
+      var inner = Math.max(200, height - taken - space('top') - space('bottom') - 2);
       editor.resize('100%', inner, true);
       if (cm && !inVisual()) { cm.setSize(null, inner); cm.refresh(); }
     } catch (e) { /* the editor is still starting */ }
@@ -82,7 +85,7 @@
     $('wf-text').textContent = result.text;
   }
   function touched() { if (!dirty) { dirty = true; $('dirty-flag').hidden = false; } }
-  function changed() { touched(); lines(); clearTimeout(checkTimer); checkTimer = setTimeout(check, 400); }
+  function changed() { touched(); lines(); clearTimeout(checkTimer); checkTimer = setTimeout(check, 400); if (typeof markStale === 'function') { markStale(); } }
   // where the cursor is, for the artefact pane: sent once it has stopped moving, and only in the Source view (the visual editor has no offset in the text)
   var cursorTimer = null;
   function cursorSoon() {
@@ -124,6 +127,65 @@
   }
   function reply(r) { return r.json().catch(function () { return { success: false, error: 'The server sent an unexpected reply (' + r.status + ').' }; }); }
 
+  // ---- validation: the Menota schema's verdict, by line ---------------------------------------------------------------------------
+  var valBtn = $('fe-val-btn'), valStatus = $('fe-val-status'), valPanel = $('fe-val'), validated = false, stale = false;
+  function gotoLine(n) {
+    var line = Math.max(0, n - 1);
+    if (cm && !inVisual()) { cm.focus(); cm.setCursor({ line: line, ch: 0 }); cm.scrollIntoView({ line: line, ch: 0 }, 120); return; }
+    var pos = 0, from = text.value;
+    for (var i = 0; i < line; i++) { var nl = from.indexOf('\n', pos); if (nl < 0) { break; } pos = nl + 1; }
+    text.focus(); text.setSelectionRange(pos, pos);
+  }
+  function showPanel(on) { if (valPanel) { valPanel.hidden = !on; fit(); } }
+  function markStale() { if (valStatus && validated && !stale) { stale = true; valStatus.className = 'fe-val-status stale'; valStatus.textContent = 'Changed since it was validated'; } }
+  function render(d, manual) {
+    validated = true; stale = false;
+    var title = $('fe-val-title'), list = $('fe-val-list');
+    list.innerHTML = '';
+    valStatus.hidden = false;
+    if (!d.available) { valStatus.className = 'fe-val-status'; valStatus.textContent = 'Validation is not available here'; showPanel(false); return; }
+    var label = d.schema ? d.schema.label : 'schema';
+    valStatus.title = label;
+    if (d.stage === 'size' || d.stage === 'busy' || d.stage === 'engine') {
+      // it could not be checked (the one line says why)
+      valStatus.className = 'fe-val-status bad'; valStatus.textContent = 'Could not validate';
+      title.textContent = d.errors.length ? d.errors[0].message : 'The text could not be validated.';
+      showPanel(!!manual);
+      return;
+    }
+    if (d.valid) {
+      valStatus.className = 'fe-val-status ok'; valStatus.textContent = 'Valid';
+      title.textContent = 'Valid against the ' + label + '.';
+      showPanel(!!manual);
+      return;
+    }
+    var n = d.errors.length;
+    valStatus.className = 'fe-val-status bad';
+    valStatus.textContent = n + (d.truncated ? '+' : '') + (n === 1 ? ' problem' : ' problems');
+    title.textContent = (d.stage === 'parse' ? 'Not well-formed XML: ' : d.stage === 'size' ? '' : 'Does not follow the ' + label + ': ') + valStatus.textContent + (d.truncated ? ' (the first ' + n + ' are listed)' : '') + '.';
+    d.errors.forEach(function (e) {
+      var li = document.createElement('li'), go = document.createElement('button'), msg = document.createElement('span');
+      go.type = 'button'; go.className = 'fe-val-line'; go.textContent = e.line ? 'line ' + e.line : 'document';
+      if (e.line) { go.addEventListener('click', function () { gotoLine(e.line); }); } else { go.disabled = true; }
+      msg.textContent = ' ' + e.message;
+      li.appendChild(go); li.appendChild(msg); list.appendChild(li);
+    });
+    showPanel(manual || !valPanel.hidden);
+  }
+  function runValidation(manual) {
+    valBtn.disabled = true; valStatus.hidden = false; valStatus.className = 'fe-val-status'; valStatus.textContent = 'Validating…';
+    return fetch('validate.php', { method: 'POST', credentials: 'same-origin', headers: { 'X-CSRF': cfg.csrf }, body: new URLSearchParams({ text: value() }) })
+      .then(reply)
+      .then(function (d) { if (d.success === false) { throw new Error(d.error || 'refused'); } render(d, manual); })
+      .catch(function (e) { valStatus.className = 'fe-val-status bad'; valStatus.textContent = 'Could not validate'; if (manual) { toast('Not validated: ' + e.message, true); } })
+      .then(function () { valBtn.disabled = false; });
+  }
+  if (cfg.validate && valBtn) {
+    valBtn.addEventListener('click', function () { runValidation(true); });
+    valStatus.addEventListener('click', function () { if (valPanel.hidden && validated) { showPanel(true); } else { showPanel(false); } });
+    $('fe-val-close').addEventListener('click', function () { showPanel(false); });
+  }
+
   // ---- save without leaving the page ------------------------------------------------------------------------------------------
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -136,6 +198,7 @@
       .then(function (d) {
         if (d.success) { dirty = false; $('dirty-flag').hidden = true; }
         toast(d.success ? 'Saved.' : (d.error || 'Not saved.'), !d.success);
+        if (d.success && cfg.validate && valBtn) { runValidation(false); }
       })
       .catch(function () { toast('Not saved: the server could not be reached.', true); })
       .then(function () { btn.disabled = !cfg.writable; btn.textContent = 'Save'; });

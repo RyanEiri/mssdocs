@@ -34,7 +34,9 @@ if (is_file(__DIR__ . '/../projects/lib.php')) {
 	require_once __DIR__ . '/../projects/lib.php';
 }
 require_once __DIR__ . '/artefact.php';
+require_once __DIR__ . '/schema.php';
 $artefact = ips_fe_artefact($real, $content, $kind);
+$can_validate = $kind === 'xml' && ips_fe_schema_available(); // the Validate button: PHP has dom and the Menota schema is installed (schema.php)
 $has_artefact = (bool) $artefact['sources'];
 [$view, $view_why] = ips_fe_view($type, $content);
 $folder = dirname(substr($real, strlen(ips_fe_roots()[$kind]) + 1));
@@ -112,6 +114,10 @@ $fe_css = 'file-editor.css?v=' . filemtime(__DIR__ . '/file-editor.css');
 			<div id="fe-pane">
 				<div class="fe-strip" id="fe-strip">
 					<span><span id="line-count">0</span> lines</span><span>UTF-8</span><span><?php echo $h($type['label']) ?></span>
+<?php if ($can_validate) { ?>
+					<button type="button" id="fe-val-btn" class="fe-strip-btn" title="Check the text against the <?php echo $h(ips_fe_schema_info()['label']) ?>">Validate</button>
+					<button type="button" id="fe-val-status" class="fe-val-status" hidden></button>
+<?php } ?>
 <?php if ($has_artefact) { ?>
 					<button type="button" id="fe-art-toggle" class="fe-strip-btn" aria-pressed="true" title="Show or hide the artefact beside the editor">Artefact</button>
 <?php } else { ?>
@@ -120,6 +126,12 @@ $fe_css = 'file-editor.css?v=' . filemtime(__DIR__ . '/file-editor.css');
 					<span class="fe-status"><span id="wf-dot" class="fe-dot"></span><span id="wf-text"><?php echo $h($type['label']) ?></span></span>
 				</div>
 <?php // The file's text goes in escaped: the editor holds exactly what the file holds and it is saved as posted. Printed raw, a file containing </textarea><script> would run script here for whoever opens it. ?>
+<?php if ($can_validate) { ?>
+				<div id="fe-val" role="region" aria-label="Validation" hidden>
+					<div class="fe-val-head"><strong id="fe-val-title"></strong><button type="button" id="fe-val-close" class="fe-strip-btn">Close</button></div>
+					<ol id="fe-val-list"></ol>
+				</div>
+<?php } ?>
 				<textarea name="editor1" id="editor1" rows="30" cols="100" spellcheck="false"<?php if (!$writable) echo ' readonly' ?> style="flex:1;border:0;padding:14px;font:13px/21px var(--ips-font-mono);resize:none"><?php echo $h($content) ?></textarea>
 			</div>
 			</div>
@@ -127,7 +139,7 @@ $fe_css = 'file-editor.css?v=' . filemtime(__DIR__ . '/file-editor.css');
 	</form>
 
 	<div id="fe-toast" role="status" aria-live="polite" hidden></div>
-	<script>window.IPS_FE_EDIT = <?php echo json_encode(['csrf' => $login_cookie->CsrfToken(), 'kind' => $kind, 'label' => $type['label'], 'mode' => $type['mode'], 'view' => $view, 'writable' => $writable, 'delete' => $can_delete, 'ckeditor' => $has_ckeditor], JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
+	<script>window.IPS_FE_EDIT = <?php echo json_encode(['csrf' => $login_cookie->CsrfToken(), 'kind' => $kind, 'label' => $type['label'], 'mode' => $type['mode'], 'view' => $view, 'writable' => $writable, 'delete' => $can_delete, 'ckeditor' => $has_ckeditor, 'validate' => $can_validate], JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
 	<script src="edit-page.js?v=<?php echo filemtime(__DIR__.'/edit-page.js') ?>"></script>
 <?php if ($has_artefact) { ?>
 	<script>window.IPS_FE_ARTEFACT = <?php echo json_encode(['sources' => $artefact['sources'], 'kind' => $kind], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;</script>
