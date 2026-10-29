@@ -5,6 +5,7 @@
    (in the visual editor, as CKEditor writes the page out).
    An XML document can also be checked against the Menota schema (cfg.validate, from schema.php): the Validate button, and after every save, post the text to validate.php and list each
    problem with its line (a click on the line goes there); it is advice and never stops a save.
+   For the Metadata panel (metadata-panel.js) it exports window.IPS_FE_TEXT (the text now in the editor) and sends 'ipsfe:changed' and 'ipsfe:saved' on window.
    For the artefact pane (artefact-pane.js) it exports window.IPS_FE_FIT (size the page again after the pane is shown, hidden or resized) and, while the Source view is
    open, sends 'ipsfe:cursor' on window ({text, index}: the text and the cursor's offset, a quarter of a second after the cursor stops). */
 (function () {
@@ -50,6 +51,7 @@
     editor = CKEDITOR.replace('editor1', options);
   }
 
+  window.IPS_FE_TEXT = function () { return value(); };
   function inVisual() { return !!editor && editor.mode === 'wysiwyg'; }
   function value() { return inVisual() ? editor.getData() : cm ? cm.getValue() : text.value; }
 
@@ -60,7 +62,8 @@
     pane.style.height = height + 'px';
     var artefact = $('fe-artefact');
     if (artefact) { artefact.style.height = height + 'px'; }
-    var problems = $('fe-val'), taken = strip.offsetHeight + (problems && !problems.hidden ? problems.offsetHeight : 0); // the strip and the validation list sit above the editor
+    var taken = strip.offsetHeight; // the strip, the validation list and the metadata panel sit above the editor
+    ['fe-val', 'fe-meta'].forEach(function (id) { var panel = $(id); if (panel && !panel.hidden) { taken += panel.offsetHeight; } });
     if (!editor) { text.style.height = Math.max(300, height - taken) + 'px'; return; }
     try {
       // CKEditor sizes its contents area (where the CodeMirror view sits) from the height it is given there, and the toolbar and status bar come on top of it
@@ -85,7 +88,11 @@
     $('wf-text').textContent = result.text;
   }
   function touched() { if (!dirty) { dirty = true; $('dirty-flag').hidden = false; } }
-  function changed() { touched(); lines(); clearTimeout(checkTimer); checkTimer = setTimeout(check, 400); if (typeof markStale === 'function') { markStale(); } }
+  function changed() {
+    touched(); lines(); clearTimeout(checkTimer); checkTimer = setTimeout(check, 400);
+    if (typeof markStale === 'function') { markStale(); }
+    window.dispatchEvent(new CustomEvent('ipsfe:changed'));
+  }
   // where the cursor is, for the artefact pane: sent once it has stopped moving, and only in the Source view (the visual editor has no offset in the text)
   var cursorTimer = null;
   function cursorSoon() {
@@ -196,7 +203,7 @@
     fetch(form.action, { method: 'POST', credentials: 'same-origin', headers: { 'X-CSRF': cfg.csrf }, body: new URLSearchParams(new FormData(form)) })
       .then(reply)
       .then(function (d) {
-        if (d.success) { dirty = false; $('dirty-flag').hidden = true; }
+        if (d.success) { dirty = false; $('dirty-flag').hidden = true; window.dispatchEvent(new CustomEvent('ipsfe:saved')); }
         toast(d.success ? 'Saved.' : (d.error || 'Not saved.'), !d.success);
         if (d.success && cfg.validate && valBtn) { runValidation(false); }
       })
