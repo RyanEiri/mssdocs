@@ -64,15 +64,9 @@
         <dc:contributor><xsl:value-of select="normalize-space(.)"/></dc:contributor>
       </xsl:for-each>
 
-      <!-- dates: a machine value (when, or an interval), never the display text -->
+      <!-- dates: an ISO 8601 machine value (a date, or an interval "start/end"), never the display text; a value that is not ISO 8601 gives no date -->
       <xsl:variable name="date">
-        <xsl:for-each select="t:history/t:origin/t:origDate[1]">
-          <xsl:choose>
-            <xsl:when test="@when"><xsl:value-of select="@when"/></xsl:when>
-            <xsl:when test="@notBefore and @notAfter"><xsl:value-of select="concat(@notBefore, '/', @notAfter)"/></xsl:when>
-            <xsl:when test="@from and @to"><xsl:value-of select="concat(@from, '/', @to)"/></xsl:when>
-          </xsl:choose>
-        </xsl:for-each>
+        <xsl:for-each select="t:history/t:origin/t:origDate[1]"><xsl:call-template name="origdate-iso"/></xsl:for-each>
       </xsl:variable>
       <xsl:if test="$date != ''">
         <dc:date><xsl:value-of select="$date"/></dc:date>

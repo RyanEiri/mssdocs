@@ -266,25 +266,19 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- 1.4B2 and 1.4B5: a date found on the unit is plain; one from outside it, or an uncertain one, is in square brackets, with a question mark when it is doubtful -->
+  <!-- 1.4B2: the date in ISO 8601 (a date, or "start/end"); RAD leaves the format to the institution (1.4B2, footnote 15), and Ryan chose ISO 8601 (2026-10-29), so RAD's bracket
+       forms of 1.4B5 are not used. An uncertain date carries the ISO 8601-2 (EDTF) mark ? (evidence a conjecture, or cert low or medium); a range open at one end is "1850/.." or "../1850"
+       (EDTF). How the date is known is said in the 1.8B8 note. A value that is not an ISO 8601 date is not printed. -->
   <xsl:template name="rad-date">
     <xsl:for-each select="t:history/t:origin/t:origDate[1]">
-      <xsl:variable name="outside" select="@evidence = 'external' or @evidence = 'conjecture' or @cert = 'low' or @cert = 'medium'"/>
+      <xsl:variable name="iso"><xsl:call-template name="origdate-iso"/></xsl:variable>
       <xsl:variable name="doubtful" select="@evidence = 'conjecture' or @cert = 'low' or @cert = 'medium'"/>
+      <xsl:variable name="before-ok"><xsl:call-template name="iso-valid"><xsl:with-param name="d" select="@notBefore"/></xsl:call-template></xsl:variable>
+      <xsl:variable name="after-ok"><xsl:call-template name="iso-valid"><xsl:with-param name="d" select="@notAfter"/></xsl:call-template></xsl:variable>
       <xsl:choose>
-        <xsl:when test="@when">
-          <xsl:value-of select="substring('[', 1, number($outside))"/><xsl:value-of select="@when"/><xsl:value-of select="substring('?', 1, number($doubtful))"/><xsl:value-of select="substring(']', 1, number($outside))"/>
-        </xsl:when>
-        <xsl:when test="@notBefore and @notAfter">
-          <xsl:variable name="span" select="number(substring(@notAfter, 1, 4)) - number(substring(@notBefore, 1, 4))"/>
-          <xsl:choose>
-            <xsl:when test="$span &lt; 20">[between <xsl:value-of select="@notBefore"/> and <xsl:value-of select="@notAfter"/>]</xsl:when>
-            <xsl:otherwise>[<xsl:value-of select="@notBefore"/>-<xsl:value-of select="@notAfter"/>?]</xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
-        <xsl:when test="@notBefore">[after <xsl:value-of select="@notBefore"/>]</xsl:when>
-        <xsl:when test="@notAfter">[before <xsl:value-of select="@notAfter"/>]</xsl:when>
-        <xsl:when test="@from and @to"><xsl:value-of select="@from"/>-<xsl:value-of select="@to"/></xsl:when>
+        <xsl:when test="$iso != ''"><xsl:value-of select="$iso"/><xsl:value-of select="substring('?', 1, number($doubtful))"/></xsl:when>
+        <xsl:when test="not(@when) and not(@from) and @notBefore and not(@notAfter) and $before-ok = 'y'"><xsl:value-of select="@notBefore"/>/..<xsl:value-of select="substring('?', 1, number($doubtful))"/></xsl:when>
+        <xsl:when test="not(@when) and not(@to) and @notAfter and not(@notBefore) and $after-ok = 'y'">../<xsl:value-of select="@notAfter"/><xsl:value-of select="substring('?', 1, number($doubtful))"/></xsl:when>
       </xsl:choose>
     </xsl:for-each>
   </xsl:template>

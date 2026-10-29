@@ -23,8 +23,18 @@
       <xsl:if test="not(t:msContents/t:msItem/t:author[normalize-space(.) != ''] or ancestor::t:teiHeader/t:fileDesc/t:titleStmt/t:author[normalize-space(.) != ''] or t:msContents/t:msItem/t:respStmt[t:resp/@key = 'crp']/t:name[normalize-space(.) != ''])">
         <missing field="creator">No author is named (an author element in an msItem or the title statement).</missing>
       </xsl:if>
-      <xsl:if test="not(t:history/t:origin/t:origDate[@when or (@notBefore and @notAfter) or (@from and @to)])">
-        <missing field="date">No date of creation with a machine value (origDate with when, notBefore and notAfter, or from and to).</missing>
+      <xsl:variable name="date">
+        <xsl:for-each select="t:history/t:origin/t:origDate[1]"><xsl:call-template name="origdate-iso"/></xsl:for-each>
+      </xsl:variable>
+      <xsl:if test="$date = ''">
+        <xsl:choose>
+          <xsl:when test="t:history/t:origin/t:origDate[1][@when or @notBefore or @notAfter or @from or @to]">
+            <missing field="date">The date of creation has no ISO 8601 value: use YYYY, YYYY-MM or YYYY-MM-DD in when, or both ends of an interval in notBefore and notAfter (or from and to), the start not after the end.</missing>
+          </xsl:when>
+          <xsl:otherwise>
+            <missing field="date">No date of creation with a machine value (origDate with when, notBefore and notAfter, or from and to).</missing>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:if>
       <xsl:if test="$leaves = ''">
         <missing field="extent">No extent (a support extent, or a book-block count).</missing>

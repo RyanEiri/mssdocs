@@ -8,6 +8,50 @@
     xmlns:t="http://www.tei-c.org/ns/1.0"
     exclude-result-prefixes="t">
 
+  <!-- ISO 8601 calendar dates. "y" when $d is YYYY, YYYY-MM or YYYY-MM-DD and a real date (month 01-12, a day the month has, February 29 only in a leap year), else nothing. -->
+  <xsl:template name="iso-valid">
+    <xsl:param name="d"/>
+    <xsl:variable name="len" select="string-length($d)"/>
+    <xsl:variable name="year" select="substring($d, 1, 4)"/>
+    <xsl:variable name="month" select="substring($d, 6, 2)"/>
+    <xsl:variable name="day" select="substring($d, 9, 2)"/>
+    <xsl:if test="$len &gt;= 4 and translate($year, '0123456789', '') = ''
+        and ($len = 4
+          or ($len &gt;= 7 and substring($d, 5, 1) = '-' and translate($month, '0123456789', '') = '' and number($month) &gt;= 1 and number($month) &lt;= 12
+            and ($len = 7
+              or ($len = 10 and substring($d, 8, 1) = '-' and translate($day, '0123456789', '') = '' and number($day) &gt;= 1
+                and number($day) &lt;= (
+                  31 - 1 * number($month = '04' or $month = '06' or $month = '09' or $month = '11')
+                     - 3 * number($month = '02')
+                     + number($month = '02' and (number($year) mod 4 = 0 and (number($year) mod 100 != 0 or number($year) mod 400 = 0))))))))">y</xsl:if>
+  </xsl:template>
+
+  <!-- the date as a comparable number: YYYYMMDD, a missing month or day taken as 01 -->
+  <xsl:template name="iso-number">
+    <xsl:param name="d"/>
+    <xsl:value-of select="number(translate(concat($d, substring('-01-01', string-length($d) - 3)), '-', ''))"/>
+  </xsl:template>
+
+  <!-- The machine date of an origDate (context node), in ISO 8601: its when, or the interval notBefore/notAfter or from/to as "start/end"; nothing when the attributes are missing, are
+       not ISO 8601 dates, or give an end before the start. An open-ended range (only a notBefore or a notAfter) has no ISO 8601 form here and gives nothing. -->
+  <xsl:template name="origdate-iso">
+    <xsl:variable name="when-ok"><xsl:call-template name="iso-valid"><xsl:with-param name="d" select="@when"/></xsl:call-template></xsl:variable>
+    <xsl:choose>
+      <xsl:when test="@when"><xsl:if test="$when-ok = 'y'"><xsl:value-of select="@when"/></xsl:if></xsl:when>
+      <xsl:when test="(@notBefore and @notAfter) or (@from and @to)">
+        <xsl:variable name="start" select="concat(@notBefore, @from)"/>
+        <xsl:variable name="end" select="concat(@notAfter, @to)"/>
+        <xsl:variable name="start-ok"><xsl:call-template name="iso-valid"><xsl:with-param name="d" select="$start"/></xsl:call-template></xsl:variable>
+        <xsl:variable name="end-ok"><xsl:call-template name="iso-valid"><xsl:with-param name="d" select="$end"/></xsl:call-template></xsl:variable>
+        <xsl:if test="$start-ok = 'y' and $end-ok = 'y'">
+          <xsl:variable name="a"><xsl:call-template name="iso-number"><xsl:with-param name="d" select="$start"/></xsl:call-template></xsl:variable>
+          <xsl:variable name="b"><xsl:call-template name="iso-number"><xsl:with-param name="d" select="$end"/></xsl:call-template></xsl:variable>
+          <xsl:if test="number($a) &lt;= number($b)"><xsl:value-of select="concat($start, '/', $end)"/></xsl:if>
+        </xsl:if>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
   <!-- where the title comes from: item (a single msItem's title), statement (titleStmt), summary, or empty -->
   <xsl:template name="msdesc-title-source">
     <xsl:variable name="items" select="t:msContents/t:msItem"/>
