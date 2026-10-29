@@ -1,0 +1,27 @@
+% The "plain" style of render-tei.py: Latin Modern Sans, ragged right, no indentation, for a working copy. pdfLaTeX with Type 1 fonts (see catalogue.tex).
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{microtype}
+\usepackage[margin=24mm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{ragged2e}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\RaggedRight
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\footnotesize\docid}
+\fancyhead[R]{\footnotesize\docstatus}
+\fancyfoot[C]{\footnotesize\thepage}
+\newcommand{\radtitle}[3]{{\Large\bfseries #1\par}{\ifx\relax#2\relax\else #2\fi\ifx\relax#3\relax\else\ \textperiodcentered\ #3\fi\par}\vspace{1em}}
+\newcommand{\radhead}[4]{{\bfseries #1}\ifx\relax#2\relax\else\ /\ #2\fi.\ifx\relax#3\relax\else\ --- #3.\fi\ifx\relax#4\relax\else\ --- #4\fi\par}
+\newcommand{\radpartof}[1]{{\small #1\par}}
+\newcommand{\radsubhead}[1]{\vspace{0.4em}{\bfseries #1}\par\nopagebreak}
+\newcommand{\radpara}[2]{{\bfseries #1:}\ #2\par}
+\newcommand{\teihead}[1]{{\bfseries #1}\par\nopagebreak}
+\newcommand{\teipb}[1]{{\footnotesize[#1]}}
+\newenvironment{teiverse}{\begin{quote}}{\end{quote}}
