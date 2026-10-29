@@ -1,0 +1,21 @@
+/* The "catalogue" style: a serif page for reading a catalogue entry, with the label of each note in small capitals. System fonts only (no download, no external resource). */
+:root { --ink: #1f1a17; --muted: #6d625a; --rule: #d9cfc4; --paper: #fdfbf7; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.55 Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif; }
+article.doc { max-width: 40rem; margin: 0 auto; padding: 3rem 1.25rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 .35rem; font-weight: 600; }
+h2 { font-size: .95rem; letter-spacing: .08em; text-transform: uppercase; margin: 2.5rem 0 .75rem; color: var(--muted); border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.1rem; margin: 1.5rem 0 .5rem; }
+.doc-meta { margin: 0 0 2rem; color: var(--muted); font-style: italic; }
+.description p { margin: 0 0 .75rem; }
+.rad-head { font-size: 1.1rem; }
+.rad-title { font-weight: 600; }
+.rad-label { font-variant: small-caps; letter-spacing: .04em; color: var(--muted); }
+.rad-part-of { color: var(--muted); font-size: .95rem; }
+.rad-notes, .rad-access { margin-top: 1.5rem; padding-top: .75rem; border-top: 1px solid var(--rule); }
+.text p { text-align: justify; hyphens: auto; }
+.pb { color: var(--muted); font-size: .8em; margin: 0 .25em; }
+.note { color: var(--muted); font-size: .9em; }
+blockquote { margin: 1rem 1.5rem; font-style: italic; }
+.lg { margin: 1rem 0; }
+@media print { body { background: #fff; font-size: 11pt; } article.doc { max-width: none; padding: 0; } }

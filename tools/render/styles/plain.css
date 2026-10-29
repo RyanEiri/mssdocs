@@ -1,0 +1,21 @@
+/* The "plain" style: a sans-serif page for a working copy. System fonts only (no download, no external resource). */
+:root { --ink: #111; --muted: #555; --rule: #ccc; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #fff; color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+article.doc { max-width: 46rem; margin: 0 auto; padding: 2rem 1rem 3rem; }
+h1 { font-size: 1.6rem; margin: 0 0 .25rem; }
+h2 { font-size: 1.1rem; margin: 2rem 0 .5rem; }
+h3 { font-size: 1rem; margin: 1.25rem 0 .4rem; }
+.doc-meta { margin: 0 0 1.5rem; color: var(--muted); }
+.description p { margin: 0 0 .6rem; }
+.rad-title { font-weight: 700; }
+.rad-label { font-weight: 600; }
+.rad-part-of { color: var(--muted); }
+.rad-notes, .rad-access { margin-top: 1.25rem; }
+.rad-notes::before { content: "Notes"; display: block; font-weight: 700; margin-bottom: .4rem; }
+.rad-access::before { content: "Access points"; display: block; font-weight: 700; margin-bottom: .4rem; }
+.pb { color: var(--muted); font-size: .85em; margin: 0 .25em; }
+.note { color: var(--muted); }
+blockquote { margin: 1rem 1.25rem; border-left: 3px solid var(--rule); padding-left: .75rem; }
+.lg { margin: 1rem 0; }
+@media print { article.doc { max-width: none; padding: 0; } }

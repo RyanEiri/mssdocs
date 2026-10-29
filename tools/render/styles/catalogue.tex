@@ -1,0 +1,24 @@
+% The "catalogue" style of render-tei.py: Latin Modern serif, justified, small capitals for the labels of a catalogue entry. pdfLaTeX with Type 1 fonts (LuaTeX cannot load OpenType fonts on every
+% machine, so no fontspec here). The text arrives escaped; characters the fonts lack are replaced by [U+XXXX] before this point.
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[margin=28mm]{geometry}
+\usepackage{fancyhdr}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.7em}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\docid}
+\fancyfoot[R]{\footnotesize\thepage}
+\newcommand{\radtitle}[3]{{\raggedright\LARGE\bfseries #1\par}\vspace{0.2em}{\itshape #2\ifx\relax#3\relax\else\ \textperiodcentered\ #3\fi\par}\vspace{1.2em}}
+\newcommand{\radhead}[4]{{\large\bfseries #1}\ifx\relax#2\relax\else\ /\ #2\fi.\ifx\relax#3\relax\else\ --- #3.\fi\ifx\relax#4\relax\else\ --- #4\fi\par}
+\newcommand{\radpartof}[1]{{\small\itshape #1\par}}
+\newcommand{\radsubhead}[1]{\vspace{0.6em}{\scshape\large #1}\par\nopagebreak}
+\newcommand{\radpara}[2]{{\scshape #1}\ \ #2\par}
+\newcommand{\teihead}[1]{{\large\bfseries #1}\par\nopagebreak}
+\newcommand{\teipb}[1]{{\footnotesize[#1]}}
+\newenvironment{teiverse}{\begin{quote}\raggedright}{\end{quote}}
