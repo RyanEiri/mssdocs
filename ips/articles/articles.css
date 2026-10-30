@@ -1,0 +1,33 @@
+/* The Articles page (articles/index.php): what it adds to the file editor module's stylesheet. */
+.ar-layout { display: grid; grid-template-columns: minmax(240px, 340px) minmax(0, 1fr); gap: 24px; align-items: start; }
+.ar-item { display: flex; flex-direction: column; gap: 2px; width: 100%; padding: 12px 20px; border: 0; border-top: 1px solid var(--ips-line); background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.ar-item:first-child { border-top: 0; }
+.ar-item:hover { background: var(--ips-hover); }
+.ar-item.current { background: var(--ips-hover); box-shadow: inset 3px 0 0 var(--ips-accent); }
+.ar-title { font-size: 15px; font-weight: 500; overflow-wrap: anywhere; }
+.ar-meta { font-size: 12.5px; color: var(--ips-muted); overflow-wrap: anywhere; }
+.ar-detail { min-width: 0; }
+.ar-wide { width: 100%; }
+.ar-detail textarea.fe-input { resize: vertical; }
+.ar-two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.ar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 16px; }
+.ar-delete { margin-left: auto; }
+.ar-hint { font-size: 12.5px; margin: 4px 0 0; }
+.ar-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 6px; }
+.ar-state.published { color: var(--ips-success); }
+.ar-state.draft, .ar-state.unpublished { color: var(--ips-danger); }
+.ar-state.scheduled { color: var(--ips-accent); }
+.ar-more { margin-top: 14px; }
+.ar-more summary { cursor: pointer; font-weight: 500; }
+.ar-body { margin: 4px 0 0; }
+.ar-preview, .ar-status, .ar-versions { margin-top: 28px; border-top: 1px solid var(--ips-line); padding-top: 18px; }
+.ar-preview h2, .ar-status h2, .ar-versions h2 { font-size: 17px; margin: 0 0 8px; }
+.ar-text { line-height: 1.6; overflow-wrap: anywhere; }
+.ar-text img { max-width: 100%; height: auto; }
+.ar-text table { border-collapse: collapse; }
+.ar-text th, .ar-text td { border: 1px solid var(--ips-line); padding: 4px 8px; }
+.ar-version { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; padding: 8px 0; border-top: 1px solid var(--ips-line); font-size: 13.5px; }
+.ar-version-actions { display: flex; gap: 8px; }
+.ar-viewing { margin-top: 12px; padding: 14px; border: 1px solid var(--ips-line); border-radius: 10px; }
+.ar-viewing h3 { font-size: 15px; margin: 0 0 8px; }
+@media (max-width: 900px) { .ar-layout { grid-template-columns: 1fr; } .ar-two { grid-template-columns: 1fr; } }
