@@ -28,7 +28,7 @@ if ($status === 'scheduled') {
 if (in_array($status, ['scheduled', 'published'], true) && $article['title'] === '') {
 	ips_articles_refuse(422, 'An article needs a title before it is published.');
 }
-$db->query("UPDATE articles SET status=?, publish_at=?, published_at=CASE WHEN ? = 'published' AND published_at IS NULL THEN NOW() ELSE published_at END, updated_by=? WHERE id=?", [
+$db->query("UPDATE articles SET status=?, publish_at=?, published_at=CASE WHEN ? = 'published' AND published_at IS NULL THEN UTC_TIMESTAMP() ELSE published_at END, updated_by=? WHERE id=?", [
 	['type' => 's', 'value' => $status], ['type' => 's', 'value' => $at], ['type' => 's', 'value' => $status], ['type' => 's', 'value' => $user], ['type' => 'i', 'value' => $id],
 ]);
 echo json_encode(['success' => true, 'article' => ips_articles_get($id)], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
