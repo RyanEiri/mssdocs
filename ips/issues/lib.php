@@ -235,3 +235,142 @@ function ips_issues_page_counts($id) {
 		FROM issue_pages WHERE issue_id=?", [['type' => 'i', 'value' => $id]])->fetchArray();
 	return ['pages' => (int) $rows[0]['pages'], 'with_text' => (int) $rows[0]['with_text'], 'corrected' => (int) $rows[0]['corrected']];
 }
+
+// ---- page text and contents (stage J4) --------------------------------------------------------------------------------------------------------
+
+const IPS_ISSUE_PAGE_TEXT_MAX = 200000;  // characters in one page's corrected text
+const IPS_ISSUE_TOC_MAX = 300;           // entries in one issue's contents
+const IPS_ISSUE_TOC_KINDS = ['article' => 'Article', 'front-page' => 'Front page', 'letter' => 'Letter', 'notice' => 'Notice', 'obituary' => 'Obituary', 'advertisement' => 'Advertisement', 'other' => 'Other'];
+
+// May this user change the issue's text and contents: an administrator, or anyone while it is a draft (the same rule as its description).
+function ips_issues_may_edit($issue, $admin) {
+	return $admin || $issue['status'] === 'draft';
+}
+
+// A page of an issue: ['page', 'text_raw', 'text_corrected' (null when none), 'corrected_by', 'corrected_at'], or null.
+function ips_issues_page($id, $page) {
+	global $db;
+	$rows = $db->query("SELECT page, text_raw, text_corrected, corrected_by, corrected_at FROM issue_pages WHERE issue_id=? AND page=? LIMIT 1", [['type' => 'i', 'value' => $id], ['type' => 'i', 'value' => $page]])->fetchArray();
+	if (!$rows) {
+		return null;
+	}
+	$r = $rows[0];
+	return ['page' => (int) $r['page'], 'text_raw' => (string) $r['text_raw'], 'text_corrected' => $r['text_corrected'] === null ? null : (string) $r['text_corrected'],
+		'corrected_by' => $r['corrected_by'], 'corrected_at' => $r['corrected_at']];
+}
+
+// The pages of an issue for moving between them: [{page, words, has_text, corrected}] (no text).
+function ips_issues_page_list($id) {
+	global $db;
+	$out = [];
+	$result = $db->query("SELECT page, CHAR_LENGTH(search_text) AS n, text_corrected IS NOT NULL AS corrected FROM issue_pages WHERE issue_id=? ORDER BY page", [['type' => 'i', 'value' => $id]]);
+	while ($r = $result->fetch()) {
+		$out[] = ['page' => (int) $r['page'], 'has_text' => (int) $r['n'] > 0, 'corrected' => (int) $r['corrected'] === 1];
+	}
+	return $out;
+}
+
+/* Corrects a page: the text an editor typed replaces what is shown and searched, and the text read from the PDF is kept (text_raw is never changed here). Text equal to the original (apart
+ * from line endings and trailing space) is not a correction: it clears one. Returns true, or a string with the problem. */
+function ips_issues_correct_page($id, $page, $text, $user) {
+	global $db;
+	$current = ips_issues_page($id, $page);
+	if ($current === null) {
+		return 'That page does not exist.';
+	}
+	$text = ips_issues_long_text($text, IPS_ISSUE_PAGE_TEXT_MAX);
+	if ($text === null) {
+		return 'The text is not valid, or longer than ' . number_format(IPS_ISSUE_PAGE_TEXT_MAX) . ' characters.';
+	}
+	$same = ips_issues_long_text($current['text_raw'], IPS_ISSUE_PAGE_TEXT_MAX) === $text;
+	if ($same) {
+		return ips_issues_restore_page($id, $page);
+	}
+	$db->query("UPDATE issue_pages SET text_corrected=?, search_text=?, corrected_by=?, corrected_at=NOW() WHERE issue_id=? AND page=?", [
+		['type' => 's', 'value' => $text], ['type' => 's', 'value' => ips_fold($text)], ['type' => 's', 'value' => $user], ['type' => 'i', 'value' => $id], ['type' => 'i', 'value' => $page],
+	]);
+	return true;
+}
+
+// Takes a correction away: the text read from the PDF is shown and searched again. True, or a string with the problem.
+function ips_issues_restore_page($id, $page) {
+	global $db;
+	$current = ips_issues_page($id, $page);
+	if ($current === null) {
+		return 'That page does not exist.';
+	}
+	$db->query("UPDATE issue_pages SET text_corrected=NULL, search_text=?, corrected_by='', corrected_at=NULL WHERE issue_id=? AND page=?", [
+		['type' => 's', 'value' => ips_fold($current['text_raw'])], ['type' => 'i', 'value' => $id], ['type' => 'i', 'value' => $page],
+	]);
+	return true;
+}
+
+// The contents of an issue in order: [{id, position, title, page_from, page_to, author, kind}].
+function ips_issues_toc($id) {
+	global $db;
+	$out = [];
+	$result = $db->query("SELECT id, position, title, page_from, page_to, author, kind FROM issue_toc WHERE issue_id=? ORDER BY position, id", [['type' => 'i', 'value' => $id]]);
+	while ($r = $result->fetch()) {
+		$out[] = ['id' => (int) $r['id'], 'position' => (int) $r['position'], 'title' => $r['title'], 'page_from' => (int) $r['page_from'], 'page_to' => (int) $r['page_to'], 'author' => $r['author'], 'kind' => $r['kind']];
+	}
+	return $out;
+}
+
+/* The entries of a contents list from what a form sends (a list of {title, page_from, page_to, author, kind}): [entries, null] or [null, message]. A title is needed; pages are whole numbers
+ * from 1 to the issue's page count (when it is known), the last at least the first (an empty last page is the first); a kind is one of IPS_ISSUE_TOC_KINDS. */
+function ips_issues_toc_entries($given, $page_count) {
+	if (!is_array($given) || count($given) > IPS_ISSUE_TOC_MAX) {
+		return [null, 'The contents are a list of at most ' . IPS_ISSUE_TOC_MAX . ' entries.'];
+	}
+	$out = [];
+	foreach (array_values($given) as $i => $entry) {
+		$n = $i + 1;
+		if (!is_array($entry)) {
+			return [null, "Entry $n is not an entry."];
+		}
+		$title = ips_issues_text($entry['title'] ?? '', 500);
+		if ($title === null || $title === '') {
+			return [null, "Entry $n needs a title (at most 500 characters)."];
+		}
+		$author = ips_issues_text($entry['author'] ?? '', 255);
+		if ($author === null) {
+			return [null, "The author of entry $n is at most 255 characters."];
+		}
+		$kind = $entry['kind'] ?? 'article';
+		if (!is_string($kind) || !isset(IPS_ISSUE_TOC_KINDS[$kind])) {
+			return [null, "The kind of entry $n is not one of: " . implode(', ', array_keys(IPS_ISSUE_TOC_KINDS)) . '.'];
+		}
+		$from = $entry['page_from'] ?? 0;
+		$to = $entry['page_to'] ?? 0;
+		foreach ([['page_from', $from], ['page_to', $to]] as [$name, $value]) {
+			if (!(is_int($value) || (is_string($value) && ctype_digit($value))) && $value !== '' && $value !== null) {
+				return [null, "The $name of entry $n must be a page number."];
+			}
+		}
+		$from = (int) $from;
+		$to = (int) ($to === '' || $to === null ? 0 : $to);
+		if ($from < 1 || ($page_count > 0 && $from > $page_count)) {
+			return [null, "The first page of entry $n must be from 1" . ($page_count > 0 ? " to $page_count" : '') . '.'];
+		}
+		if ($to === 0) {
+			$to = $from;
+		}
+		if ($to < $from || ($page_count > 0 && $to > $page_count)) {
+			return [null, "The last page of entry $n must be from its first page" . ($page_count > 0 ? " to $page_count" : '') . '.'];
+		}
+		$out[] = ['title' => $title, 'page_from' => $from, 'page_to' => $to, 'author' => $author, 'kind' => $kind];
+	}
+	return [$out, null];
+}
+
+// Replaces the contents of the issue with these entries (already checked), in this order.
+function ips_issues_toc_replace($id, $entries) {
+	global $db;
+	$db->query("DELETE FROM issue_toc WHERE issue_id=?", [['type' => 'i', 'value' => $id]]);
+	foreach ($entries as $position => $e) {
+		$db->query("INSERT INTO issue_toc (issue_id, position, title, page_from, page_to, author, kind) VALUES (?, ?, ?, ?, ?, ?, ?)", [
+			['type' => 'i', 'value' => $id], ['type' => 'i', 'value' => $position + 1], ['type' => 's', 'value' => $e['title']], ['type' => 'i', 'value' => $e['page_from']],
+			['type' => 'i', 'value' => $e['page_to']], ['type' => 's', 'value' => $e['author']], ['type' => 's', 'value' => $e['kind']],
+		]);
+	}
+}

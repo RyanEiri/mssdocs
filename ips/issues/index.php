@@ -165,11 +165,65 @@ $is_css = ['file_editor/file-editor.css', 'issues/issues.css'];
 							<p class="fe-error" v-if="formError" role="alert" id="issue-error">{{ formError }}</p>
 							<div class="pj-actions">
 								<button type="submit" class="fe-btn fe-btn-primary" id="issue-save" :disabled="busy || !canEdit">Save changes</button>
+								<button v-if="form.has_pdf && pages && pages.pages" type="button" class="fe-btn" id="issue-correct" :aria-expanded="correcting ? 'true' : 'false'" @click="toggleCorrect">{{ correcting ? 'Close the text view' : 'Correct the text' }}</button>
 								<a v-if="form.has_pdf" class="fe-btn" id="issue-pdf" :href="pdfHref" target="_blank" rel="noopener">Open the PDF</a>
 								<a v-if="form.external_url" class="fe-btn" id="issue-external" :href="form.external_url" target="_blank" rel="noopener noreferrer">Open the external address</a>
 								<button v-if="canRemove" type="button" class="fe-del pj-delete" :class="{ armed: armed }" id="issue-remove" @click="remove">{{ armed ? 'Sure? The PDF is removed too.' : 'Remove issue' }}</button>
 							</div>
 						</form>
+
+						<section v-if="correcting" class="is-correct" id="correct" aria-label="Correct the text of a page">
+							<div class="is-correct-bar">
+								<button type="button" class="fe-btn fe-btn-sm" id="correct-prev" :disabled="!correcting.pages.length || correcting.page <= 1" @click="goTo(correcting.page - 1)" aria-label="Previous page">&lsaquo;</button>
+								<label class="l" for="correct-page" style="margin:0">Page</label>
+								<select class="fe-input" id="correct-page" :value="correcting.page" @change="goTo(Number($event.target.value))"><option v-for="p in correcting.pages" :key="p.page" :value="p.page">{{ p.page }}{{ p.corrected ? ' (corrected)' : '' }}{{ p.has_text ? '' : ' (no text)' }}</option></select>
+								<button type="button" class="fe-btn fe-btn-sm" id="correct-next" :disabled="correcting.page >= correcting.pages.length" @click="goTo(correcting.page + 1)" aria-label="Next page">&rsaquo;</button>
+								<span class="fe-muted" id="correct-status">{{ correctStatus }}</span>
+							</div>
+							<div v-if="correcting.pending" class="fe-notice" id="correct-dirty" role="alert"><strong>Unsaved changes</strong>
+								<span class="fe-muted">Save the correction of page {{ correcting.page }} before going to page {{ correcting.pending }}, or leave it unsaved.</span>
+								<button type="button" class="fe-btn fe-btn-sm" id="correct-save-go" @click="saveCorrection(true)">Save and go on</button>
+								<button type="button" class="fe-btn fe-btn-sm" id="correct-discard" @click="discardAndGo">Discard the changes</button>
+							</div>
+							<div class="is-correct-split">
+								<iframe id="correct-pdf" class="is-pdf" :src="pdfAt(correcting.page)" title="The PDF page"></iframe>
+								<div>
+									<textarea class="fe-input pj-wide is-text" id="correct-text" v-model="correcting.text" :readonly="!canEdit" spellcheck="false" aria-label="The text of the page"></textarea>
+									<p v-if="!canEdit" class="fe-muted pj-hint" id="correct-locked">This issue is {{ form.status }}: only an administrator can correct its text.</p>
+									<p class="fe-error" v-if="correcting.error" role="alert" id="correct-error">{{ correcting.error }}</p>
+									<div class="pj-actions">
+										<button type="button" class="fe-btn fe-btn-primary" id="correct-save" :disabled="!canEdit || !dirty || correcting.busy" @click="saveCorrection(false)">Save the correction</button>
+										<button v-if="correcting.corrected" type="button" class="fe-del" :class="{ armed: correcting.armed }" id="correct-restore" :disabled="!canEdit" @click="restoreCorrection">{{ correcting.armed ? 'Sure? The correction is lost.' : 'Restore the original' }}</button>
+										<button v-if="correcting.corrected" type="button" class="fe-btn fe-btn-sm" id="correct-original-toggle" @click="correcting.showOriginal = !correcting.showOriginal">{{ correcting.showOriginal ? 'Hide' : 'Show' }} the original</button>
+									</div>
+									<pre v-if="correcting.corrected && correcting.showOriginal" class="is-original" id="correct-original">{{ correcting.raw }}</pre>
+								</div>
+							</div>
+						</section>
+
+						<section class="is-toc" id="issue-toc" aria-label="Contents">
+							<h2>Contents <span class="fe-muted">({{ toc.length }})</span></h2>
+							<p v-if="!toc.length" class="fe-muted pj-hint" id="toc-empty">No contents yet. Add the articles of the issue with their pages.</p>
+							<div v-for="(e, i) in toc" :key="i" class="is-toc-row" :data-row="i">
+								<select class="fe-input" v-model="e.kind" :disabled="!canEdit" :aria-label="'Kind of entry ' + (i + 1)"><option v-for="k in tocKinds" :key="k.id" :value="k.id">{{ k.label }}</option></select>
+								<input type="text" class="fe-input is-toc-title" v-model="e.title" maxlength="500" placeholder="Title" :disabled="!canEdit" :aria-label="'Title of entry ' + (i + 1)">
+								<input type="number" min="1" class="fe-input is-toc-page" v-model="e.page_from" placeholder="From" :disabled="!canEdit" :aria-label="'First page of entry ' + (i + 1)">
+								<input type="number" min="1" class="fe-input is-toc-page" v-model="e.page_to" placeholder="To" :disabled="!canEdit" :aria-label="'Last page of entry ' + (i + 1)">
+								<input type="text" class="fe-input is-toc-author" v-model="e.author" maxlength="255" placeholder="Author" :disabled="!canEdit" :aria-label="'Author of entry ' + (i + 1)">
+								<span class="pj-file-actions">
+									<a v-if="form.has_pdf && Number(e.page_from) > 0" :href="pdfAt(Number(e.page_from), true)" target="_blank" rel="noopener" class="fe-muted" :aria-label="'Open page ' + e.page_from">open</a>
+									<button type="button" class="fe-del" :disabled="!canEdit || i === 0" @click="moveToc(i, -1)" :aria-label="'Move entry ' + (i + 1) + ' up'">↑</button>
+									<button type="button" class="fe-del" :disabled="!canEdit || i === toc.length - 1" @click="moveToc(i, 1)" :aria-label="'Move entry ' + (i + 1) + ' down'">↓</button>
+									<button type="button" class="fe-del" :disabled="!canEdit" @click="toc.splice(i, 1)" :aria-label="'Remove entry ' + (i + 1)">Remove</button>
+								</span>
+							</div>
+							<p class="fe-error" v-if="tocError" role="alert" id="toc-error">{{ tocError }}</p>
+							<div class="pj-actions">
+								<button type="button" class="fe-btn" id="toc-add" :disabled="!canEdit" @click="addToc">Add an entry</button>
+								<button type="button" class="fe-btn fe-btn-primary" id="toc-save" :disabled="!canEdit || tocBusy" @click="saveToc">Save the contents</button>
+								<span v-if="tocSaved" class="fe-muted" id="toc-saved">Saved.</span>
+							</div>
+						</section>
 					</template>
 				</section>
 			</div>
