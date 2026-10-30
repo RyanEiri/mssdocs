@@ -32,4 +32,16 @@
 .is-open { font-size: 12.5px; margin-left: 8px; }
 .is-snippet { margin: 4px 0 0; font-size: 13.5px; line-height: 1.5; overflow-wrap: anywhere; }
 .is-snippet mark { background: var(--ips-accent-soft); color: inherit; border-radius: 2px; padding: 0 1px; }
+/* the correction screen and the contents */
+.is-correct { margin-top: 28px; border-top: 1px solid var(--ips-line); padding-top: 18px; }
+.is-correct-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 12px; }
+.is-correct-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.is-pdf { width: 100%; height: 640px; border: 1px solid var(--ips-line); border-radius: 10px; background: var(--ips-surface); }
+.is-text { height: 560px; font: 13px/1.55 var(--ips-font-mono); }
+.is-original { margin: 10px 0 0; max-height: 220px; overflow: auto; white-space: pre-wrap; font: 12.5px/1.5 var(--ips-font-mono); background: var(--ips-hover); border-radius: 8px; padding: 10px; }
+.is-toc { margin-top: 28px; border-top: 1px solid var(--ips-line); padding-top: 18px; }
+.is-toc h2 { font-size: 17px; margin: 0 0 8px; }
+.is-toc-row { display: grid; grid-template-columns: 130px minmax(0, 2fr) 74px 74px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 0; border-top: 1px solid var(--ips-line); }
+.pj-file-actions { display: flex; align-items: center; gap: 10px; }
+@media (max-width: 1100px) { .is-correct-split { grid-template-columns: 1fr; } .is-toc-row { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 900px) { .pj-layout { grid-template-columns: 1fr; } .pj-two { grid-template-columns: 1fr; } }

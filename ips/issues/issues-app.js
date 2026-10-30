@@ -1,5 +1,6 @@
 /* The Issues page (issues/index.php): the issues, the open issue's description and the state of its text, and a form to make a new one. Data comes from issue_list.php, issue_get.php and
-   source_list.php; writes post to issue_create.php, issue_save.php, issue_extract.php and issue_remove.php (same-origin, with the user's CSRF token in X-CSRF). While the text of the open
+   source_list.php; writes post to issue_create.php, issue_save.php, issue_extract.php and issue_remove.php (same-origin, with the user's CSRF token in X-CSRF). The correction screen (the PDF
+   page beside its text: issue_page.php, issue_page_save.php) and the contents list (issue_toc_save.php) are on the open issue; a page whose text was changed and not saved is not left without asking. While the text of the open
    issue is being read (pending, running) the page asks again every two seconds. An administrator's page also checks, without credentials, that the PDF's direct address is not public (it is
    behind the nginx gate on the sites that have one) and says so when it is. Vue is the base shell's own copy. */
 (function () {
@@ -21,7 +22,7 @@
   Vue.createApp({
     data: function () {
       return { issues: [], statuses: [], accessLevels: [], loaded: false, listError: '', query: '', current: null, form: null, pages: null, formError: '', busy: false, armed: false,
-               creating: null, createError: '', reading: false, admin: !!cfg.admin, gateWarning: '', poll: null, finder: null, directUrl: null,
+               creating: null, createError: '', reading: false, admin: !!cfg.admin, gateWarning: '', poll: null, finder: null, directUrl: null, correcting: null, toc: [], tocKinds: [], tocError: '', tocBusy: false, tocSaved: false,
                search: { q: '', busy: false, error: '', done: false, total: 0, results: [] } };
     },
     computed: {
@@ -32,6 +33,12 @@
       canEdit: function () { return !!this.form && (cfg.admin || this.form.status === 'draft'); },
       canRead: function () { return !!this.form && (cfg.admin || (this.form.created_by === cfg.user && this.form.status === 'draft')); },
       canRemove: function () { return !!this.form && (cfg.admin || (this.form.created_by === cfg.user && this.form.status === 'draft')); },
+      dirty: function () { return !!this.correcting && this.correcting.text !== this.correcting.loaded; },
+      correctStatus: function () {
+        var c = this.correcting;
+        if (!c) { return ''; }
+        return c.corrected ? 'Corrected by ' + c.by + (c.at ? ' on ' + c.at : '') : 'The text read from the PDF';
+      },
       pdfHref: function () { return this.form ? 'file.php?id=' + encodeURIComponent(this.form.id) : '#'; }
     },
     methods: {
@@ -57,6 +64,9 @@
         return get('issue_get.php?id=' + encodeURIComponent(id)).then(function (d) {
           if (!d.success) { self.formError = d.error || 'The issue could not be read.'; return; }
           self.show(d);
+          self.correcting = null; self.tocError = ''; self.tocSaved = false;
+          self.toc = (d.toc || []).map(function (e) { return { kind: e.kind, title: e.title, page_from: e.page_from, page_to: e.page_to, author: e.author }; });
+          self.tocKinds = d.toc_kinds || [];
           try { history.replaceState(null, '', '?id=' + id); } catch (e) { /* the address is a nicety */ }
           self.startPolling();
           if (d.direct_url) { self.checkGate(d.direct_url); }
@@ -101,6 +111,68 @@
           s.busy = false;
           if (!d.success) { s.error = d.error || 'The search failed.'; return; }
           s.results = s.results.concat(d.results); s.total = d.total; s.done = true;
+        });
+      },
+      // the PDF at a page, for the frame (relative) or a link
+      pdfAt: function (page, link) { return 'file.php?id=' + encodeURIComponent(this.form.id) + '#page=' + page + (link ? '' : '&view=FitH'); },
+      toggleCorrect: function () {
+        if (this.correcting) { this.correcting = null; return; }
+        this.correcting = { page: 1, pages: [], raw: '', loaded: '', text: '', corrected: false, by: '', at: '', busy: false, error: '', armed: false, pending: 0, showOriginal: false };
+        this.loadPage(1);
+      },
+      loadPage: function (n) {
+        var self = this, c = self.correcting;
+        return get('issue_page.php?id=' + encodeURIComponent(self.form.id) + '&page=' + n).then(function (d) {
+          if (self.correcting !== c) { return; }
+          if (!d.success) { c.error = d.error || 'The page could not be read.'; return; }
+          self.fillPage(d);
+          c.pending = 0; c.error = ''; c.armed = false; c.showOriginal = false;
+        });
+      },
+      fillPage: function (d) {
+        var c = this.correcting, p = d.page;
+        c.page = p.page; c.pages = d.pages; c.raw = p.text_raw; c.corrected = p.text_corrected !== null;
+        c.loaded = p.text_corrected !== null ? p.text_corrected : p.text_raw; c.text = c.loaded; c.by = p.corrected_by; c.at = p.corrected_at;
+        this.pages = Object.assign({}, this.pages, { corrected: d.pages.filter(function (x) { return x.corrected; }).length });
+      },
+      goTo: function (n) {
+        var c = this.correcting;
+        if (!c || n < 1 || n > c.pages.length || n === c.page) { return; }
+        if (this.dirty) { c.pending = n; return; }
+        this.loadPage(n);
+      },
+      saveCorrection: function (andGo) {
+        var self = this, c = self.correcting, go = c.pending;
+        c.busy = true; c.error = '';
+        post('issue_page_save.php', { id: self.form.id, page: c.page, text: c.text }).then(function (d) {
+          c.busy = false;
+          if (!d.success) { c.error = d.error || 'The correction was not saved.'; return; }
+          self.fillPage(d); c.pending = 0;
+          if (andGo && go) { self.loadPage(go); }
+        });
+      },
+      discardAndGo: function () { var c = this.correcting, n = c.pending; c.text = c.loaded; c.pending = 0; if (n) { this.loadPage(n); } },
+      restoreCorrection: function () {
+        var self = this, c = self.correcting;
+        if (!c.armed) { c.armed = true; setTimeout(function () { c.armed = false; }, 4000); return; }
+        c.armed = false; c.error = '';
+        post('issue_page_save.php', { id: self.form.id, page: c.page, restore: '1' }).then(function (d) {
+          if (!d.success) { c.error = d.error || 'The correction was not removed.'; return; }
+          self.fillPage(d);
+        });
+      },
+      addToc: function () { this.toc.push({ kind: 'article', title: '', page_from: '', page_to: '', author: '' }); this.tocSaved = false; },
+      moveToc: function (i, by) { var t = this.toc, e = t.splice(i, 1)[0]; t.splice(i + by, 0, e); this.tocSaved = false; },
+      saveToc: function () {
+        var self = this, entries = self.toc.map(function (e) {
+          return { kind: e.kind, title: e.title, author: e.author, page_from: e.page_from === '' || e.page_from === null ? '' : Number(e.page_from), page_to: e.page_to === '' || e.page_to === null ? '' : Number(e.page_to) };
+        });
+        self.tocBusy = true; self.tocError = ''; self.tocSaved = false;
+        post('issue_toc_save.php', { id: self.form.id, entries: JSON.stringify(entries) }).then(function (d) {
+          self.tocBusy = false;
+          if (!d.success) { self.tocError = d.error || 'The contents were not saved.'; return; }
+          self.toc = d.toc.map(function (e) { return { kind: e.kind, title: e.title, page_from: e.page_from, page_to: e.page_to, author: e.author }; });
+          self.tocSaved = true;
         });
       },
       stopPolling: function () { if (this.poll) { clearInterval(this.poll); this.poll = null; } },
