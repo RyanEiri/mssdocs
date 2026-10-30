@@ -6,8 +6,8 @@
  *   1. A soft hyphen (U+00AD) at the end of a line joins the word ("Austur", soft hyphen, newline, "bæjarskóli" gives "Austurbæjarskóli"); one inside a line is removed.
  *   2. Private-use glyphs (the bullets of a symbol font, U+E000 to U+F8FF) and the ornaments U+25BA and U+2022 stop being characters: they separate words.
  *   3. Lower case; ligatures expanded (ﬁ ﬂ ﬀ ﬃ ﬄ); Icelandic and Nordic letters made plain (þ th, ð d, æ ae, œ oe, ø o, ö o, å a, ß ss); other Latin accents dropped.
- *   4. An apostrophe or curly quote inside a word is removed (culture's and cultures match); everything else that is not a letter or a digit separates words; runs of space, a line break
- *      included, are one space.
+ *   4. A possessive 's is dropped (Saunderson's becomes saunderson, so a search for the name finds it: the real issues are full of them); any other apostrophe or curly quote inside a word
+ *      is removed (don't becomes dont, O'Neil oneil); everything else that is not a letter or a digit separates words; runs of space, a line break included, are one space.
  * The result is lower-case words separated by single spaces. It is idempotent: folding folded text changes nothing.
  */
 
@@ -37,7 +37,8 @@ function ips_fold($text) {
 	$text = str_replace("\xc2\xad", '', $text);                                   // a soft hyphen inside a line
 	$text = preg_replace('/[\x{E000}-\x{F8FF}\x{25BA}\x{2022}]/u', ' ', $text);   // symbol-font bullets and ornaments
 	$text = strtr(mb_strtolower($text, 'UTF-8'), ips_fold_map());
-	$text = preg_replace("/(?<=[\\p{L}\\p{N}])['\\x{2019}\\x{2018}\\x{02BC}`](?=[\\p{L}\\p{N}])/u", '', $text);
+	$text = preg_replace("/(?<=[\\p{L}\\p{N}])['\\x{2019}\\x{2018}\\x{02BC}`]s(?![\\p{L}\\p{N}])/u", '', $text);        // a possessive 's
+	$text = preg_replace("/(?<=[\\p{L}\\p{N}])['\\x{2019}\\x{2018}\\x{02BC}`](?=[\\p{L}\\p{N}])/u", '', $text);        // any other apostrophe inside a word
 	$text = preg_replace('/[^\p{L}\p{N}]+/u', ' ', $text);
 	return trim($text);
 }

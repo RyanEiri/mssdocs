@@ -21,4 +21,15 @@
 .is-pending, .is-running { color: var(--ips-muted); }
 .is-failed { color: var(--ips-danger); }
 .is-warning { border-color: var(--ips-danger); }
+/* the text search */
+.is-search { margin: 0 0 20px; }
+.is-search-row { display: flex; gap: 8px; }
+.is-search-row .fe-input { flex: 1; }
+.is-hits { list-style: none; margin: 8px 0 12px; padding: 0; }
+.is-hit { padding: 10px 0; border-top: 1px solid var(--ips-line); }
+.is-hit:first-child { border-top: 0; }
+.is-hit-title { font-weight: 500; }
+.is-open { font-size: 12.5px; margin-left: 8px; }
+.is-snippet { margin: 4px 0 0; font-size: 13.5px; line-height: 1.5; overflow-wrap: anywhere; }
+.is-snippet mark { background: var(--ips-accent-soft); color: inherit; border-radius: 2px; padding: 0 1px; }
 @media (max-width: 900px) { .pj-layout { grid-template-columns: 1fr; } .pj-two { grid-template-columns: 1fr; } }
