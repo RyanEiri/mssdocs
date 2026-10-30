@@ -6,6 +6,7 @@
  * The rules (levels, parents, dates, effective visibility, inheritance) are pure functions of the set of units ($all: project id => row), so they are tested without a database.
  */
 require_once __DIR__ . '/lib.php';
+require_once __DIR__ . '/../php/iso_date.php';
 
 const IPS_UNIT_LEVELS = ['fonds' => 'Fonds', 'collection' => 'Collection', 'series' => 'Series', 'file' => 'File'];
 const IPS_UNIT_VISIBILITIES = ['draft' => 'Draft', 'published' => 'Published', 'private' => 'Private'];
@@ -20,30 +21,9 @@ const IPS_UNIT_TEXT_MAX = 20000;
 
 // ---- pure rules -------------------------------------------------------------------------------------------------------------------------------
 
-// [first day, last day] of an ISO 8601 date as YYYYMMDD numbers (a year covers the whole year, a month the whole month), or null when it is not a real YYYY, YYYY-MM or YYYY-MM-DD.
+// [first day, last day] of an ISO 8601 date as YYYYMMDD numbers, or null (php/iso_date.php).
 function ips_units_date_bounds($d) {
-	if (!is_string($d) || !preg_match('/^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/', $d, $m)) {
-		return null;
-	}
-	$year = (int) $m[1];
-	if (!isset($m[2])) {
-		return [$year * 10000 + 101, $year * 10000 + 1231];
-	}
-	$month = (int) $m[2];
-	if ($month < 1 || $month > 12) {
-		return null;
-	}
-	$leap = $year % 4 === 0 && ($year % 100 !== 0 || $year % 400 === 0);
-	$days = [31, $leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][$month - 1];
-	if (!isset($m[3])) {
-		return [$year * 10000 + $month * 100 + 1, $year * 10000 + $month * 100 + $days];
-	}
-	$day = (int) $m[3];
-	if ($day < 1 || $day > $days) {
-		return null;
-	}
-	$n = $year * 10000 + $month * 100 + $day;
-	return [$n, $n];
+	return ips_iso_date_bounds($d);
 }
 
 // The ancestors of a unit, top first, then the unit itself: a list of rows from $all (id => row). Stops, without looping, at a missing parent or a cycle.
