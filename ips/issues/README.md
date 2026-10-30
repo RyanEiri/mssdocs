@@ -1,9 +1,11 @@
 # Issues (optional module)
 
-A publication's **issues as PDFs**, with the text read page by page for search. Design, reasons and the plan for testing the search: `docs/mssdocs-issues-design.md` in the fleet repository. This is stage J1 (the data, the PDF store, the text extraction and the endpoints); the Issues page, the search and the page-correction screen are the next stages.
+A publication's **issues as PDFs**, with the text read page by page for search. Design, reasons and the plan for testing the search: `docs/mssdocs-issues-design.md` in the fleet repository. Stages J1 (the data, the PDF store, the text extraction and the endpoints) and J2 (the Issues page) are built; the search and the page-correction screen are the next stages.
 
 | File | What it does |
 |---|---|
+| `index.php`, `issues-app.js`, `issues.css`, `header.php` | **The Issues page**: the issues newest first with a filter, the open issue's description, the state of its text (it asks again every two seconds while the text is being read), *Read the text again*, *Open the PDF*, a two-click *Remove*, and *New issue* (from a PDF in the file store, or an external address only). A regular user's status and access boxes are disabled; for an administrator the page asks for the PDF's direct address without credentials and **warns when it answers 200** (a site without the nginx gate). It uses the file editor module's stylesheet. |
+| `source_list.php` | The PDFs of the file store a new issue can be made from, read from the file browser's catalogue (a PDF uploaded in the Files page is there), by part of a name or folder. |
 | `schema.sql` | `issues`, `issue_pages` (raw, corrected and accent-folded text, with a FULLTEXT index) and `issue_toc`. Run it once. No foreign keys; the code keeps the three together. |
 | `lib.php` | Who may do what, the checks on a form, the PDF store (a copy named by its SHA-256 in `upload/archives/issues/xx/`), the queries. |
 | `issue_create.php` | Makes an issue from a PDF already in the file store (`path=files/A/b.pdf`, copied; the same file twice is stored once) or, with no path, from an external address only (an issue hosted elsewhere, such as timarit.is). A draft, for signed-in readers. |
@@ -18,4 +20,4 @@ A publication's **issues as PDFs**, with the text read page by page for search. 
 
 **Needs:** `poppler-utils` on the host (`pdfinfo`, `pdftotext`; `php_extra_packages`), PHP `mbstring`, `exec` allowed (as for the folder zip), and the DDL applied by the site's administrator. **The nginx gate must be deployed** (the three IPS sites have it): it is what keeps the direct address of a PDF under `upload/archives/` from visitors; a site without it must not hold a restricted issue (the base's own dev stack has no gate). Settings in `php/site-config.php`: `IPS_ISSUES_MAX_BYTES` (200 MB), `IPS_ISSUES_MAX_PAGES` (400), `IPS_ISSUES_EXTRACT_TIMEOUT` (180 s).
 
-Tests (fleet repository): `tests/test_issues_logic.py` (folding, access and extraction in real PHP on LaTeX-made PDFs), `tests/test_issues_module.py` (the endpoints, the worker and the PDF's address on the mssdocs dev stack) and `tests/test_issues_gate.py` (the direct address behind the gate, on the vesturheimsrit base stack).
+Tests (fleet repository): `tests/test_issues_logic.py` (folding, access and extraction in real PHP on LaTeX-made PDFs), `tests/test_issues_module.py` (the endpoints, the worker and the PDF's address on the mssdocs dev stack), `tests/test_issues_gate.py` (the direct address behind the gate, on the vesturheimsrit base stack) and `tests/test_ui_issues.py` (the page in Chrome on both stacks: the warning appears where the gate is missing and not where it is deployed).

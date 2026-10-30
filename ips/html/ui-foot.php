@@ -16,6 +16,7 @@ foreach ([
 	'file_editor' => ['File editor', 'Create, edit and delete files in your own folder.', 'edit-3', 'file_editor/'],
 	'links'       => ['Links', 'Edit the links on the site\'s Links page.', 'globe', 'links/'],
 	'projects'    => ['Projects', 'Group files of the file store into projects.', 'layers', 'projects/'],
+	'issues'      => ['Issues', 'The PDF issues of a publication.', 'file-text', 'issues/'],
 	'catalogue'   => ['Catalogue', 'Browse the catalogue of items.', 'book-open', 'catalogue/'],
 	'contacts'    => ['Contacts', 'The contacts list.', 'users', 'contacts/'],
 ] as $dir => $info) {
