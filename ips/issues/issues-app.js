@@ -21,7 +21,8 @@
   Vue.createApp({
     data: function () {
       return { issues: [], statuses: [], accessLevels: [], loaded: false, listError: '', query: '', current: null, form: null, pages: null, formError: '', busy: false, armed: false,
-               creating: null, createError: '', reading: false, admin: !!cfg.admin, gateWarning: '', poll: null, finder: null, directUrl: null };
+               creating: null, createError: '', reading: false, admin: !!cfg.admin, gateWarning: '', poll: null, finder: null, directUrl: null,
+               search: { q: '', busy: false, error: '', done: false, total: 0, results: [] } };
     },
     computed: {
       shown: function () {
@@ -89,6 +90,18 @@
             if (d.issue.extraction !== 'pending' && d.issue.extraction !== 'running') { self.stopPolling(); self.load(); }
           });
         }, 2000);
+      },
+      // the text search: pages that match, newest issue first, with a snippet; "Show more" asks for the next ones
+      runSearch: function (fresh) {
+        var self = this, s = self.search;
+        if (!s.q.trim()) { return; }
+        if (fresh) { s.results = []; s.total = 0; s.done = false; }
+        s.busy = true; s.error = '';
+        get('issue_search.php?q=' + encodeURIComponent(s.q) + '&offset=' + s.results.length).then(function (d) {
+          s.busy = false;
+          if (!d.success) { s.error = d.error || 'The search failed.'; return; }
+          s.results = s.results.concat(d.results); s.total = d.total; s.done = true;
+        });
       },
       stopPolling: function () { if (this.poll) { clearInterval(this.poll); this.poll = null; } },
       openNew: function () {

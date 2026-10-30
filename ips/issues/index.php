@@ -45,6 +45,29 @@ $is_css = ['file_editor/file-editor.css', 'issues/issues.css'];
 				<button type="button" id="issue-add" class="fe-btn fe-btn-primary" @click="openNew">New issue</button>
 			</div>
 
+			<section class="is-search" aria-label="Search the text of the issues">
+				<form id="text-search" @submit.prevent="runSearch(true)" role="search">
+					<label class="l" for="search-q">Search the text</label>
+					<div class="is-search-row">
+						<input type="search" class="fe-input" id="search-q" v-model="search.q" placeholder="words, “a phrase”, prefix*, -excluded" autocomplete="off" spellcheck="false" maxlength="200">
+						<button type="submit" class="fe-btn fe-btn-primary" id="search-go" :disabled="search.busy">Search</button>
+					</div>
+				</form>
+				<p v-if="search.error" class="fe-error" role="alert" id="search-error">{{ search.error }}</p>
+				<div v-if="search.done" id="search-results" aria-live="polite">
+					<p class="fe-muted pj-hint" id="search-count">{{ search.total }} {{ search.total === 1 ? 'page' : 'pages' }} found</p>
+					<ol class="is-hits">
+						<li v-for="r in search.results" :key="r.issue_id + '-' + r.page" class="is-hit" :data-issue="r.issue_id" :data-page="r.page">
+							<a :href="'file.php?id=' + r.issue_id + '#page=' + r.page" target="_blank" rel="noopener" class="is-hit-title">{{ r.label || ('Issue ' + r.issue_id) }}<template v-if="r.issue_date"> · {{ r.issue_date }}</template> · page {{ r.page }}</a>
+							<span v-if="r.status !== 'published'" class="is-state" :class="r.status">{{ statusLabel(r.status) }}</span>
+							<a href="#" class="fe-muted is-open" @click.prevent="open(r.issue_id)">open issue</a>
+							<p class="is-snippet"><template v-for="(part, k) in r.snippet_parts" :key="k"><mark v-if="part[1]">{{ part[0] }}</mark><template v-else>{{ part[0] }}</template></template></p>
+						</li>
+					</ol>
+					<button v-if="search.results.length < search.total" type="button" class="fe-btn fe-btn-sm" id="search-more" :disabled="search.busy" @click="runSearch(false)">Show more</button>
+				</div>
+			</section>
+
 			<div v-if="gateWarning" class="fe-notice is-warning" id="gate-warning" role="alert"><strong>Not private</strong><span class="fe-muted">{{ gateWarning }}</span></div>
 
 			<div class="pj-layout">
