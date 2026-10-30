@@ -31,8 +31,19 @@
     <xsl:variable name="items" select="t:msContents/t:msItem"/>
     <xsl:variable name="stmttitle" select="normalize-space($header/t:fileDesc/t:titleStmt/t:title[normalize-space(.) != ''][1])"/>
     <xsl:variable name="summary" select="normalize-space(t:msContents/t:summary)"/>
-    <!-- D2: a single msItem's title, then the titleStmt title, then the summary -->
-    <xsl:variable name="title"><xsl:call-template name="msdesc-title"/></xsl:variable>
+    <!-- a printed book (section 9 of the mapping): the copy's msItem points at a biblStruct in the same file, which describes the publication -->
+    <xsl:variable name="ptr" select="string(t:msContents/t:msItem/t:bibl/t:ptr/@target)"/>
+    <xsl:variable name="bibl" select="//t:biblStruct[$ptr != '' and @xml:id = substring-after($ptr, '#')][1]"/>
+    <xsl:variable name="mono" select="$bibl/t:monogr[1]"/>
+    <!-- D2: a single msItem's title, then the titleStmt title, then the summary; a printed book's own title is the biblStruct's (main, else descriptive) -->
+    <xsl:variable name="title">
+      <xsl:choose>
+        <xsl:when test="$mono/t:title[not(@type) or @type = 'main' or @type = 'desc'][normalize-space(.) != '']">
+          <xsl:value-of select="normalize-space(($mono/t:title[@type = 'main' or not(@type)][normalize-space(.) != ''] | $mono/t:title[@type = 'desc'][normalize-space(.) != ''])[1])"/>
+        </xsl:when>
+        <xsl:otherwise><xsl:call-template name="msdesc-title"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="status" select="normalize-space($header/t:revisionDesc/@status)"/>
 
     <record>
@@ -52,25 +63,30 @@
       <xsl:if test="$stmttitle != '' and $stmttitle != $title">
         <dcterms:alternative><xsl:value-of select="$stmttitle"/></dcterms:alternative>
       </xsl:if>
+      <!-- an English title a cataloguer supplied, and a parallel title -->
+      <xsl:for-each select="$mono/t:title[@type = 'translated' or @type = 'parallel' or @type = 'alt'][normalize-space(.) != '']">
+        <dcterms:alternative><xsl:value-of select="normalize-space(.)"/></dcterms:alternative>
+      </xsl:for-each>
 
       <!-- creators: msItem authors, else titleStmt authors, else a correspondent (respStmt/resp[@key='crp']); each name once -->
-      <xsl:variable name="authors" select="$items/t:author[normalize-space(.) != ''] | $header/t:fileDesc/t:titleStmt/t:author[normalize-space(.) != '']"/>
+      <xsl:variable name="authors" select="$items/t:author[normalize-space(.) != ''] | $header/t:fileDesc/t:titleStmt/t:author[normalize-space(.) != ''] | $mono/t:author[normalize-space(.) != '']"/>
       <xsl:variable name="writers" select="$items/t:respStmt[t:resp/@key = 'crp']/t:name[normalize-space(.) != '']"/>
       <xsl:for-each select="($authors | $writers)[generate-id() = generate-id(key('by-text', normalize-space(.))[1])]">
         <dc:creator><xsl:value-of select="normalize-space(.)"/></dc:creator>
       </xsl:for-each>
       <!-- contributors: the other responsibility statements, scribes named in the hand description -->
-      <xsl:for-each select="($items/t:respStmt[not(t:resp/@key = 'crp')]/t:name | $header/t:fileDesc/t:titleStmt/t:respStmt/t:name | t:physDesc/t:handDesc/t:handNote/t:persName)[normalize-space(.) != '']">
+      <xsl:for-each select="($items/t:respStmt[not(t:resp/@key = 'crp')]/t:name | $header/t:fileDesc/t:titleStmt/t:respStmt/t:name | t:physDesc/t:handDesc/t:handNote/t:persName | $mono/t:editor | $mono/t:respStmt/t:name)[normalize-space(.) != '']">
         <dc:contributor><xsl:value-of select="normalize-space(.)"/></dc:contributor>
       </xsl:for-each>
 
       <!-- dates: an ISO 8601 machine value (a date, or an interval "start/end"), never the display text; a value that is not ISO 8601 gives no date -->
       <xsl:variable name="date">
-        <xsl:for-each select="t:history/t:origin/t:origDate[1]"><xsl:call-template name="origdate-iso"/></xsl:for-each>
+        <xsl:for-each select="(t:history/t:origin/t:origDate | $mono/t:imprint/t:date)[1]"><xsl:call-template name="origdate-iso"/></xsl:for-each>
       </xsl:variable>
       <xsl:if test="$date != ''">
         <dc:date><xsl:value-of select="$date"/></dc:date>
-        <dcterms:created><xsl:value-of select="$date"/></dcterms:created>
+        <!-- the date of publication is not a date of creation -->
+        <xsl:if test="not($bibl)"><dcterms:created><xsl:value-of select="$date"/></dcterms:created></xsl:if>
       </xsl:if>
       <xsl:for-each select="t:history/t:origin/t:origPlace[1][normalize-space(.) != '']">
         <dcterms:spatial><xsl:value-of select="normalize-space(.)"/></dcterms:spatial>
@@ -90,6 +106,7 @@
       </xsl:for-each>
 
       <xsl:call-template name="types"/>
+      <xsl:if test="$bibl and not($items/@class)"><dc:type>Text</dc:type></xsl:if>
 
       <xsl:for-each select="t:physDesc/t:objectDesc/@form[. != '']">
         <dc:format><xsl:call-template name="form-label"><xsl:with-param name="code" select="."/></xsl:call-template></dc:format>
@@ -99,7 +116,7 @@
       </xsl:for-each>
       <xsl:call-template name="extent"/>
 
-      <xsl:for-each select="t:msIdentifier/t:idno[normalize-space(.) != ''] | t:msIdentifier/t:altIdentifier/t:idno[normalize-space(.) != '']">
+      <xsl:for-each select="t:msIdentifier/t:idno[normalize-space(.) != ''] | t:msIdentifier/t:altIdentifier[not(@type = 'image-label')]/t:idno[normalize-space(.) != '']">
         <dc:identifier><xsl:value-of select="normalize-space(.)"/></dc:identifier>
       </xsl:for-each>
 
@@ -121,9 +138,25 @@
           substring(', ', 1, 2 * number($r != '' and $i != '')), $i,
           substring(', ', 1, 2 * number(($r != '' or $i != '') and $s != '')), $s,
           substring(', ', 1, 2 * number(($r != '' or $i != '' or $s != '') and $c != '')), $c)"/>
-      <xsl:if test="$publisher != ''"><dc:publisher><xsl:value-of select="$publisher"/></dc:publisher></xsl:if>
+      <xsl:choose>
+        <!-- a printed book: the publisher is the imprint's, and the holder is the custodian of this copy (mapping section 9, D16) -->
+        <xsl:when test="$bibl">
+          <xsl:for-each select="$mono/t:imprint/t:publisher[normalize-space(.) != ''][1]"><dc:publisher><xsl:value-of select="normalize-space(.)"/></dc:publisher></xsl:for-each>
+          <xsl:variable name="place" select="normalize-space($mono/t:imprint/t:pubPlace[1])"/>
+          <xsl:variable name="house" select="normalize-space($mono/t:imprint/t:publisher[1])"/>
+          <xsl:variable name="when" select="normalize-space($mono/t:imprint/t:date[1][normalize-space(.) != 'n.d.'])"/>
+          <xsl:variable name="ed" select="normalize-space($mono/t:edition[1])"/>
+          <xsl:variable name="cite" select="concat($place, substring(': ', 1, 2 * number($place != '' and $house != '')), $house,
+              substring(', ', 1, 2 * number(($place != '' or $house != '') and $when != '')), $when)"/>
+          <xsl:if test="$cite != '' or $ed != ''">
+            <dc:source><xsl:value-of select="$cite"/><xsl:if test="$ed != ''"><xsl:if test="$cite != ''">. </xsl:if>Edition: <xsl:value-of select="$ed"/></xsl:if></dc:source>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="$publisher != ''"><dc:publisher><xsl:value-of select="$publisher"/></dc:publisher></xsl:when>
+      </xsl:choose>
 
       <xsl:variable name="provenance">
+        <xsl:if test="$bibl and (t:msIdentifier/t:collection != '' or $publisher != '')">Held <xsl:if test="normalize-space(t:msIdentifier/t:collection[1]) != ''">in <xsl:value-of select="normalize-space(t:msIdentifier/t:collection[1])"/></xsl:if><xsl:if test="$publisher != ''"><xsl:text> (</xsl:text><xsl:value-of select="$publisher"/><xsl:text>)</xsl:text></xsl:if>.</xsl:if>
         <xsl:for-each select="(t:history/t:provenance | t:history/t:acquisition | t:additional/t:adminInfo/t:custodialHist)[normalize-space(.) != '']">
           <xsl:if test="position() &gt; 1"><xsl:text> </xsl:text></xsl:if>
           <xsl:value-of select="normalize-space(.)"/>

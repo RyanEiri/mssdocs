@@ -30,7 +30,18 @@
     <xsl:variable name="header" select="ancestor::t:teiHeader"/>
     <xsl:variable name="items" select="t:msContents/t:msItem"/>
     <xsl:variable name="status" select="normalize-space($header/t:revisionDesc/@status)"/>
-    <xsl:variable name="title"><xsl:call-template name="msdesc-title"/></xsl:variable>
+    <!-- a printed book (mapping section 9): the copy's msItem points at a biblStruct in the same file that describes the publication -->
+    <xsl:variable name="ptr" select="string(t:msContents/t:msItem/t:bibl/t:ptr/@target)"/>
+    <xsl:variable name="bibl" select="//t:biblStruct[$ptr != '' and @xml:id = substring-after($ptr, '#')][1]"/>
+    <xsl:variable name="mono" select="$bibl/t:monogr[1]"/>
+    <xsl:variable name="title">
+      <xsl:choose>
+        <xsl:when test="$mono/t:title[not(@type) or @type = 'main' or @type = 'desc'][normalize-space(.) != '']">
+          <xsl:value-of select="normalize-space(($mono/t:title[@type = 'main' or not(@type)][normalize-space(.) != ''] | $mono/t:title[@type = 'desc'][normalize-space(.) != ''])[1])"/>
+        </xsl:when>
+        <xsl:otherwise><xsl:call-template name="msdesc-title"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="title-source"><xsl:call-template name="msdesc-title-source"/></xsl:variable>
 
     <div class="rad-record">
@@ -53,7 +64,10 @@
             <xsl:text> / </xsl:text><span class="rad-responsibility" data-rule="1.1F"><xsl:value-of select="normalize-space($transcribed)"/></span>
           </xsl:if>
           <xsl:text>.</xsl:text>
-          <xsl:if test="$date != ''"><xsl:text> – </xsl:text><span class="rad-date" data-rule="1.4B2"><xsl:value-of select="$date"/></span><xsl:text>.</xsl:text></xsl:if>
+          <xsl:if test="$bibl">
+            <xsl:call-template name="rad-publication"><xsl:with-param name="mono" select="$mono"/></xsl:call-template>
+          </xsl:if>
+          <xsl:if test="$date != '' and not($bibl)"><xsl:text> – </xsl:text><span class="rad-date" data-rule="1.4B2"><xsl:value-of select="$date"/></span><xsl:text>.</xsl:text></xsl:if>
           <xsl:if test="$physical != ''"><xsl:text> – </xsl:text><span class="rad-physical" data-rule="1.5"><xsl:value-of select="$physical"/></span></xsl:if>
         </p>
       </xsl:if>
@@ -94,7 +108,7 @@
 
       <!-- notes (1.8B) -->
       <div class="rad-notes">
-        <xsl:if test="$title-source = 'item' and $items/t:title/@type = 'supplied'">
+        <xsl:if test="$title-source = 'item' and $items/t:title/@type = 'supplied' and not($bibl)">
           <xsl:call-template name="note"><xsl:with-param name="rule" select="'1.8B2'"/><xsl:with-param name="label" select="'Source of title proper'"/>
             <xsl:with-param name="text" select="'Title based on the contents of the manuscript.'"/></xsl:call-template>
         </xsl:if>
@@ -107,12 +121,19 @@
           <xsl:with-param name="text" select="concat(substring('Also known as: ', 1, 15 * number($variants != '')), $variants)"/></xsl:call-template>
 
         <xsl:variable name="makers">
-          <xsl:for-each select="($items/t:author | $header/t:fileDesc/t:titleStmt/t:author)[normalize-space(.) != '' and not(@source = 'transcribed') and not(@cert = 'low' or @cert = 'medium')][generate-id() = generate-id(key('by-name', normalize-space(.))[1])]">
+          <xsl:for-each select="($items/t:author | $header/t:fileDesc/t:titleStmt/t:author | $mono/t:author)[normalize-space(.) != '' and not(@source = 'transcribed') and not(@cert = 'low' or @cert = 'medium')][generate-id() = generate-id(key('by-name', normalize-space(.))[1])]">
             <xsl:if test="position() &gt; 1"><xsl:text>; </xsl:text></xsl:if><xsl:value-of select="normalize-space(.)"/>
           </xsl:for-each>
         </xsl:variable>
         <xsl:call-template name="note"><xsl:with-param name="rule" select="'1.8B5'"/><xsl:with-param name="label" select="'Statement of responsibility'"/>
           <xsl:with-param name="text" select="concat(substring('By ', 1, 3 * number($makers != '')), $makers)"/></xsl:call-template>
+        <!-- editors and translators of a printed book (1.8B5) -->
+        <xsl:variable name="editors"><xsl:for-each select="$mono/t:editor[normalize-space(.) != '']"><xsl:if test="position() &gt; 1"><xsl:text>; </xsl:text></xsl:if><xsl:value-of select="normalize-space(.)"/></xsl:for-each></xsl:variable>
+        <xsl:call-template name="note"><xsl:with-param name="rule" select="'1.8B5'"/><xsl:with-param name="label" select="'Editors'"/>
+          <xsl:with-param name="text" select="concat(substring('Edited by ', 1, 10 * number($editors != '')), $editors)"/></xsl:call-template>
+        <xsl:variable name="translators"><xsl:for-each select="$mono/t:respStmt[normalize-space(t:resp) = 'Translator']/t:name[normalize-space(.) != '']"><xsl:if test="position() &gt; 1"><xsl:text>; </xsl:text></xsl:if><xsl:value-of select="normalize-space(.)"/></xsl:for-each></xsl:variable>
+        <xsl:call-template name="note"><xsl:with-param name="rule" select="'1.8B5'"/><xsl:with-param name="label" select="'Translators'"/>
+          <xsl:with-param name="text" select="concat(substring('Translated by ', 1, 14 * number($translators != '')), $translators)"/></xsl:call-template>
         <xsl:variable name="attributed">
           <xsl:for-each select="($items/t:author | $header/t:fileDesc/t:titleStmt/t:author)[normalize-space(.) != '' and (@cert = 'low' or @cert = 'medium')][generate-id() = generate-id(key('by-name', normalize-space(.))[1])]">
             <xsl:if test="position() &gt; 1"><xsl:text>; </xsl:text></xsl:if><xsl:value-of select="normalize-space(.)"/>
@@ -167,7 +188,7 @@
           <xsl:with-param name="text" select="normalize-space(concat($accompanying, ' ', normalize-space(t:physDesc/t:accMat[not(.//t:item)])))"/></xsl:call-template>
 
         <xsl:variable name="others">
-          <xsl:for-each select="t:msIdentifier/t:altIdentifier[normalize-space(t:idno) != '']">
+          <xsl:for-each select="t:msIdentifier/t:altIdentifier[normalize-space(t:idno) != '' and not($bibl and @type = 'image-label')]">
             <xsl:if test="position() &gt; 1"><xsl:text>; </xsl:text></xsl:if>
             <xsl:value-of select="normalize-space(t:idno)"/>
             <xsl:if test="@type != ''"> (<xsl:value-of select="@type"/>)</xsl:if>
@@ -222,7 +243,7 @@
 
       <!-- access points: names, places, subjects -->
       <div class="rad-access">
-        <xsl:variable name="names" select="($items/t:author | $header/t:fileDesc/t:titleStmt/t:author | $items/t:respStmt[t:resp/@key = 'crp']/t:name | $items/t:respStmt/t:name[@key] | .//t:persName[@key])[normalize-space(.) != ''][generate-id() = generate-id(key('by-name', normalize-space(.))[1])]"/>
+        <xsl:variable name="names" select="($items/t:author | $header/t:fileDesc/t:titleStmt/t:author | $mono/t:author | $mono/t:editor | $items/t:respStmt[t:resp/@key = 'crp']/t:name | $items/t:respStmt/t:name[@key] | .//t:persName[@key])[normalize-space(.) != ''][generate-id() = generate-id(key('by-name', normalize-space(.))[1])]"/>
         <xsl:if test="$names">
           <p class="rad-access-names"><span class="rad-label">Name</span><xsl:text> </xsl:text>
             <xsl:for-each select="$names">
@@ -264,6 +285,37 @@
       </xsl:choose>
       <xsl:text>)</xsl:text>
     </xsl:if>
+  </xsl:template>
+
+  <!-- The edition (1.2B1) and the publication area (1.4C, 1.4D, 1.4F) of a printed book: "Winnipeg : Ólafur S. Thorgeirsson, 1917". An unknown place is [S.l.] and an unknown publisher [s.n.]
+       (RAD 1.4C6, 1.4D7: supplied information in square brackets). The date is the date of publication (1.4F), ISO 8601 like every date here (D13); an undated book prints none, because RAD
+       says not to use "n.d." (1.4B, footnote 18). A bare edition number is the cataloguer's, so it is bracketed; a statement is printed as it stands. -->
+  <xsl:template name="rad-publication">
+    <xsl:param name="mono"/>
+    <xsl:variable name="edition" select="normalize-space($mono/t:edition[1])"/>
+    <xsl:if test="$edition != ''">
+      <xsl:text> – </xsl:text><span class="rad-edition" data-rule="1.2B1">
+        <xsl:choose>
+          <xsl:when test="string(number($edition)) != 'NaN'">[Edition <xsl:value-of select="$edition"/>]</xsl:when>
+          <xsl:otherwise><xsl:value-of select="$edition"/></xsl:otherwise>
+        </xsl:choose>
+      </span><xsl:text>.</xsl:text>
+    </xsl:if>
+    <xsl:variable name="place" select="normalize-space($mono/t:imprint/t:pubPlace[1])"/>
+    <xsl:variable name="house" select="normalize-space($mono/t:imprint/t:publisher[1])"/>
+    <xsl:variable name="date">
+      <xsl:for-each select="$mono/t:imprint/t:date[1]">
+        <xsl:variable name="iso"><xsl:call-template name="origdate-iso"/></xsl:variable>
+        <xsl:value-of select="$iso"/><xsl:value-of select="substring('?', 1, number($iso != '' and (@cert = 'low' or @cert = 'medium')))"/>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:text> – </xsl:text>
+    <span class="rad-publication">
+      <span class="rad-place" data-rule="1.4C"><xsl:choose><xsl:when test="$place != ''"><xsl:value-of select="$place"/></xsl:when><xsl:otherwise>[S.l.]</xsl:otherwise></xsl:choose></span>
+      <xsl:text> : </xsl:text>
+      <span class="rad-publisher" data-rule="1.4D"><xsl:choose><xsl:when test="$house != ''"><xsl:value-of select="$house"/></xsl:when><xsl:otherwise>[s.n.]</xsl:otherwise></xsl:choose></span>
+      <xsl:if test="$date != ''"><xsl:text>, </xsl:text><span class="rad-date" data-rule="1.4F"><xsl:value-of select="$date"/></span></xsl:if>
+    </span><xsl:text>.</xsl:text>
   </xsl:template>
 
   <!-- 1.4B2: the date in ISO 8601 (a date, or "start/end"); RAD leaves the format to the institution (1.4B2, footnote 15), and Ryan chose ISO 8601 (2026-10-29), so RAD's bracket

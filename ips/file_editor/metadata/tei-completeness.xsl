@@ -19,12 +19,16 @@
   <xsl:template match="t:msDesc">
     <xsl:variable name="leaves"><xsl:call-template name="leaves"/></xsl:variable>
     <xsl:variable name="size"><xsl:call-template name="size"/></xsl:variable>
+    <!-- a printed book (mapping section 9): the publication is the biblStruct the copy's msItem points at -->
+    <xsl:variable name="ptr" select="string(t:msContents/t:msItem/t:bibl/t:ptr/@target)"/>
+    <xsl:variable name="bibl" select="//t:biblStruct[$ptr != '' and @xml:id = substring-after($ptr, '#')][1]"/>
+    <xsl:variable name="mono" select="$bibl/t:monogr[1]"/>
     <completeness id="{@xml:id}">
-      <xsl:if test="not(t:msContents/t:msItem/t:author[normalize-space(.) != ''] or ancestor::t:teiHeader/t:fileDesc/t:titleStmt/t:author[normalize-space(.) != ''] or t:msContents/t:msItem/t:respStmt[t:resp/@key = 'crp']/t:name[normalize-space(.) != ''])">
+      <xsl:if test="not($mono/t:author[normalize-space(.) != ''] or $mono/t:editor[normalize-space(.) != ''] or $mono/t:respStmt/t:name[normalize-space(.) != ''] or t:msContents/t:msItem/t:author[normalize-space(.) != ''] or ancestor::t:teiHeader/t:fileDesc/t:titleStmt/t:author[normalize-space(.) != ''] or t:msContents/t:msItem/t:respStmt[t:resp/@key = 'crp']/t:name[normalize-space(.) != ''])">
         <missing field="creator">No author is named (an author element in an msItem or the title statement).</missing>
       </xsl:if>
       <xsl:variable name="date">
-        <xsl:for-each select="t:history/t:origin/t:origDate[1]"><xsl:call-template name="origdate-iso"/></xsl:for-each>
+        <xsl:for-each select="(t:history/t:origin/t:origDate | $mono/t:imprint/t:date)[1]"><xsl:call-template name="origdate-iso"/></xsl:for-each>
       </xsl:variable>
       <xsl:if test="$date = ''">
         <xsl:choose>
@@ -35,6 +39,12 @@
             <missing field="date">No date of creation with a machine value (origDate with when, notBefore and notAfter, or from and to).</missing>
           </xsl:otherwise>
         </xsl:choose>
+      </xsl:if>
+      <xsl:if test="$bibl and normalize-space($mono/t:imprint/t:publisher[1]) = ''">
+        <missing field="publisher">No publisher in the imprint (RAD 1.4D prints [s.n.]).</missing>
+      </xsl:if>
+      <xsl:if test="$bibl and normalize-space($mono/t:imprint/t:pubPlace[1]) = ''">
+        <missing field="place">No place of publication in the imprint (RAD 1.4C prints [S.l.]).</missing>
       </xsl:if>
       <xsl:if test="$leaves = ''">
         <missing field="extent">No extent (a support extent, or a book-block count).</missing>

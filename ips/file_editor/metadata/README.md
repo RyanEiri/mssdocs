@@ -16,3 +16,11 @@ XSLT 1.0, so PHP's `XSLTProcessor` (`php8.2-xml` includes `xsl`) and lxml both r
 Dates are ISO 8601: the `origDate` value is checked, a value that is not an ISO 8601 date is left out of both views and named by the completeness report, and RAD prints a doubtful date with the ISO 8601-2 mark `?`. A field the record lacks is left out, never filled in. What each field comes from, and the reasons, are in `docs/mssdocs-metadata-mapping.md` of the webserversAC repository. The labels for coded values (`@material`, `@form`, the text classes) are in `tei-common.xsl` and the named templates of `tei-to-dc.xsl`; a class code whose label is not confirmed gives a `dc:type` but no `dc:subject`.
 
 Command line (lxml): `python3 -c "import lxml.etree as e,sys; print(str(e.XSLT(e.parse('tei-to-rad.xsl'))(e.parse(sys.argv[1]))))" record.xml`
+
+## Printed books (a `biblStruct` beside the copy's `msDesc`)
+A record whose `msContents/msItem/bibl/ptr` points at a `biblStruct` in the same file is a printed book: the title, makers, edition, imprint and date come from the publication (`monogr`), and the
+holder, identifiers, binding, marks, condition and photographs from the copy's `msDesc`. The stylesheets change only when that pointer resolves; a manuscript, or a pointer to nothing, is described
+as before. Dublin Core: the publisher is the imprint's and the holder is the provenance; RAD: edition, place, publisher and date of publication (1.2B1, 1.4C, 1.4D, 1.4F, `[S.l.]` and `[s.n.]` when
+unknown, no "n.d."); completeness asks for a publisher and a place. Decisions D14 to D19 are in `docs/mssdocs-metadata-mapping.md` of the webserversAC repository, section 9; the generator of such
+records for a catalogue spreadsheet is `tools/books-to-tei.py` there.
+
