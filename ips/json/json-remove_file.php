@@ -109,6 +109,7 @@ if($login_cookie->CheckIt()) {
 	    foreach (ips_version_dirs($folder) as $version) {
 		rmdir($folder.'/'.$version);
 	    }
+	    @unlink($folder.'/'.IPS_ROTATION_FILE); // the hidden rotation record goes with its folder
 	    rmdir($folder);
 //	    $db_folder_pattern = '/^.*files\/?/';
 //	    $db_folder_replacement = '';
