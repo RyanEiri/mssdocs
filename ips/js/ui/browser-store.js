@@ -159,11 +159,48 @@
   const thumbUrl = (n) => CFG.base + "upload/" + join(join(parentOf(n.path), "thumbnail"), n.name);
   const fileUrl = (n) => CFG.base + "upload/" + n.path;
 
+  // ---- turning a photograph for display ------------------------------------------------------------------------
+  // The turn (0, 90, 180 or 270, on top of the picture's own EXIF orientation) is recorded beside the photograph by json/json-photo_rotate.php; the file and its EXIF data are never
+  // changed. The listing carries it as `rotation`; whoever may write in the folder can change it, everyone else can only look at the picture turned.
+  const rotationOf = (n) => (n && n.rotation) || 0;
+  const canTurn = (n) => !!n && !n.folder && typeOf(n) === "image" && canWrite(n.path);
+  // The style that draws a thumbnail with its turn. A half turn is a rotation; a quarter turn swaps the sides of a 4:3 box (`ratio` "4:3") so the picture still fills it, and needs
+  // nothing more in a square one. null when the photograph is not turned.
+  function turnStyle(n, ratio) {
+    const t = rotationOf(n);
+    if (!t) return null;
+    if (t === 180 || ratio !== "4:3") return { transform: "rotate(" + t + "deg)" };
+    return { left: "50%", top: "50%", right: "auto", bottom: "auto", width: "75%", height: "133.3334%", transform: "translate(-50%, -50%) rotate(" + t + "deg)" };
+  }
+  function setTreeRotation(path, turn) {
+    (function walk(node) {
+      if (!node) return false;
+      if (node.path === path && node.type !== "folder") { if (turn) node.rotation = turn; else delete node.rotation; return true; }
+      return (Array.isArray(node.items) ? node.items : []).some(walk);
+    })(store.tree);
+  }
+  // Records a further turn of `delta` degrees (90, -90 or 180) for a photograph; resolves with the turn now recorded, rejects with a message the user can read.
+  function rotate(n, delta) {
+    if (!canTurn(n)) return Promise.reject(new Error("You can only turn photographs in your own folder."));
+    return IPS.postForm("json/json-photo_rotate.php", { dir: parentOf(n.path), name: n.name, turn: String(delta) }).then((d) => {
+      if (!d || !d.success) throw new Error((d && d.error) || "The turn could not be saved.");
+      setTreeRotation(n.path, d.rotation);
+      return d.rotation;
+    });
+  }
+
+  // Back to the way the picture's own EXIF orientation shows it: the turn that cancels the recorded one.
+  function unturn(n) {
+    const cancel = { 90: -90, 180: 180, 270: 90 }[rotationOf(n)];
+    return cancel ? rotate(n, cancel) : Promise.resolve(0);
+  }
+
   const visibleClear = () => { store.query = ""; store.filter = "all"; store.project = 0; store.projectPaths = []; };
 
   IPS.browser = Object.assign(IPS.browser || {}, {
     ROOT, store, load, loadTitles, go, apply, select, toggle, selectAll, clearSelection, setSort, setView, togglePanel, isSelected, visibleClear,
     nodes, children, stats, visible, inFolder, inProject, searching, matches, crumbs, typeOf, canWrite, thumbUrl, fileUrl,
+    rotationOf, canTurn, turnStyle, rotate, unturn,
     byName, path: { nameOf, parentOf, join, within, cleanPath },
   });
 })();

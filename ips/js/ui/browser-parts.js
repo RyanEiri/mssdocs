@@ -108,7 +108,7 @@
       const isOn = (n) => props.selection.includes(n.path);
       const allOn = Vue.computed(() => props.items.length > 0 && props.items.every((n) => props.selection.includes(n.path)));
       const COLS = [["name", "Name"], ["title", "Title"], ["type", "Type"], ["size", "Size"], ["modified", "Modified"]];
-      return { B, U: U2, STRIPES, meta, where, isOn, allOn, COLS, thumb: (n) => B().thumbUrl(n), isImage: (n) => !n.folder && B().typeOf(n) === "image", size: (n) => (n.folder ? (B().children(n.path).length ? U2.plural(B().stats(n.path).files, "file") : "—") : U2.bytesToSize(n.size)) };
+      return { B, U: U2, STRIPES, meta, where, isOn, allOn, COLS, thumb: (n) => B().thumbUrl(n), turn: (n, ratio) => B().turnStyle(n, ratio), isImage: (n) => !n.folder && B().typeOf(n) === "image", size: (n) => (n.folder ? (B().children(n.path).length ? U2.plural(B().stats(n.path).files, "file") : "—") : U2.bytesToSize(n.size)) };
     },
     template: `
       <div>
@@ -118,7 +118,7 @@
             :class="['flex items-center gap-3 h-[68px] px-3.5 rounded-[10px] border cursor-pointer', isOn(n) ? 'bg-accent-soft border-accent' : 'bg-surface border-line hover:border-line-strong']"
             @click.stop="$emit('pick', n, $event)" @dblclick="$emit('open', n)" @keydown.enter="$emit('open', n)" @contextmenu.prevent.stop="$emit('context', n, $event)">
             <span v-if="n.folder" class="grid place-items-center w-10 h-10 rounded-[9px] bg-accent-soft text-accent shrink-0"><ips-icon name="folder" :size="20"></ips-icon></span>
-            <span v-else-if="isImage(n)" class="relative block w-10 h-10 rounded-md overflow-hidden shrink-0" :style="STRIPES"><img :src="thumb(n)" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'"></span>
+            <span v-else-if="isImage(n)" class="relative block w-10 h-10 rounded-md overflow-hidden shrink-0" :style="STRIPES"><img :src="thumb(n)" :style="turn(n)" :data-rot="n.rotation || null" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'"></span>
             <ips-badge v-else :name="n.name"></ips-badge>
             <span class="min-w-0 flex-1">
               <span class="block truncate text-[13.5px] font-medium">{{ n.name }}</span>
@@ -163,7 +163,7 @@
             <div class="relative grid place-items-center aspect-[4/3] bg-sidebar border-b border-line" :style="isImage(n) ? STRIPES : null">
               <ips-icon v-if="n.folder" name="folder" :size="44" class="text-accent"></ips-icon>
               <span v-if="n.public" class="absolute top-2 right-2 text-accent" title="Public: anyone can see the files in this folder"><ips-icon name="globe" :size="16"></ips-icon></span>
-              <img v-else-if="isImage(n)" :src="thumb(n)" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'">
+              <img v-else-if="isImage(n)" :src="thumb(n)" :style="turn(n, '4:3')" :data-rot="n.rotation || null" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'">
               <ips-badge v-else :name="n.name" large></ips-badge>
             </div>
             <span class="absolute top-2 right-2"><ips-check :on="isOn(n)" :label="'Select ' + n.name" @toggle="$emit('check', n)"></ips-check></span>
