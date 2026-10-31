@@ -156,7 +156,13 @@
       </xsl:choose>
 
       <xsl:variable name="provenance">
-        <xsl:if test="$bibl and (t:msIdentifier/t:collection != '' or $publisher != '')">Held <xsl:if test="normalize-space(t:msIdentifier/t:collection[1]) != ''">in <xsl:value-of select="normalize-space(t:msIdentifier/t:collection[1])"/></xsl:if><xsl:if test="$publisher != ''"><xsl:text> (</xsl:text><xsl:value-of select="$publisher"/><xsl:text>)</xsl:text></xsl:if>.</xsl:if>
+        <!-- the custodian of this copy: the repository (a private owner by name) with its place, else the collection it is in -->
+        <xsl:if test="$bibl and (t:msIdentifier/t:repository != '' or t:msIdentifier/t:institution != '' or t:msIdentifier/t:collection != '')">
+          <xsl:choose>
+            <xsl:when test="$publisher != ''">Held by <xsl:value-of select="$publisher"/>.</xsl:when>
+            <xsl:otherwise>Held in <xsl:value-of select="normalize-space(t:msIdentifier/t:collection[1])"/>.</xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
         <xsl:for-each select="(t:history/t:provenance | t:history/t:acquisition | t:additional/t:adminInfo/t:custodialHist)[normalize-space(.) != '']">
           <xsl:if test="position() &gt; 1"><xsl:text> </xsl:text></xsl:if>
           <xsl:value-of select="normalize-space(.)"/>
