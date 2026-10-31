@@ -53,7 +53,15 @@ $options = array(
 	'db_pass' => DB_PASS,
 	'db_name' => DB_NAME,
 	'db_table' => 'files',
-	'user_dirs' => true
+	'user_dirs' => true,
+	// A photograph is never changed by the web application, and neither is its EXIF data (Ryan, 2026-10-31). blueimp's default turns `auto_orient` on for the original (the '' version), which
+	// rotates the pixels, re-encodes the JPEG at quality 75 and writes it over the upload, with the EXIF dropped (GD) or its orientation reset (Imagick). Here the original gets no processing at
+	// all (scale 1, nothing to write: the file stays byte for byte as uploaded) and only the 80 pixel copy, a different file, is made upright from the EXIF orientation.
+	// A photograph that needs turning is turned for display and never in the file (the rotation that belongs to a photograph is kept beside it, not in it).
+	'image_versions' => array(
+		'' => array('auto_orient' => false),
+		'thumbnail' => array('auto_orient' => true, 'max_width' => 80, 'max_height' => 80)
+	)
 );
 
 // The reply is JSON: PHP notices (the vendored handler raises PHP 8 deprecations) go to the log, never into the response.
