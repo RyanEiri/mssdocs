@@ -17,6 +17,7 @@ foreach ([
 	'links'       => ['Links', 'Edit the links on the site\'s Links page.', 'globe', 'links/'],
 	'projects'    => ['Projects', 'Group files of the file store into projects.', 'layers', 'projects/'],
 	'issues'      => ['Issues', 'The PDF issues of a publication.', 'file-text', 'issues/'],
+	'articles'    => ['Articles', 'Write and publish stories.', 'edit-3', 'articles/'],
 	'catalogue'   => ['Catalogue', 'Browse the catalogue of items.', 'book-open', 'catalogue/'],
 	'contacts'    => ['Contacts', 'The contacts list.', 'users', 'contacts/'],
 ] as $dir => $info) {
