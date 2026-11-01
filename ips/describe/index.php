@@ -36,7 +36,7 @@ $is_css = ['file_editor/file-editor.css', 'describe/describe.css'];
 	</main>
 <?php } else { ?>
 	<div id="dc-app" v-cloak>
-		<main class="fe-page">
+		<main class="fe-page dc-wide">
 			<div class="fe-titlerow">
 				<div>
 					<h1>Describe</h1>
@@ -57,7 +57,7 @@ $is_css = ['file_editor/file-editor.css', 'describe/describe.css'];
 				<button type="button" class="fe-btn fe-btn-sm" id="dc-reload" @click="reload">Load their version</button></div>
 			<p v-if="listError" class="fe-error" role="alert" id="dc-list-error">{{ listError }}</p>
 
-			<div class="dc-layout" v-if="dir">
+			<div class="dc-layout" :class="{ 'dc-with-viewer': rec && form }" v-if="dir">
 				<section class="dc-list" aria-label="Records">
 					<div class="fe-filter"><label><input type="checkbox" id="dc-only" v-model="onlyOpen"> Only records with open questions</label></div>
 					<div class="fe-table" id="dc-records">
@@ -169,8 +169,8 @@ $is_css = ['file_editor/file-editor.css', 'describe/describe.css'];
 							<h3>Photographs <span class="fe-muted">({{ form.photos.length }})</span></h3>
 							<p v-if="!form.photos.length" class="fe-muted" id="dc-no-photos">No photograph is placed on this book yet.</p>
 							<div class="dc-photos">
-								<div class="dc-photo" v-for="(p, i) in recPhotos" :key="p.path" :data-photo="p.name">
-									<a :href="p.full || '#'" target="_blank" rel="noopener"><span class="dc-pic" :class="{ 'dc-missing': p.missing }"><img v-if="!p.missing" :src="p.thumb" :alt="p.name" loading="lazy" :style="turnStyle(p)" :data-rot="p.rotation || null"><span v-else>missing</span></span></a>
+								<div class="dc-photo" :class="{ viewing: viewed && viewed.path === p.path }" v-for="(p, i) in recPhotos" :key="p.path" :data-photo="p.name">
+									<button type="button" class="dc-picbtn" @click="view(p)" :aria-label="'Look at ' + p.name + ' beside the form'" :aria-pressed="viewed && viewed.path === p.path" data-look><span class="dc-pic" :class="{ 'dc-missing': p.missing }"><img v-if="!p.missing" :src="p.thumb" :alt="p.name" loading="lazy" :style="turnStyle(p)" :data-rot="p.rotation || null"><span v-else>missing</span></span></button>
 									<div class="dc-file">{{ p.name }}</div>
 									<select class="fe-input" :value="form.photos[i] && form.photos[i].role" @change="setRole(p, $event.target.value)" :aria-label="'What ' + p.name + ' shows'"><option v-for="r in photoRoles" :key="r" :value="r">{{ r.replace(/-/g, ' ') }}</option></select>
 									<div class="dc-actions">
@@ -182,8 +182,8 @@ $is_css = ['file_editor/file-editor.css', 'describe/describe.css'];
 							</div>
 							<details class="dc-tray" id="dc-tray" :open="trayOpen" @toggle="trayOpen = $event.target.open"><summary>Photographs in no book ({{ tray.length }}): add one to this book</summary>
 								<div class="dc-photos">
-									<div class="dc-photo" v-for="p in tray" :key="p.path" :data-tray="p.name">
-										<span class="dc-pic"><img :src="p.thumb" :alt="p.name" loading="lazy" :style="turnStyle(p)"></span>
+									<div class="dc-photo" :class="{ viewing: viewed && viewed.path === p.path }" v-for="p in tray" :key="p.path" :data-tray="p.name">
+										<button type="button" class="dc-picbtn" @click="view(p)" :aria-label="'Look at ' + p.name + ' beside the form'" data-look><span class="dc-pic"><img :src="p.thumb" :alt="p.name" loading="lazy" :style="turnStyle(p)"></span></button>
 										<div class="dc-file">{{ p.name }}</div>
 										<select class="fe-input" v-model="trayRole[p.name]" :aria-label="'What ' + p.name + ' shows'"><option v-for="r in photoRoles" :key="r" :value="r">{{ r.replace(/-/g, ' ') }}</option></select>
 										<button type="button" class="fe-btn fe-btn-sm" :disabled="busy" @click="fromTray(p)" data-addphoto>Add to this book</button>
@@ -224,6 +224,41 @@ $is_css = ['file_editor/file-editor.css', 'describe/describe.css'];
 						<p v-if="preview.completeness && preview.completeness.length" class="fe-muted dc-hint">Still missing from the description: {{ preview.completeness.map(function (c) { return c[0]; }).join(', ') }}.</p>
 					</section>
 				</section>
+
+				<aside class="dc-viewer" id="dc-viewer" aria-label="The photograph being described" v-if="rec && form">
+					<template v-if="viewed">
+						<div class="dc-vbar">
+							<span class="dc-file" id="dc-vname">{{ viewed.name }}</span>
+							<span class="fe-muted" id="dc-vwhere">{{ viewedIndex >= 0 ? (viewedIndex + 1) + ' of ' + recPhotos.length + ' on this book' : 'in no book' }}</span>
+							<span class="dc-vtools">
+								<button type="button" class="fe-btn fe-btn-sm" @click="step(-1)" :disabled="candidates.length < 2" aria-label="Previous photograph" data-vprev>‹</button>
+								<button type="button" class="fe-btn fe-btn-sm" @click="step(1)" :disabled="candidates.length < 2" aria-label="Next photograph" data-vnext>›</button>
+								<button type="button" class="fe-btn fe-btn-sm" v-for="z in zooms" :key="z.key" :class="{ 'is-on': zoom === z.value }" @click="zoom = z.value" :data-vzoom="z.key">{{ z.label }}</button>
+								<button type="button" class="fe-btn fe-btn-sm" :disabled="busy || viewed.missing" @click="rotate(viewed, -90)" aria-label="Turn the view left" data-vrotate="left">⟲</button>
+								<button type="button" class="fe-btn fe-btn-sm" :disabled="busy || viewed.missing" @click="rotate(viewed, 90)" aria-label="Turn the view right" data-vrotate="right">⟳</button>
+								<a class="fe-btn fe-btn-sm" :href="viewed.full || '#'" target="_blank" rel="noopener" data-vopen>Open</a>
+							</span>
+						</div>
+						<div class="dc-vbar" id="dc-vrole-row">
+							<template v-if="viewedIndex >= 0">
+								<label class="fe-muted">Shows <select class="fe-input" :value="form.photos[viewedIndex] && form.photos[viewedIndex].role" @change="setRole(viewed, $event.target.value)" aria-label="What the photograph being viewed shows" id="dc-vrole"><option v-for="r in photoRoles" :key="r" :value="r">{{ r.replace(/-/g, ' ') }}</option></select></label>
+								<button type="button" class="fe-btn fe-btn-sm" :disabled="busy" @click="toTray(viewed)" data-vtotray>Not this book</button>
+							</template>
+							<template v-else>
+								<label class="fe-muted">Shows <select class="fe-input" v-model="trayRole[viewed.name]" aria-label="What the photograph being viewed shows" id="dc-vrole"><option v-for="r in photoRoles" :key="r" :value="r">{{ r.replace(/-/g, ' ') }}</option></select></label>
+								<button type="button" class="fe-btn fe-btn-sm" :disabled="busy" @click="fromTray(viewed)" data-vaddphoto>Add to this book</button>
+							</template>
+						</div>
+						<div class="dc-stage" ref="stage" id="dc-stage">
+							<span v-if="viewed.missing" class="dc-missing">This photograph is missing from the file store.</span>
+							<div v-else class="dc-sheet" :style="sheetStyle" id="dc-sheet"><img :key="viewed.path" :src="viewed.full" :alt="viewed.name" @load="measure($event)" :style="imgStyle" id="dc-vimg"></div>
+						</div>
+						<div class="dc-strip" aria-label="This book's photographs and the ones in no book">
+							<button type="button" class="dc-thumb" v-for="p in candidates" :key="p.path" :class="{ viewing: p.path === viewed.path, loose: !isOnBook(p) }" @click="view(p)" :title="p.name + (isOnBook(p) ? '' : ' (in no book)')" :data-strip="p.name"><img :src="p.thumb" :alt="p.name" :style="turnStyle(p)"></button>
+						</div>
+					</template>
+					<p v-else class="fe-empty" id="dc-vnone">No photograph to show. Add one from the tray, or confirm that none survives.</p>
+				</aside>
 			</div>
 			<p v-else class="fe-empty" id="dc-choose">{{ folders.length ? 'Choose a records folder.' : 'No records folder yet: tools/books-to-tei.py generate puts one in the file store.' }}</p>
 		</main>
