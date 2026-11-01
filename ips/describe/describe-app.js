@@ -24,13 +24,44 @@
   Vue.createApp({
     data: function () {
       return { dir: cfg.dir || '', loadedDir: '', folders: cfg.folders || [], records: [], tray: [], roles: {}, photoRoles: [], loaded: false, listError: '', onlyOpen: false,
-               rec: null, form: null, notesText: '', snapshot: '', preview: null, busy: false, error: '', saved: false, pending: null, conflict: '', statusChoice: 'draft', trayRole: {}, trayOpen: true,
+               rec: null, form: null, notesText: '', snapshot: '', preview: null, busy: false, error: '', saved: false, pending: null, conflict: '', statusChoice: 'draft', trayRole: {}, trayOpen: true, viewPath: '', zoom: 'fit', natural: null, stage: { w: 0, h: 0 },
+               zooms: [{ key: 'fit', value: 'fit', label: 'Fit' }, { key: '100', value: 1, label: '100%' }, { key: '200', value: 2, label: '200%' }],
                confirmWords: CONFIRM };
     },
     computed: {
       shown: function () { var only = this.onlyOpen; return this.records.filter(function (r) { return !only || r.error || (r.open && r.open.length); }); },
       openQuestions: function () { return this.rec && this.rec.questions ? this.rec.questions : []; },
       recPhotos: function () { return this.rec && this.rec.photos ? this.rec.photos : []; },
+      // what the viewer can show: this book's photographs, then the ones in no book (the tray)
+      candidates: function () { return this.recPhotos.concat(this.tray); },
+      viewed: function () {
+        var path = this.viewPath, all = this.candidates;
+        var found = all.find(function (p) { return p.path === path; });
+        if (found) { return found; }
+        var form = this.form, title = this.recPhotos.findIndex(function (p, i) { return form && form.photos[i] && form.photos[i].role === 'title-page'; });
+        return (title >= 0 ? this.recPhotos[title] : this.recPhotos[0]) || all[0] || null;
+      },
+      viewedIndex: function () { var v = this.viewed; return v ? this.recPhotos.findIndex(function (p) { return p.path === v.path; }) : -1; },
+      viewedPath: function () { return this.viewed ? this.viewed.path : ''; },
+      // the photograph turned as recorded (on top of its EXIF orientation, which the browser applies), at the chosen zoom: the sheet is the size of the turned picture
+      scale: function () {
+        var v = this.viewed, n = this.natural;
+        if (!v || !n) { return 0; }
+        var t = (v.rotation || 0) % 180 === 90, w = t ? n.h : n.w, h = t ? n.w : n.h;
+        if (this.zoom !== 'fit') { return this.zoom; }
+        return Math.min(1, (this.stage.w - 4) / w, (this.stage.h - 4) / h) || 1;
+      },
+      sheetStyle: function () {
+        var v = this.viewed, n = this.natural, k = this.scale;
+        if (!v || !n) { return {}; }
+        var t = (v.rotation || 0) % 180 === 90;
+        return { width: Math.round((t ? n.h : n.w) * k) + 'px', height: Math.round((t ? n.w : n.h) * k) + 'px' };
+      },
+      imgStyle: function () {
+        var v = this.viewed, n = this.natural, k = this.scale;
+        if (!v || !n) { return { opacity: 0 }; }
+        return { width: Math.round(n.w * k) + 'px', height: Math.round(n.h * k) + 'px', transform: 'translate(-50%, -50%) rotate(' + ((v.rotation || 0) % 360) + 'deg)' };
+      },
       decisionList: function () { var d = (this.form && this.form.decisions) || {}; return Object.keys(d).map(function (k) { return { key: k, who: d[k].who, when: d[k].when, text: d[k].text }; }); },
       dirty: function () { return !!this.form && JSON.stringify(this.payload()) !== this.snapshot; },
       needsSplit: function () { return !!this.form && this.form.contributors.some(function (c) { return /[\/,&;]|\(|\bog\b|\band\b/i.test(c.name); }); },
@@ -78,6 +109,10 @@
         return get(self.url('record_get.php', { id: id })).then(function (d) {
           if (!d.success) { self.rec = { id: id, error: d.error || 'The record could not be read.' }; self.form = null; return; }
           self.adopt(d.record, d.preview, true);
+          self.$nextTick(function () {   // bring the form and the photograph beside it just under the page header, so the whole viewer is on screen
+            var at = document.getElementById('dc-detail');
+            if (at) { window.scrollTo({ top: Math.max(0, at.getBoundingClientRect().top + window.pageYOffset - 68) }); }
+          });
           try { history.replaceState(null, '', '?dir=' + encodeURIComponent(self.dir) + '&id=' + encodeURIComponent(id)); } catch (e) { /* a nicety */ }
         });
       },
@@ -87,6 +122,7 @@
         this.rec = view;
         if (preview !== undefined && preview !== null) { this.preview = preview; }
         if (all) {
+          this.viewPath = '';
           this.form = clone(view.struct);
           this.notesText = (view.struct.notes || []).join('\n');
           this.statusChoice = view.struct.status;
@@ -144,6 +180,19 @@
         });
         this.form.contributors = out; this.form.pseudonym = pseudonym;
       },
+      view: function (p) { this.viewPath = p.path; },
+      isOnBook: function (p) { return this.recPhotos.some(function (r) { return r.path === p.path; }); },
+      step: function (d) {
+        var all = this.candidates, v = this.viewed;
+        if (all.length < 2 || !v) { return; }
+        var i = all.findIndex(function (p) { return p.path === v.path; });
+        this.viewPath = all[(i + d + all.length) % all.length].path;
+      },
+      measure: function (event) {
+        if (event && event.target && event.target.naturalWidth) { this.natural = { w: event.target.naturalWidth, h: event.target.naturalHeight }; }
+        var st = this.$refs.stage;
+        if (st) { this.stage = { w: st.clientWidth, h: st.clientHeight }; }
+      },
       turnStyle: function (p) {
         var t = p.rotation || 0;
         if (!t) { return null; }
@@ -176,8 +225,15 @@
         });
       }
     },
+    watch: { viewedPath: function () { this.natural = null; this.zoom = 'fit'; this.$nextTick(this.measure); } },
     mounted: function () {
       var self = this;
+      window.addEventListener('resize', function () { self.measure(); });
+      window.addEventListener('keydown', function (e) {
+        var t = e.target && e.target.tagName;
+        if (t === 'INPUT' || t === 'SELECT' || t === 'TEXTAREA' || e.altKey || e.ctrlKey || e.metaKey || !self.viewed) { return; }
+        if (e.key === 'ArrowLeft') { self.step(-1); } else if (e.key === 'ArrowRight') { self.step(1); }
+      });
       window.addEventListener('beforeunload', function (e) { if (self.dirty) { e.preventDefault(); e.returnValue = ''; } });
       if (self.dir) {
         self.loadList().then(function () {

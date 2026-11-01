@@ -21,5 +21,7 @@ hidden, never served), and the new one is written through a temporary file and a
 **Photographs:** moving one between books or the tray is `photo_assign.php` (one book per photograph, under a lock). **No photograph is ever changed**: turning is the file browser's `.rotation.json`
 sidecar through `json/json-photo_rotate.php`.
 
+**The viewer:** beside the form (below 1300 px the list moves above and the form and viewer share a row; below 900 px the viewer comes first, unpinned) the photograph being described is shown large and stays in view while the form scrolls. It opens on the title page (else the first photograph, else the first one in no book); the strip under it holds this book's photographs and, dashed, the ones in no book; Fit, 100% and 200% zoom (the stage scrolls), the turn buttons (the same sidecar), previous/next (also the left and right arrow keys outside a text box), a role menu, and Not this book or Add to this book. Clicking a card's picture shows that photograph. It loads the `thumbnail-2048` copy when there is one, else the original.
+
 **Endpoints** (JSON; 400 where a missing record would be a 404, because nginx replaces a PHP 404 body): `record_list.php`, `record_get.php`, `record_save.php`, `record_status.php`,
 `photo_assign.php`. Home card: `IPS_MODULES` lists `describe`. Tests: `tests/test_describe_logic.py`, `test_describe_module.py`, `test_ui_describe.py`.
