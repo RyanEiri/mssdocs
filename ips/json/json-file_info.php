@@ -81,13 +81,21 @@ if($login_cookie->CheckIt()) {
 
 					// It is a file
 
-					$files[] = array(
+					$entry = array(
 						"name" => $f,
 						"type" => "file",
 						"path" => $path . '/' . $f,
 						"modified" => filemtime($dir . '/' . $f),
 						"size" => filesize($dir . '/' . $f) // Gets the size of this file
 					);
+					// The turn recorded beside a photograph (ips_rotation_*, files_table.php), only when there is one: the page draws the picture with it.
+					if (!isset($turns) && function_exists('ips_rotation_read')) {
+						$turns = ips_rotation_read($dir);
+					}
+					if (!empty($turns[$f])) {
+						$entry["rotation"] = $turns[$f];
+					}
+					$files[] = $entry;
 				}
 			}
 

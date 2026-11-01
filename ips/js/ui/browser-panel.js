@@ -3,7 +3,7 @@
    here and saved with json-file_functions.php (browser-actions.js). */
 (function () {
   "use strict";
-  const { reactive, computed, watch } = Vue;
+  const { reactive, computed, watch, ref } = Vue;
   const IPS = window.IPS, S = IPS.S, U = IPS.util, B = IPS.browser, st = B.store, CFG = IPS.cfg;
 
   const Panel = {
@@ -76,7 +76,16 @@
       const bytes = (n) => U.bytesToSize(n) + (n >= 1024 ? " (" + Number(n).toLocaleString("en") + " bytes)" : "");
       const when = (sec) => { if (!sec) return "—"; const d = new Date(sec * 1000); return U.fmtEpoch(sec) + ", " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); };
 
-      return { S, B, st, CFG, U, pub, setPublic, sel, node, mode, label, detail, isImage, writable, folders, folderLabel, form, errors, saving, dirty, save, fill, multi, folderInfo, bytes, when, emit };
+      // Turning a photograph for display: recorded beside it, the file and its EXIF data are never changed (json/json-photo_rotate.php)
+      const turning = ref(false);
+      function turn(delta) {
+        if (turning.value || !node.value) return;
+        turning.value = true;
+        (delta === 0 ? B.unturn(node.value) : B.rotate(node.value, delta))
+          .catch((e) => IPS.toast(e.message || "The turn could not be saved.", { icon: "alert-circle" }))
+          .finally(() => (turning.value = false));
+      }
+      return { S, B, st, CFG, U, turning, turn, pub, setPublic, sel, node, mode, label, detail, isImage, writable, folders, folderLabel, form, errors, saving, dirty, save, fill, multi, folderInfo, bytes, when, emit };
     },
     template: `
       <aside class="flex flex-col min-h-0 bg-surface border-l border-line" aria-label="Details">
@@ -90,14 +99,20 @@
           <template v-if="mode === 'file' && node">
             <div>
               <div v-if="isImage" class="relative aspect-[4/3] rounded-[10px] overflow-hidden border border-line bg-sidebar">
-                <img :src="B.thumbUrl(node)" :data-full="B.fileUrl(node)" alt="" class="absolute inset-0 w-full h-full object-contain" onerror="if(!this.dataset.tried){this.dataset.tried=1;this.src=this.dataset.full}">
+                <img :src="B.thumbUrl(node)" :data-full="B.fileUrl(node)" :style="B.turnStyle(node, '4:3')" :data-rot="node.rotation || null" data-panel="image" alt="" class="absolute inset-0 w-full h-full object-contain" onerror="if(!this.dataset.tried){this.dataset.tried=1;this.src=this.dataset.full}">
               </div>
               <div v-else class="grid place-items-center h-[120px] rounded-[10px] border border-line bg-sidebar"><ips-badge :name="node.name" large></ips-badge></div>
               <h2 class="mt-3 font-display text-[21px] font-medium leading-tight break-words">{{ (detail && detail.found && detail.title) || node.name }}</h2>
               <p class="mt-1 font-mono text-[11.5px] text-muted break-all">{{ node.path }}</p>
               <div class="mt-3 flex flex-wrap gap-2">
                 <a :href="B.fileUrl(node)" :download="node.name" :class="S.btnSecondary" class="!h-[30px] !rounded-[7px] !text-[12.5px] no-underline"><ips-icon name="download" :size="14"></ips-icon>Download</a>
+                <template v-if="B.canTurn(node)">
+                  <button type="button" :disabled="turning" @click="turn(-90)" data-act="rotate-left" title="Turn the picture left. The file and its EXIF data are not changed." :class="S.btnSecondary" class="!h-[30px] !rounded-[7px] !text-[12.5px]"><ips-icon name="rotate-ccw" :size="14"></ips-icon>Rotate left</button>
+                  <button type="button" :disabled="turning" @click="turn(90)" data-act="rotate-right" title="Turn the picture right. The file and its EXIF data are not changed." :class="S.btnSecondary" class="!h-[30px] !rounded-[7px] !text-[12.5px]"><ips-icon name="rotate-cw" :size="14"></ips-icon>Rotate right</button>
+                  <button v-if="node.rotation" type="button" :disabled="turning" @click="turn(0)" data-act="rotate-reset" :class="S.btnSecondary" class="!h-[30px] !rounded-[7px] !text-[12.5px]">Reset turn</button>
+                </template>
               </div>
+              <p v-if="B.canTurn(node)" class="mt-2 text-[12px] text-muted" data-note="rotation">{{ node.rotation ? 'Shown turned ' + node.rotation + '° (everywhere the file is shown). ' : '' }}Turning only changes how the picture is shown: the file and its EXIF data are never changed.</p>
             </div>
 
             <p v-if="!detail || detail.loading" class="text-[13px] text-muted">Loading…</p>

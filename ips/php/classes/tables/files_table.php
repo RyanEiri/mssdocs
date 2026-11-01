@@ -300,6 +300,110 @@ function ips_dir_is_public($real) {
 // takes its copies along, so a removed photo never stays reachable as a copy.
 const IPS_VERSION_DIR = '/^thumbnail(-[0-9]+)?$/';
 
+/* A photograph's rotation lives BESIDE it, never in it (Ryan, 2026-10-31: the web application never changes a photograph or its EXIF data, and can still turn it). Each folder may hold
+ * a hidden file, `.rotation.json`, {"IMG_1.JPG": 90, ...}: the extra clockwise turn in degrees (90, 180 or 270) to show a photograph with, on top of the way its own EXIF orientation shows
+ * it. Pages apply it when they draw the picture. Turning a photograph to upright is 0, which removes the entry (and the file when it is the last). Nothing here opens the photograph. A file
+ * that is moved, renamed or removed takes its entry along (the same three places that carry its version copies), and the hidden file never blocks removing a folder. The names are plain file
+ * names (ips_safe_name), the values only 90, 180 and 270, whatever the file says: anything else in it is ignored. */
+const IPS_ROTATION_FILE = '.rotation.json';
+const IPS_ROTATION_TYPES = '/\.(jpe?g|png|gif)$/i';
+
+// The turns recorded for the photographs in $dir: [name => 90|180|270].
+function ips_rotation_read($dir) {
+	$path = $dir . '/' . IPS_ROTATION_FILE;
+	if (!is_string($dir) || !is_file($path) || is_link($path)) {
+		return [];
+	}
+	$handle = @fopen($path, 'r');
+	if ($handle === false) {
+		return [];
+	}
+	flock($handle, LOCK_SH);
+	$text = stream_get_contents($handle);
+	flock($handle, LOCK_UN);
+	fclose($handle);
+	$data = json_decode((string) $text, true);
+	$out = [];
+	foreach (is_array($data) ? $data : [] as $name => $turn) {
+		if (ips_safe_name((string) $name) && in_array($turn, [90, 180, 270], true)) {
+			$out[(string) $name] = $turn;
+		}
+	}
+	return $out;
+}
+
+// The extra clockwise turn of one photograph: 0, 90, 180 or 270.
+function ips_rotation_of($dir, $name) {
+	return ips_rotation_read($dir)[$name] ?? 0;
+}
+
+/* Records the turn of one photograph ($turn is taken modulo 360 and must be a multiple of 90; 0 removes the entry). Read, change and write happen under one lock; an empty record removes the
+ * file. Returns the turn now recorded, or false when the name or the turn is not acceptable or the folder cannot be written. */
+function ips_rotation_set($dir, $name, $turn) {
+	if (!is_dir($dir) || !ips_safe_name($name) || !is_numeric($turn) || (int) $turn != $turn) {
+		return false;
+	}
+	$turn = (((int) $turn % 360) + 360) % 360;
+	if ($turn % 90 !== 0) {
+		return false;
+	}
+	$path = $dir . '/' . IPS_ROTATION_FILE;
+	if (is_link($path)) {
+		return false;
+	}
+	if (!file_exists($path) && $turn === 0) {
+		return 0;
+	}
+	$handle = @fopen($path, 'c+');
+	if ($handle === false) {
+		return false;
+	}
+	flock($handle, LOCK_EX);
+	$current = json_decode((string) stream_get_contents($handle), true);
+	$map = [];
+	foreach (is_array($current) ? $current : [] as $n => $t) {
+		if (ips_safe_name((string) $n) && in_array($t, [90, 180, 270], true)) {
+			$map[(string) $n] = $t;
+		}
+	}
+	if ($turn === 0) {
+		unset($map[$name]);
+	} else {
+		$map[$name] = $turn;
+	}
+	ksort($map, SORT_NATURAL | SORT_FLAG_CASE);
+	if ($map === []) {
+		flock($handle, LOCK_UN);
+		fclose($handle);
+		@unlink($path);
+		return 0;
+	}
+	ftruncate($handle, 0);
+	rewind($handle);
+	fwrite($handle, json_encode($map, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . "\n");
+	fflush($handle);
+	flock($handle, LOCK_UN);
+	fclose($handle);
+	return $turn;
+}
+
+// Drops the entry of a photograph that is gone (never creates the file).
+function ips_rotation_forget($dir, $name) {
+	if (is_file($dir . '/' . IPS_ROTATION_FILE)) {
+		ips_rotation_set($dir, $name, 0);
+	}
+}
+
+// Moves the entry of $from_dir/$from_name to $to_dir/$to_name (a move or a rename).
+function ips_rotation_move($from_dir, $from_name, $to_dir, $to_name) {
+	$turn = ips_rotation_of($from_dir, $from_name);
+	if ($turn === 0) {
+		return;
+	}
+	ips_rotation_forget($from_dir, $from_name);
+	ips_rotation_set($to_dir, $to_name, $turn);
+}
+
 // The version folders inside $dir (names).
 function ips_version_dirs($dir) {
 	$names = @scandir($dir);
@@ -310,6 +414,7 @@ function ips_version_dirs($dir) {
 
 // Removes the copies of $name from the version folders in $dir.
 function ips_remove_versions($dir, $name) {
+	ips_rotation_forget($dir, $name);
 	foreach (ips_version_dirs($dir) as $v) {
 		if (is_file("$dir/$v/$name")) {
 			unlink("$dir/$v/$name");
@@ -319,6 +424,7 @@ function ips_remove_versions($dir, $name) {
 
 // Moves the copies of $from_dir/$from_name to $to_dir/$to_name, making the version folders there when needed.
 function ips_move_versions($from_dir, $from_name, $to_dir, $to_name) {
+	ips_rotation_move($from_dir, $from_name, $to_dir, $to_name);
 	foreach (ips_version_dirs($from_dir) as $v) {
 		if (!is_file("$from_dir/$v/$from_name")) {
 			continue;
@@ -337,7 +443,7 @@ function ips_dir_only_versions($dir) {
 		return false;
 	}
 	$versions = ips_version_dirs($dir);
-	foreach (array_diff($names, ['.', '..']) as $n) {
+	foreach (array_diff($names, ['.', '..', IPS_ROTATION_FILE]) as $n) {
 		if (!in_array($n, $versions, true) || count(scandir("$dir/$n")) !== 2) {
 			return false;
 		}
