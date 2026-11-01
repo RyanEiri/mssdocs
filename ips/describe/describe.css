@@ -1,0 +1,36 @@
+/* The Describe page (describe/index.php): what it adds to the file editor module's stylesheet. */
+.dc-folder { display: grid; gap: 4px; min-width: 260px; }
+.dc-layout { display: grid; grid-template-columns: minmax(240px, 340px) minmax(0, 1fr); gap: 24px; align-items: start; }
+.dc-item { display: flex; flex-direction: column; gap: 2px; width: 100%; padding: 12px 20px; border: 0; border-top: 1px solid var(--ips-line); background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.dc-item:first-child { border-top: 0; }
+.dc-item:hover { background: var(--ips-hover); }
+.dc-item.current { background: var(--ips-hover); box-shadow: inset 3px 0 0 var(--ips-accent); }
+.dc-title { font-size: 15px; font-weight: 500; overflow-wrap: anywhere; }
+.dc-meta { font-size: 12.5px; color: var(--ips-muted); }
+.dc-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--ips-muted); vertical-align: baseline; }
+.dc-dot.open { background: var(--ips-danger); } .dc-dot.ready { background: var(--ips-accent); } .dc-dot.done { background: var(--ips-success); } .dc-dot.bad { background: var(--ips-danger); outline: 2px solid var(--ips-danger); outline-offset: 1px; }
+.dc-hint { font-size: 12.5px; margin: 4px 0 8px; }
+.dc-detail { min-width: 0; }
+.dc-h { font-size: 19px; margin: 0 0 6px; } .dc-ref { color: var(--ips-muted); font-weight: 400; margin-right: 6px; font-size: 14px; }
+.dc-line { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 10px; }
+.dc-questions { border: 1px solid var(--ips-danger); border-radius: 10px; padding: 12px 16px; margin: 0 0 16px; background: var(--ips-hover); }
+.dc-questions h3 { font-size: 15px; margin: 0 0 6px; } .dc-q { padding: 8px 0; border-top: 1px solid var(--ips-line); } .dc-q:first-of-type { border-top: 0; } .dc-q p { margin: 0 0 6px; }
+.dc-qactions { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; } .dc-ok { color: var(--ips-success); margin: 0; }
+.dc-block { border-top: 1px solid var(--ips-line); padding: 14px 0 6px; } .dc-block h3 { font-size: 15px; margin: 0 0 8px; }
+.dc-open, .dc-open-field { box-shadow: inset 3px 0 0 var(--ips-danger); padding-left: 10px; }
+.dc-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 8px; } .dc-grow { flex: 1 1 260px; } .dc-short { width: 130px; } .dc-wide { width: 100%; }
+.dc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; } .dc-grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px 16px; margin-top: 6px; }
+.dc-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 6px 0; } .dc-savebar { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--ips-line); }
+.dc-check { display: block; margin: 0 0 10px; }
+.dc-photos { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0; }
+.dc-photo { width: 190px; border: 1px solid var(--ips-line); border-radius: 8px; padding: 6px; display: grid; gap: 4px; align-content: start; }
+.dc-pic { display: block; position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--ips-hover); border-radius: 4px; }
+.dc-pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; }
+.dc-pic.dc-missing { display: grid; place-items: center; color: var(--ips-danger); }
+.dc-file { font: 12px var(--ips-font-mono); color: var(--ips-muted); overflow-wrap: anywhere; }
+.dc-tray { margin-top: 10px; } .dc-tray summary { cursor: pointer; font-weight: 500; }
+.dc-decision { margin: 0 0 6px; }
+.dc-preview { margin-top: 28px; border-top: 1px solid var(--ips-line); padding-top: 16px; } .dc-preview h3 { font-size: 15px; margin: 0 0 8px; }
+.dc-rad { font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; } .dc-rad .rad-note, .dc-rad .rad-head { margin: 0 0 6px; }
+.dc-dc { display: grid; grid-template-columns: max-content 1fr; gap: 2px 12px; font-size: 13px; margin: 12px 0 0; } .dc-dc dt { color: var(--ips-muted); } .dc-dc dd { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 900px) { .dc-layout { grid-template-columns: 1fr; } .dc-grid, .dc-grid3 { grid-template-columns: 1fr; } }

@@ -130,7 +130,7 @@ function ips_describe_url($real, $size = null) {
 // What a page needs to draw one photograph of a record: its address, role, the browser's addresses of its small and large copies and its recorded turn; missing = the file is gone.
 function ips_describe_photo_view($folder, $address, $role = '') {
 	$real = ips_describe_resolve_photo($folder, $address);
-	return ['path' => $address, 'role' => $role, 'name' => basename($address), 'missing' => $real === null,
+	return ['path' => $address, 'role' => $role, 'name' => basename($address), 'missing' => $real === null, 'store_dir' => $real ? 'files/' . substr(dirname($real), strlen(ips_files_root()) + 1) : '',
 		'thumb' => $real ? ips_describe_url($real, 'thumbnail-480') : '', 'full' => $real ? ips_describe_url($real, 'thumbnail-2048') : '',
 		'rotation' => $real && function_exists('ips_rotation_of') ? ips_rotation_of(dirname($real), basename($real)) : 0];
 }
@@ -181,6 +181,38 @@ function ips_describe_used($folder) {
 		}
 	}
 	return $used;
+}
+
+/* The records folders in the store: the folders that hold a .describe.json, as "files/..." names for the page's menu, found by looking down from upload/files/ (depth 7, at most 4000 entries, no
+ * hidden or thumbnail folders, no links). The administrators' view of what there is to describe. */
+function ips_describe_find_folders() {
+	$root = ips_files_root();
+	$found = [];
+	$seen = 0;
+	$walk = function ($dir, $depth) use (&$walk, &$found, &$seen, $root) {
+		if ($depth > 7 || $seen > 4000 || $root === false) {
+			return;
+		}
+		foreach (@scandir($dir) ?: [] as $name) {
+			if ($name[0] === '.' || preg_match(IPS_VERSION_DIR, $name) || ++$seen > 4000) {
+				continue;
+			}
+			$path = $dir . '/' . $name;
+			if (!is_dir($path) || is_link($path)) {
+				continue;
+			}
+			if (is_file($path . '/.describe.json')) {
+				$found[] = 'files/' . substr($path, strlen($root) + 1);
+			}
+			$walk($path, $depth + 1);
+		}
+	};
+	if ($root !== false && is_file($root . '/.describe.json')) {
+		return [];   // the files root itself is never a records folder
+	}
+	$walk($root, 1);
+	natsort($found);
+	return array_values($found);
 }
 
 // The Dublin Core, RAD and completeness for a record's text, when PHP has what they need; [] otherwise.
