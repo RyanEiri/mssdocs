@@ -3,6 +3,7 @@
  * the text is well-formed XML. */
 return [
 	'id' => 'xml',
+	'order' => 20,
 	'label' => 'XML',
 	'group' => 'XML files',
 	'ext' => ['xml'],
