@@ -23,6 +23,10 @@ if ($real === false) {
 }
 $kind = ips_fe_kind_of($real);
 $type = ips_fe_type($kind);
+if ($type['view'] === 'grid') { // a spreadsheet type has its own page
+	header('Location: ' . PROGRAM_WEB_BASE . 'file_editor/grid.php?file=' . rawurlencode(ips_fe_name($real)));
+	exit;
+}
 $public = array_values(array_filter(ips_fe_public_types(), function ($t) use ($kind) { return $t['id'] === $kind; }))[0];
 $may = ips_fe_may_write($real, $fe_scope);
 $writable = $may && is_writable($real);

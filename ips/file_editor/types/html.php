@@ -19,6 +19,7 @@
  */
 return [
 	'id' => 'html',
+	'order' => 10,
 	'label' => 'HTML',
 	'group' => 'HTML pages',
 	'ext' => ['html'],

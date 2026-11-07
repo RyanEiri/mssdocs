@@ -36,14 +36,18 @@ function ips_fe_registry() {
 			continue;
 		}
 		$d['ext'] = $ext;
-		$d += ['group' => $d['label'] . ' files', 'blurb' => '', 'mode' => 'htmlmixed', 'view' => 'source', 'validate' => null, 'js' => null];
-		$d['view'] = $d['view'] === 'wysiwyg' ? 'wysiwyg' : 'source';
+		$d += ['group' => $d['label'] . ' files', 'blurb' => '', 'mode' => 'htmlmixed', 'view' => 'source', 'validate' => null, 'js' => null, 'order' => 100];
+		$d['order'] = (int) $d['order'];
+		$d['view'] = in_array($d['view'], ['wysiwyg', 'grid'], true) ? $d['view'] : 'source';
 		$registry[$d['id']] = $d;
 		$folders[$d['folder']] = $d['id'];
 		foreach ($ext as $e) {
 			$extensions[$e] = $d['id'];
 		}
 	}
+	// How the types are listed (and which one the New file dialog offers first): by their 'order', then in the order loaded. A claim on an id, extension or folder is
+	// still decided by the order the files load in, above.
+	uasort($registry, function ($a, $b) { return $a['order'] <=> $b['order']; });
 	return $registry;
 }
 
@@ -66,9 +70,12 @@ function ips_fe_type($id) {
 // frames, plugins, forms, style sheets), and a whole document (CKEditor's full-page mode has an open advisory in the last open-source CKEditor 4).
 const IPS_FE_NOT_VISUAL = '/<\\s*(html|head|body|script|style|link|meta|base|iframe|frame|object|embed|applet|form|input|button|textarea|select)\\b|<[^>]*\\son[a-z]+\\s*=|<[^>]*javascript\\s*:/i';
 
-// How a file opens: its type's view ('source' or 'wysiwyg', the visual editor), except that a file holding what the visual editor would remove opens in Source,
+// How a file opens: its type's view ('source', 'wysiwyg' (the visual editor) or 'grid' (a spreadsheet, grid.php)), except that a file holding what the visual editor would remove opens in Source,
 // so nothing is stripped without anyone seeing it. Returns [view, reason or null].
 function ips_fe_view($type, $text) {
+	if ($type['view'] === 'grid') {
+		return ['grid', null]; // opened by grid.php (edit.php sends it there), not in a text editor
+	}
 	if ($type['view'] !== 'wysiwyg') {
 		return ['source', null];
 	}

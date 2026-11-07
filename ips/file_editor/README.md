@@ -14,6 +14,7 @@ only when this folder exists.
 | `artefact.php`, `artefact-pane.js` | **The artefact pane**: the page images or PDF a document describes, beside the editor (below). |
 | `lib.php` | The one place a request's path becomes a file, the file-type registry, and who may do what. |
 | `types/*.php` (and `types/*.js`) | **The file types**: one module per type of file (below). |
+| `grid.php`, `grid-page.js`, `fill-series.js` | **The CSV grid**: the page a CSV file opens in, and its fill handle's series logic (below). The grid library is vendored in `js/jspreadsheet/`. |
 | `header.php`, `file-editor.css` | The app bar and the styles (on the admin UI's `--ips-*` tokens, so `css/site-theme.css` re-themes them). |
 
 ## File types are modules
@@ -31,13 +32,32 @@ A descriptor (`types/html.php` documents it):
 | `ext` | The extensions it owns (lowercase, no dot); the first is given to a new file. |
 | `folder` | Its templates folder under `upload/files/`: its files are listed, opened, created, saved and deleted there and nowhere else (one type per folder). |
 | `mode` | The CodeMirror mode of the Source view (default `htmlmixed`). |
-| `view` | How its files open: `source` (the default: CodeMirror only) or `wysiwyg` (CKEditor's visual editor, with a Source button). A file that holds script, a form, a frame or a whole HTML document still opens in Source, so the visual editor never removes anything unseen (`ips_fe_view()` in `lib.php`). |
+| `view` | How its files open: `source` (the default: CodeMirror only), `grid` (a spreadsheet, `grid.php`: `edit.php` sends the file there; see below) or `wysiwyg` (CKEditor's visual editor, with a Source button). A file that holds script, a form, a frame or a whole HTML document still opens in Source, so the visual editor never removes anything unseen (`ips_fe_view()` in `lib.php`). |
+| `order` | Optional number (default 100): where the type comes in the list and the New file dialog, which offers the first one. `html` 10, `xml` 20, `csv` 30. |
 | `skeleton` | `function ($title)`: the text of a new file. |
 | `validate` | Optional `function ($text)`: `null` when the text may be saved, else the reason it may not (XML: it must be well-formed). |
 | `js` | Optional script in `types/`, loaded by the editor page, registering `window.IPS_FE_TYPES[id] = { check: function (text) { return {ok, text}; } }`, the live status beside the line count (XML: "Well-formed"). |
 
 A descriptor that is malformed, or that claims an id, extension or folder another has already taken, is ignored, so one bad module cannot take the others down (`tests/test_file_editor_types.py`
 in webserversAC). Security of a new type is the site's call: the save path, the folder rules and the escaped output are the module's, but a type that holds script needs the nginx rule below.
+
+## CSV files open in a spreadsheet grid
+
+`types/csv.php` is the third file type that comes with the module (folder `upload/files/csv_templates/`, `view` `grid`). A CSV opens in `grid.php` (a spreadsheet, Jspreadsheet CE) instead of a text editor, so a RAD or AtoM CSV
+can be edited like a sheet. Saving goes through `save.php` like any file: sign-in, CSRF, the user's own folder, and the type's rules (UTF-8, a first row of column names, no quote left open, at most 5 MB).
+
+- **The sheet:** the first row of the file is the column names and stays as it is: columns cannot be added, removed, renamed, moved or sorted, so a file keeps its layout. Rows can be added and removed (right-click), and every cell is edited as plain text.
+  A cell is never evaluated: `=1+1` is the text `=1+1`, and markup in a header or a cell is shown as the text it is (tested in a browser with `<img onerror>`, `<script>` and `javascript:`).
+- **Copy and paste** with Ctrl+C and Ctrl+V, also to and from Excel. **Ctrl+Z / Ctrl+Y** undo and redo; a whole fill is one step.
+- **Fill handle** (`fill-series.js`): select cells and drag the small square at the corner of the selection, up, down, left or right. It continues what Excel continues: `1, 2` as `3, 4, 5`; `Item 1, Item 2` as `Item 3, Item 4`; one `FH-B01-0009`
+  as `FH-B01-0010` (zero padding kept); ISO dates by the same number of days (one date by a day); an uneven or mixed selection is repeated. One number is copied, as in Excel, and one plain text is copied. Each selected column fills on its own.
+  The library only repeats the selection, so the series comes from the `onbeforechange` hook while the corner is dragged; a paste, typing or undo never counts as a fill. Not done: Excel's fill options menu, double-click to fill down, Ctrl-drag to copy instead.
+- **Saving** writes the sheet back as CSV (RFC 4180: a cell is quoted only when it holds a comma, a quote or a line break), with the file's own line endings, its byte order mark if it has one and its closing line break; blank rows at the end are dropped.
+  A file opened and saved without a change is not marked as changed. Quoting of cells nobody touched may differ from how the file was first written (a quoted cell that did not need quotes is written without them).
+- **Not there:** frozen columns, search, sorting, formulas (the Pro edition), a CSV with a different separator (semicolon, tab), files over 5 MB. Not tested: screen readers (the library's markup has little ARIA, so this is a mouse and keyboard tool),
+  touch screens, and a pasted block that is wider than the sheet.
+- **The library** is vendored by `tools/vendor-grid-assets.sh` (pinned Jspreadsheet CE 5.0.4 and jsuites 6.6.1, both MIT, licence texts beside them, about 1.2 MB, no CDN and no bundler). The fill relies on that version's `onbeforechange` hook and the `.jss_corner` square:
+  after changing the version, run `tests/test_ui_csv_grid.py` and `tests/test_fill_series.py` (webserversAC).
 
 ## The artefact beside a document
 
